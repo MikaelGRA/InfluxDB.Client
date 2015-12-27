@@ -660,10 +660,10 @@ namespace Vibrant.InfluxDB.Client
                throw new InfluxException( resultWrapper.Error );
             }
 
-            if ( isMeasurementsQuery && resultWrapper.Series == null )
-            {
-               throw new InfluxException( Errors.UnexpectedQueryResult );
-            }
+            //if ( isMeasurementsQuery && resultWrapper.Series == null )
+            //{
+            //   throw new InfluxException( Errors.UnexpectedQueryResult );
+            //}
          }
       }
 

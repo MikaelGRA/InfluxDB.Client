@@ -61,7 +61,7 @@ namespace Vibrant.InfluxDB.Client.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No measurements were returned in the query. Likely because the measurement does not exist of because there was an error in the identifiers used in the query..
+        ///   Looks up a localized string similar to No measurements were returned in the query. Likely because the measurement does not exist, no data exists for the queried period or because there was an error in the identifiers used in the query..
         /// </summary>
         internal static string UnexpectedQueryResult {
             get {

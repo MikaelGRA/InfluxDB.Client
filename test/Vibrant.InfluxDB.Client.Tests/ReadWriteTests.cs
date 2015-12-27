@@ -9,13 +9,13 @@ using Xunit;
 namespace Vibrant.InfluxDB.Client.Tests
 {
    [Collection( "InfluxClient collection" )]
-   public class InfluxClientTests
+   public class ReadWriteTests
    {
       private const string Unused = "unuseddatabasename";
 
       private InfluxClient _client;
 
-      public InfluxClientTests( InfluxClientFixture fixture )
+      public ReadWriteTests( InfluxClientFixture fixture )
       {
          _client = fixture.Client;
       }
@@ -79,47 +79,6 @@ namespace Vibrant.InfluxDB.Client.Tests
             timestamp = timestamp.AddSeconds( 1 );
          }
          return infos;
-      }
-
-      [Fact]
-      public async Task Should_Show_Database()
-      {
-         var result = await _client.ShowDatabasesAsync();
-
-         Assert.True( result.Succeeded );
-         Assert.Equal( result.Series.Count, 1 );
-
-         var rows = result.Series[ 0 ].Rows;
-         Assert.Contains( rows, x => x.Name == InfluxClientFixture.DatabaseName );
-      }
-
-      [Fact]
-      public async Task Should_Create_Show_And_Delete_Database()
-      {
-         await _client.CreateDatabaseIfNotExistsAsync( Unused );
-
-         var result = await _client.ShowDatabasesAsync();
-
-         Assert.True( result.Succeeded );
-         Assert.Equal( result.Series.Count, 1 );
-
-         var rows = result.Series[ 0 ].Rows;
-         Assert.Contains( rows, x => x.Name == Unused );
-
-         await _client.DropDatabaseIfExistsAsync( Unused );
-      }
-
-      [Fact]
-      public async Task Should_Throw_When_Creating_Duplicate_Database()
-      {
-         await _client.CreateDatabaseIfNotExistsAsync( Unused );
-
-         await Assert.ThrowsAsync( typeof( InfluxException ), async () =>
-         {
-            await _client.CreateDatabaseAsync( Unused );
-         } );
-
-         await _client.DropDatabaseAsync( Unused );
       }
 
       [Theory]

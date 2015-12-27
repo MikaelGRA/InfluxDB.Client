@@ -118,6 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="UnexpectedQueryResult" xml:space="preserve">
-    <value>No measurements were returned in the query. Likely because the measurement does not exist of because there was an error in the identifiers used in the query.</value>
+    <value>No measurements were returned in the query. Likely because the measurement does not exist, no data exists for the queried period or because there was an error in the identifiers used in the query.</value>
   </data>
 </root>
