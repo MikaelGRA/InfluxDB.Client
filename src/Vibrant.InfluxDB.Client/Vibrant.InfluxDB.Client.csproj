@@ -59,6 +59,7 @@
     <Compile Include="Helpers\DataPointTypeInfo.cs" />
     <Compile Include="Helpers\PropertyExpressionInfo.cs" />
     <Compile Include="Helpers\TypeCache.cs" />
+    <Compile Include="Rows\ContinuousQueryRow.cs" />
     <Compile Include="Rows\IInfluxRow.cs" />
     <Compile Include="Rows\IHaveMeasurementName.cs" />
     <Compile Include="InfluxClient.cs" />
@@ -116,6 +117,8 @@
     <Compile Include="Rows\DatabaseRow.cs" />
     <Compile Include="Rows\DynamicInfluxRow.cs" />
     <Compile Include="Rows\FieldKeyRow.cs" />
+    <Compile Include="Rows\MeasurementRow.cs" />
+    <Compile Include="Rows\RetentionPolicyRow.cs" />
     <Compile Include="Rows\TagKeyRow.cs" />
     <Compile Include="TimestampPrecision.cs" />
     <Compile Include="TimestampPrecisionExtensions.cs" />

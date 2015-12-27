@@ -84,7 +84,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       [Fact]
       public async Task Should_Show_Database()
       {
-         var result = await _client.ShowDatabasesAsync<DatabaseRow>();
+         var result = await _client.ShowDatabasesAsync();
 
          Assert.True( result.Succeeded );
          Assert.Equal( result.Series.Count, 1 );
@@ -98,7 +98,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       {
          await _client.CreateDatabaseIfNotExistsAsync( Unused );
 
-         var result = await _client.ShowDatabasesAsync<DatabaseRow>();
+         var result = await _client.ShowDatabasesAsync();
 
          Assert.True( result.Succeeded );
          Assert.Equal( result.Series.Count, 1 );
