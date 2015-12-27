@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 namespace Vibrant.InfluxDB.Client
 {
    public class InfluxSeries<TInfluxRow>
-      where TInfluxRow : IInfluxRow
    {
       internal InfluxSeries( string name, List<TInfluxRow> dataPoints, IDictionary<string, string> tags )
       {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client.Rows
 {
-   public class DatabaseRow : IInfluxRow
+   public class DatabaseRow
    {
       [InfluxField( "name" )]
       public string Name { get; set; }

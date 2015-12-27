@@ -19,7 +19,6 @@ namespace Vibrant.InfluxDB.Client
    }
 
    public class InfluxResult<TInfluxRow> : InfluxResult
-      where TInfluxRow : IInfluxRow
    {
       internal InfluxResult( List<InfluxSeries<TInfluxRow>> series, string error )
          : base( error )

@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Vibrant.InfluxDB.Client.Dto;
 using Vibrant.InfluxDB.Client.Helpers;
 using Vibrant.InfluxDB.Client.Resources;
+using Vibrant.InfluxDB.Client.Rows;
 
 namespace Vibrant.InfluxDB.Client.Parsers
 {
@@ -14,7 +15,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
    {
       internal static bool IsCustomDataPoint<TInfluxRow>()
       {
-         return typeof( ICustomInfluxRow ).IsAssignableFrom( typeof( TInfluxRow ) );
+         return typeof( IInfluxRow ).IsAssignableFrom( typeof( TInfluxRow ) );
       }
 
       private static bool HasAllColumns( DatabaseSeriesInfo meta, List<string> columns )
@@ -44,7 +45,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
          QueryResult queryResult,
          string db,
          bool isExclusivelyTags )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          if ( IsCustomDataPoint<TInfluxRow>() )
          {
@@ -83,11 +84,11 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      var dataPoints = new List<TInfluxRow>();
                      foreach ( var values in series.Values )
                      {
-                        var dataPoint = (ICustomInfluxRow)new TInfluxRow();
-                        var seriesDataPoint = dataPoints as IMeasurementInfluxRow;
+                        var dataPoint = (IInfluxRow)new TInfluxRow();
+                        var seriesDataPoint = dataPoints as IHaveMeasurementName;
                         if ( seriesDataPoint != null )
                         {
-                           seriesDataPoint.SeriesName = name;
+                           seriesDataPoint.MeasurementName = name;
                         }
 
                         for ( int i = 0 ; i < values.Count ; i++ )
@@ -159,10 +160,10 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      foreach ( var values in series.Values )
                      {
                         var dataPoint = new TInfluxRow();
-                        var seriesDataPoint = dataPoints as IMeasurementInfluxRow;
+                        var seriesDataPoint = dataPoints as IHaveMeasurementName;
                         if ( seriesDataPoint != null )
                         {
-                           seriesDataPoint.SeriesName = name;
+                           seriesDataPoint.MeasurementName = name;
                         }
 
                         for ( int i = 0 ; i < values.Count ; i++ )

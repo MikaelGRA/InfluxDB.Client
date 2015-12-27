@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client.Rows
 {
-    public class TagKeyRow
-    {
-      [InfluxField( "tagKey" )]
-      public string TagKey { get; set; }
+   public interface IHaveMeasurementName
+   {
+      string MeasurementName { get; set; }
    }
 }

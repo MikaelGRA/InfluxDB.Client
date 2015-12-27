@@ -12,7 +12,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
       private static readonly Dictionary<Type, object> _typeCache = new Dictionary<Type, object>();
 
       internal static DataPointTypeInfo<TInfluxRow> GetOrCreateTypeCache<TInfluxRow>()
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          lock ( _sync )
          {

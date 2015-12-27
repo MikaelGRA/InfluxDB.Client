@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client.Rows
 {
-   public class DynamicInfluxRow : DynamicObject, ICustomInfluxRow
+   public class DynamicInfluxRow : DynamicObject, IInfluxRow
    {
       public DateTime ReadTimestamp()
       {

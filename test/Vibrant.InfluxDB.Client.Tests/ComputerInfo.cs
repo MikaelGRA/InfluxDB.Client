@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client.Tests
 {
-   public class ComputerInfo : IInfluxRow
+   public class ComputerInfo
    {
       [InfluxTimestamp]
       public DateTime Timestamp { get; set; }

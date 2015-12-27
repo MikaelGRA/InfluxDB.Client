@@ -49,13 +49,13 @@ namespace Vibrant.InfluxDB.Client
       }
 
       public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery, string db )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          return ExecuteQueryInternalAsync<TInfluxRow>( commandOrQuery, db, false );
       }
 
       public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          return ExecuteQueryInternalAsync<TInfluxRow>( commandOrQuery );
       }
@@ -201,7 +201,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <returns></returns>
       public async Task<InfluxResult<TInfluxRow>> ListContinuousQueries<TInfluxRow>( string db )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( "SHOW CONTINUOUS QUERIES", db, false ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -228,7 +228,7 @@ namespace Vibrant.InfluxDB.Client
       /// <typeparam name="TInfluxRow"></typeparam>
       /// <returns></returns>
       public async Task<InfluxResult<TInfluxRow>> ShowDatabasesAsync<TInfluxRow>()
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW DATABASES" ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -241,7 +241,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <returns></returns>
       public async Task<InfluxResult<TInfluxRow>> ShowRetensionPoliciesAsync<TInfluxRow>( string db )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW RETENTION POLICIES ON \"{db}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -254,7 +254,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <returns></returns>
       public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW SERIES", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -268,7 +268,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="measurementName"></param>
       /// <returns></returns>
       public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db, string measurementName )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW SERIES FROM \"{measurementName}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -283,7 +283,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="where"></param>
       /// <returns></returns>
       public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db, string measurementName, string where )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW SERIES FROM \"{measurementName}\" WHERE {where}", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -296,7 +296,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <returns></returns>
       public async Task<InfluxResult<TInfluxRow>> ShowMeasurementsAsync<TInfluxRow>( string db )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( "SHOW MEASUREMENTS", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -310,7 +310,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="withMeasurement"></param>
       /// <returns></returns>
       public async Task<InfluxResult<TInfluxRow>> ShowMeasurementsAsync<TInfluxRow>( string db, string withMeasurement )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW MEASUREMENTS WITH MEASUREMENT {withMeasurement}", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -325,7 +325,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="where"></param>
       /// <returns></returns>
       public async Task<InfluxResult<TInfluxRow>> ShowMeasurementsAsync<TInfluxRow>( string db, string withMeasurement, string where )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW MEASUREMENTS WITH MEASUREMENT {withMeasurement} WHERE {where}", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -338,7 +338,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <returns></returns>
       public async Task<InfluxResult<TInfluxRow>> ShowTagsKeysAsync<TInfluxRow>( string db )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( "SHOW TAG KEYS", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -352,7 +352,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="measurementName"></param>
       /// <returns></returns>
       public async Task<InfluxResult<TInfluxRow>> ShowTagsKeysAsync<TInfluxRow>( string db, string measurementName )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW TAG KEYS FROM \"{measurementName}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -366,7 +366,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="tagKey"></param>
       /// <returns></returns>
       public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsync<TInfluxRow>( string db, string tagKey )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW FIELD VALUES WITH KEY = \"{tagKey}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -381,7 +381,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="measurementName"></param>
       /// <returns></returns>
       public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsync<TInfluxRow>( string db, string tagKey, string measurementName )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW FIELD VALUES FROM \"{measurementName}\" WITH KEY = \"{tagKey}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -395,7 +395,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <returns></returns>
       public async Task<InfluxResult<TInfluxRow>> ShowFieldKeysAsync<TInfluxRow>( string db )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW FIELD KEYS", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -409,7 +409,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="measurementName"></param>
       /// <returns></returns>
       public async Task<InfluxResult<TInfluxRow>> ShowFieldKeysAsync<TInfluxRow>( string db, string measurementName )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW FIELD KEYS FROM \"{measurementName}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -428,7 +428,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="dataPoints"></param>
       /// <returns></returns>
       public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> dataPoints, TimestampPrecision precision, Consistency consistency )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          return WriteAsync( db, x => measurementName, dataPoints, precision, consistency );
       }
@@ -442,13 +442,13 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="dataPoints"></param>
       /// <returns></returns>
       public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> dataPoints, TimestampPrecision precision, Consistency consistency )
-         where TInfluxRow : IMeasurementInfluxRow, new()
+         where TInfluxRow : IHaveMeasurementName, new()
       {
-         return WriteAsync( db, x => x.SeriesName, dataPoints, precision, consistency );
+         return WriteAsync( db, x => x.MeasurementName, dataPoints, precision, consistency );
       }
 
       private Task WriteAsync<TInfluxRow>( string db, Func<TInfluxRow, string> getMeasurementName, IEnumerable<TInfluxRow> dataPoints, TimestampPrecision precision, Consistency consistency )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          return PostInternalIgnoreResultAsync( CreateWriteUrl( db, precision.GetQueryParameter(), consistency.GetQueryParameter() ), new InfluxRowContent<TInfluxRow>( dataPoints, getMeasurementName, precision ) );
       }
@@ -461,7 +461,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <returns></returns>
       public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string query, string db )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          return ExecuteQueryInternalAsync<TInfluxRow>( query, db, TimestampPrecision.Nanosecond );
       }
@@ -530,21 +530,21 @@ namespace Vibrant.InfluxDB.Client
       }
 
       private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db, TimestampPrecision precision )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var queryResult = await GetInternalAsync( CreateQueryOrCommandUrl( "query", query, db, precision.GetQueryParameter() ), true ).ConfigureAwait( false );
          return await QueryTransform.ParseQueryAsync<TInfluxRow>( this, queryResult, db, false ).ConfigureAwait( false );
       }
 
       private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db, bool isMeasurementQuery = false )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var queryResult = await GetInternalAsync( CreateQueryOrCommandUrl( "query", query, db ), isMeasurementQuery ).ConfigureAwait( false );
          return await QueryTransform.ParseQueryAsync<TInfluxRow>( this, queryResult, db, !isMeasurementQuery ).ConfigureAwait( false );
       }
 
       private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query )
-         where TInfluxRow : IInfluxRow, new()
+         where TInfluxRow : new()
       {
          var queryResult = await GetInternalAsync( CreateQueryOrCommandUrl( "query", query ), false ).ConfigureAwait( false );
          return await QueryTransform.ParseQueryAsync<TInfluxRow>( this, queryResult, null, false ).ConfigureAwait( false );

@@ -11,11 +11,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Vibrant.InfluxDB.Client.Helpers;
 using Vibrant.InfluxDB.Client.Parsers;
+using Vibrant.InfluxDB.Client.Rows;
 
 namespace Vibrant.InfluxDB.Client
 {
    public class InfluxRowContent<TInfluxRow> : HttpContent
-      where TInfluxRow : IInfluxRow, new()
+      where TInfluxRow : new()
    {
       private static readonly MediaTypeHeaderValue _mediaType = new MediaTypeHeaderValue( "text/plain" ) { CharSet = "utf-8" };
       private static readonly Encoding UTF8 = new UTF8Encoding( false );
@@ -42,7 +43,7 @@ namespace Vibrant.InfluxDB.Client
          {
 
             var writer = new StreamWriter( stream, UTF8 );
-            foreach ( ICustomInfluxRow dp in _dataPoints )
+            foreach ( IInfluxRow dp in _dataPoints )
             {
                writer.Write( getMeasurementName( (TInfluxRow)dp ) );
                foreach ( var kvp in dp.GetAllTags() )

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 namespace Vibrant.InfluxDB.Client
 {
     public class InfluxResultSet<TInfluxRow>
-      where TInfluxRow : IInfluxRow
     {
       internal InfluxResultSet( List<InfluxResult<TInfluxRow>> results )
       {

@@ -59,9 +59,8 @@
     <Compile Include="Helpers\DataPointTypeInfo.cs" />
     <Compile Include="Helpers\PropertyExpressionInfo.cs" />
     <Compile Include="Helpers\TypeCache.cs" />
-    <Compile Include="ICustomInfluxRow.cs" />
-    <Compile Include="IInfluxRow.cs" />
-    <Compile Include="IMeasurementInfluxRow.cs" />
+    <Compile Include="Rows\IInfluxRow.cs" />
+    <Compile Include="Rows\IHaveMeasurementName.cs" />
     <Compile Include="InfluxClient.cs" />
     <Compile Include="InfluxConstants.cs" />
     <Compile Include="InfluxException.cs" />
