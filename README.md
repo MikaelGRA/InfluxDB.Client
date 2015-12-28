@@ -95,3 +95,13 @@ public async Task Should_Query_Typed_Data()
    }
 }
 ```
+
+The goal is that there will be linq-to-influx provider that allows you to use LINQ to execute queries. But for now, you must write the queries yourself.
+
+### Using dynamic classes
+
+POCO classes does not fit every use-case. This becomes obvious once you are implementing a system and you don't know what the fields/tags will be a compile time. In this case you must use dynamic classes.
+
+In order for this to work, you must use the interfacae IInfluxRow that specifies reading/writing methods for tags and fields. This library already includes one implementatioon of this interfaces that uses dictionaries and supports the DLR. This class is called DynamicInfluxRow. 
+
+1. Here's how to write using dynamic classes.
