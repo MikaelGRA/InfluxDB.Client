@@ -74,7 +74,7 @@ public async Task Should_Write_Typed_Rows_To_Database()
 }
 ```
 
-Here's how to query from the database:
+2. Here's how to query from the database:
 ```c#
 public async Task Should_Query_Typed_Data()
 {
@@ -96,7 +96,7 @@ public async Task Should_Query_Typed_Data()
 }
 ```
 
-The goal is that there will be linq-to-influx provider that allows you to use LINQ to execute queries. But for now, you must write the queries yourself.
+The goal is that there will be an linq-to-influx provider that allows you to use LINQ to execute queries. But for now, you must write the queries yourself.
 
 ### Using dynamic classes
 
@@ -145,3 +145,24 @@ public async Task Should_Write_Typed_Rows_To_Database()
 ```
 
 Do note, that if you use dynamic classes, user-defined enums are not supported, as there is no way to differentiate between a string and an enum.
+
+2. Here's how to query from the database:
+```c#
+public async Task Should_Query_Dynamic_Data()
+{
+   var resultSet = await _client.ReadAsync<DynamicInfluxRow>( $"SELECT * FROM myMeasurementName", "mydb" );
+   
+   // resultSet will contain 1 result in the Results collection (or multiple if you execute multiple queries at once)
+   var result = resultSet.Results[ 0 ];
+   
+   // result will contain 1 series in the Series collection (or potentially multiple if you specify a GROUP BY clause)
+   var series = result.Series[ 0 ];
+   
+   // series.Rows will be the list of DynamicInfluxRow that you queried for (which can be cast to dynamic)
+   foreach ( dynamic row in series.Rows )
+   {
+      Console.WriteLine( "CPU: " + row.cpu );
+      Console.WriteLine( "RAM: " + row.ram );
+      // ...
+   }
+}
