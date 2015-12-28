@@ -12,3 +12,22 @@ The library exposes all operations on InfluxDB and can be used for reading/writi
 
 1. Start by defining a class that represents a row in InfluxDB that you want to store.
 
+```c#
+   public class ComputerState
+   {
+      [InfluxTimestamp]
+      public DateTime Timestamp { get; set; }
+
+      [InfluxTag( "host" )]
+      public string Host { get; set; }
+
+      [InfluxTag( "region" )]
+      public string Region { get; set; }
+
+      [InfluxField( "cpu" )]
+      public double CPU { get; set; }
+
+      [InfluxField( "ram" )]
+      public long RAM { get; set; }
+   }
+```
