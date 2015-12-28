@@ -37,7 +37,7 @@ On your POCO class you must specify these things:
  * 0-* properties with the type string or a user-defined enum with the [InfluxTag] attribute that InfluxDB will use as indexed tags.
  * 0-* properties with the type string, long, double, bool or a user-defined enum with the [InfluxValue] attribute that InfluxDB will use as fields.
 
-Once you've defined your class, you're ready to use the InfluxClient, which is the main entry points to the API:
+Once you've defined your class, you're ready to use the InfluxClient, which is the main entry point to the API:
 
 Here's how to write to the database:
 
