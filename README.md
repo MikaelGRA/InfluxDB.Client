@@ -10,7 +10,7 @@ The library exposes all operations on InfluxDB and can be used for reading/writi
 
 ### Using your own POCO classes.
 
-1. Start by defining a class that represents a row in InfluxDB that you want to store.
+Start by defining a class that represents a row in InfluxDB that you want to store.
 
 ```c#
 public class ComputerInfo
@@ -74,7 +74,7 @@ public async Task Should_Write_Typed_Rows_To_Database()
 }
 ```
 
-2. Here's how to query from the database:
+Here's how to query from the database:
 ```c#
 public async Task Should_Query_Typed_Data()
 {
@@ -105,7 +105,7 @@ POCO classes does not fit every use-case. This becomes obvious once you are impl
 
 In order for this to work, you must use the interfacae IInfluxRow that specifies reading/writing methods for tags and fields. This library already includes one implementatioon of this interfaces that uses dictionaries and supports the DLR. This class is called DynamicInfluxRow. 
 
-1. Here's how to write using dynamic classes.
+Here's how to write using dynamic classes.
 
 ```c#
 private DynamicInfluxRow[] CreateDynamicRowsStartingAt( DateTime start, int rows )
@@ -147,7 +147,7 @@ public async Task Should_Write_Typed_Rows_To_Database()
 
 Do note, that if you use dynamic classes, user-defined enums are not supported, as there is no way to differentiate between a string and an enum.
 
-2. Here's how to query from the database:
+Here's how to query from the database:
 ```c#
 public async Task Should_Query_Dynamic_Data()
 {
