@@ -100,8 +100,48 @@ The goal is that there will be linq-to-influx provider that allows you to use LI
 
 ### Using dynamic classes
 
-POCO classes does not fit every use-case. This becomes obvious once you are implementing a system and you don't know what the fields/tags will be a compile time. In this case you must use dynamic classes.
+POCO classes does not fit every use-case. This becomes obvious once you are implementing a system and you don't know what the fields/tags will be at compile time. In this case you must use dynamic classes.
 
 In order for this to work, you must use the interfacae IInfluxRow that specifies reading/writing methods for tags and fields. This library already includes one implementatioon of this interfaces that uses dictionaries and supports the DLR. This class is called DynamicInfluxRow. 
 
 1. Here's how to write using dynamic classes.
+
+```c#
+private DynamicInfluxRow[] CreateDynamicRowsStartingAt( DateTime start, int rows )
+{
+   var rng = new Random();
+   var regions = new[] { "west-eu", "north-eu", "west-us", "east-us", "asia" };
+   var hosts = new[] { "some-host", "some-other-host" };
+   
+   var timestamp = start;
+   var infos = new DynamicInfluxRow[ rows ];
+   for ( int i = 0 ; i < rows ; i++ )
+   {
+      long ram = rng.Next( int.MaxValue );
+      double cpu = rng.NextDouble();
+      string region = regions[ rng.Next( regions.Length ) ];
+      string host = hosts[ rng.Next( hosts.Length ) ];
+
+      var info = new DynamicInfluxRow();
+      info.Fields.Add( "cpu", cpu );
+      info.Fields.Add( "ram", ram );
+      info.Tags.Add( "host", host );
+      info.Tags.Add( "region", region );
+      info.Timestamp = timestamp;
+
+      infos[ i ] = info;
+
+      timestamp = timestamp.AddSeconds( 1 );
+   }
+   return infos;
+}
+
+public async Task Should_Write_Typed_Rows_To_Database()
+{
+   var client = new InfluxClient( new Uri( "http://localhost:8086" ) );
+   var infos = CreateDynamicRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 500 );
+   await _client.WriteAsync( "mydb", "myMeasurementName", infos, TimestampPrecision.Nanosecond, Consistency.One );
+}
+```
+
+Do note, that if you use dynamic classes, user-defined enums are not supported, as there is no way to differentiate between a string and an enum.
