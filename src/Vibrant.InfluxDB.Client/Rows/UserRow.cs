@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client.Rows
 {
-   public class MeasurementRow
+   public class UserRow
    {
-      [InfluxField( "name" )]
-      public string Name { get; set; }
+      [InfluxField( "user" )]
+      public string Username { get; set; }
+
+      [InfluxField( "admin" )]
+      public bool IsAdmin { get; set; }
    }
 }

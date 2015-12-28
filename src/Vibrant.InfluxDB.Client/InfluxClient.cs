@@ -15,6 +15,7 @@ using Vibrant.InfluxDB.Client.Helpers;
 using Vibrant.InfluxDB.Client.Parsers;
 using Vibrant.InfluxDB.Client.Resources;
 using Vibrant.InfluxDB.Client.Rows;
+using Vibrant.InfluxDB.Client.Http;
 
 namespace Vibrant.InfluxDB.Client
 {
@@ -94,6 +95,77 @@ namespace Vibrant.InfluxDB.Client
       public Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery )
       {
          return ExecuteQueryInternalAsync( commandOrQuery );
+      }
+
+      #endregion
+
+      #region Authentication and Authorization
+
+      public Task CreateAdminUserAsync( string username, string password )
+      {
+         return ExecuteOperationWithNoResultAsync( $"CREATE USER {username} WITH PASSWORD '{password}' WITH ALL PRIVILEGES" );
+      }
+
+      public Task CreateUserAsync( string username, string password )
+      {
+         return ExecuteOperationWithNoResultAsync( $"CREATE USER {username} WITH PASSWORD '{password}'" );
+      }
+
+      public Task GrantAdminPrivilegesAsync( string username )
+      {
+         return ExecuteOperationWithNoResultAsync( $"GRANT ALL PRIVILEGES TO {username}" );
+      }
+
+      public Task GrantPriviledgeAsync( DatabasePriviledge privilege, string db, string username )
+      {
+         return ExecuteOperationWithNoResultAsync( $"GRANT {GetPrivilege( privilege )} ON \"{db}\" TO {username}" );
+      }
+
+      public Task RevokeAdminPrivilegesAsync( string username )
+      {
+         return ExecuteOperationWithNoResultAsync( $"REVOKE ALL PRIVILEGES FROM {username}" );
+      }
+
+      public Task RevokePriviledgeAsync( DatabasePriviledge privilege, string db, string username )
+      {
+         return ExecuteOperationWithNoResultAsync( $"REVOKE {GetPrivilege( privilege )} ON \"{db}\" FROM {username}" );
+      }
+
+      public Task SetPasswordAsync( string username, string password )
+      {
+         return ExecuteOperationWithNoResultAsync( $"SET PASSWORD FOR {username} = '{password}'" );
+      }
+
+      public Task DropUserAsync( string username )
+      {
+         return ExecuteOperationWithNoResultAsync( $"DROP USER {username}" );
+      }
+
+      public async Task<InfluxResult<UserRow>> ShowUsersAsync()
+      {
+         var parserResult = await ExecuteQueryInternalAsync<UserRow>( $"SHOW USERS" ).ConfigureAwait( false );
+         return parserResult.Results.First();
+      }
+
+      public async Task<InfluxResult<GrantsRow>> ShowGrantsAsync( string username )
+      {
+         var parserResult = await ExecuteQueryInternalAsync<GrantsRow>( $"SHOW GRANTS FOR {username}" ).ConfigureAwait( false );
+         return parserResult.Results.First();
+      }
+
+      private string GetPrivilege( DatabasePriviledge privilege )
+      {
+         switch ( privilege )
+         {
+            case DatabasePriviledge.Read:
+               return "READ";
+            case DatabasePriviledge.Write:
+               return "WRITE";
+            case DatabasePriviledge.All:
+               return "ALL";
+            default:
+               throw new ArgumentException( "Invalid value.", nameof( privilege ) );
+         }
       }
 
       #endregion
@@ -598,7 +670,7 @@ namespace Vibrant.InfluxDB.Client
             using ( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
-               var queryResult = await response.Content.ReadAsAsync<QueryResult>().ConfigureAwait( false );
+               var queryResult = await response.Content.ReadAsJsonAsync<QueryResult>().ConfigureAwait( false );
                EnsureValidQueryResult( queryResult, isMeasurementsQuery );
                return queryResult;
             }
@@ -622,7 +694,7 @@ namespace Vibrant.InfluxDB.Client
                // but we still need to check what is being returned
                if ( response.StatusCode == HttpStatusCode.OK )
                {
-                  var queryResult = await response.Content.ReadAsAsync<QueryResult>().ConfigureAwait( false );
+                  var queryResult = await response.Content.ReadAsJsonAsync<QueryResult>().ConfigureAwait( false );
                   EnsureValidQueryResult( queryResult, false );
                }
             }
@@ -671,7 +743,7 @@ namespace Vibrant.InfluxDB.Client
       {
          if ( !response.IsSuccessStatusCode )
          {
-            var errorResult = await response.Content.ReadAsAsync<ErrorResult>();
+            var errorResult = await response.Content.ReadAsJsonAsync<ErrorResult>();
             if ( errorResult?.Error != null )
             {
                throw new InfluxException( errorResult.Error );

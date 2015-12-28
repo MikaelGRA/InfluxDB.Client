@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Vibrant.InfluxDB.Client.Rows
+namespace Vibrant.InfluxDB.Client.Tests
 {
-   public class MeasurementRow
+   public enum TestEnum1
    {
-      [InfluxField( "name" )]
-      public string Name { get; set; }
+      Value1,
+      Value2,
+      Value3,
    }
 }

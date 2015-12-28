@@ -170,14 +170,18 @@ namespace Vibrant.InfluxDB.Client.Parsers
                         {
                            var value = values[ i ];
                            var property = properties[ i ];
-                           if ( value != null && property != null )
+                           if ( value != null )
                            {
-                              // ChangeType is important because we cannot be certain of the correct type
-                              // which JSON.NET has constructed for us. For example, json always interprets
-                              // scientific notation as a double, even though it could realisticly be 
-                              // another type.
-                              property.SetValue( dataPoint, Convert.ChangeType( value, property.Type ) );
+                              if ( property.Type.IsEnum )
+                              {
+                                 property.SetValue( dataPoint, property.GetEnumValue( value ) );
+                              }
+                              else
+                              {
+                                 property.SetValue( dataPoint, Convert.ChangeType( value, property.Type ) );
+                              }
                            }
+                           // TODO: require that it is nullable in an ELSE?
                         }
 
                         dataPoints.Add( dataPoint );

@@ -10,6 +10,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
    {
       private static readonly object _sync = new object();
       private static readonly Dictionary<Type, object> _typeCache = new Dictionary<Type, object>();
+      private static readonly HashSet<Type> _validFieldTypes = new HashSet<Type> { typeof( string ), typeof( double ), typeof( long ), typeof( bool ) };
 
       internal static DataPointTypeInfo<TInfluxRow> GetOrCreateTypeCache<TInfluxRow>()
          where TInfluxRow : new()
@@ -42,17 +43,32 @@ namespace Vibrant.InfluxDB.Client.Helpers
                   if ( timestampAttribute != null )
                   {
                      timestamp = new PropertyExpressionInfo<TInfluxRow>( propertyInfo );
+                     if ( timestamp.Type != typeof( DateTime ) )
+                     {
+                        throw new InfluxException( $"The property {propertyInfo.Name} on the type {type.Name} must be a DateTime." );
+                     }
+
                      all.Add( "time", timestamp );
                   }
                   else if ( fieldAttribute != null )
                   {
                      var expression = new PropertyExpressionInfo<TInfluxRow>( propertyInfo );
+                     if ( !_validFieldTypes.Contains( expression.Type ) && !expression.Type.IsEnum )
+                     {
+                        throw new InfluxException( $"The property {propertyInfo.Name} on the type {type.Name} must be a string, double, long or bool." );
+                     }
+
                      fields.Add( fieldAttribute.Name, expression );
                      all.Add( fieldAttribute.Name, expression );
                   }
                   else if ( tagAttribute != null )
                   {
                      var expression = new PropertyExpressionInfo<TInfluxRow>( propertyInfo );
+                     if ( expression.Type != typeof( string ) && !expression.Type.IsEnum )
+                     {
+                        throw new InfluxException( $"The property {propertyInfo.Name} on the type {type.Name} must be a string or an enum." );
+                     }
+
                      tags.Add( tagAttribute.Name, expression );
                      all.Add( tagAttribute.Name, expression );
                   }

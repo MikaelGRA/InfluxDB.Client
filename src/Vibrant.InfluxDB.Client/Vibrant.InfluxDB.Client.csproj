@@ -36,10 +36,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -50,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Consistency.cs" />
     <Compile Include="ConsistencyExtensions.cs" />
+    <Compile Include="DatabasePriviledge.cs" />
     <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="Dto\ErrorResult.cs" />
     <Compile Include="Dto\QueryResult.cs" />
@@ -59,7 +57,10 @@
     <Compile Include="Helpers\DataPointTypeInfo.cs" />
     <Compile Include="Helpers\PropertyExpressionInfo.cs" />
     <Compile Include="Helpers\TypeCache.cs" />
+    <Compile Include="Http\HttpContentExtensions.cs" />
+    <Compile Include="Parsers\LineProtocolEscape.cs" />
     <Compile Include="Rows\ContinuousQueryRow.cs" />
+    <Compile Include="Rows\GrantsRow.cs" />
     <Compile Include="Rows\IInfluxRow.cs" />
     <Compile Include="Rows\IHaveMeasurementName.cs" />
     <Compile Include="InfluxClient.cs" />
@@ -70,7 +71,7 @@
     <Compile Include="InfluxQueryProvider.cs" />
     <Compile Include="InfluxResult.cs" />
     <Compile Include="InfluxResultSet.cs" />
-    <Compile Include="InfluxRowContent.cs" />
+    <Compile Include="Http\InfluxRowContent.cs" />
     <Compile Include="InfluxSeries.cs" />
     <Compile Include="InfluxTagAttribute.cs" />
     <Compile Include="InfluxTimestampAttribute.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="Rows\MeasurementRow.cs" />
     <Compile Include="Rows\RetentionPolicyRow.cs" />
     <Compile Include="Rows\TagKeyRow.cs" />
+    <Compile Include="Rows\UserRow.cs" />
     <Compile Include="TimestampPrecision.cs" />
     <Compile Include="TimestampPrecisionExtensions.cs" />
     <Compile Include="Visitors\QueryBinder.cs" />

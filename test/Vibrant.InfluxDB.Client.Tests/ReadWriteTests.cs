@@ -112,6 +112,33 @@ namespace Vibrant.InfluxDB.Client.Tests
       }
 
       [Fact]
+      public async Task Should_Write_All_Field_Types_To_Database()
+      {
+         var row = new VariationRow
+         {
+            Timestamp = new DateTime( 2013, 1, 1, 1, 1, 1, DateTimeKind.Utc ),
+            Count = 1337,
+            Indicator = true,
+            Message = "Hello there\nWhat's up?",
+            Percent = 0.37,
+            Type = "tag Value",
+            Category = TestEnum1.Value2,
+            CategoryTag = TestEnum2.Value3,
+         };
+
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "variation", new[] { row }, TimestampPrecision.Nanosecond, Consistency.One );
+
+         var resultSet = await _client.ReadAsync<VariationRow>( "SELECT * FROM variation", InfluxClientFixture.DatabaseName );
+         Assert.Equal( 1, resultSet.Results.Count );
+
+         var result = resultSet.Results[ 0 ];
+         Assert.Equal( 1, result.Series.Count );
+
+         var series = result.Series[ 0 ];
+         Assert.Equal( 1, series.Rows.Count );
+      }
+
+      [Fact]
       public async Task Should_Write_And_Query_Typed_Data()
       {
          var start = new DateTime( 2013, 1, 1, 1, 1, 1, DateTimeKind.Utc );

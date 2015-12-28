@@ -14,7 +14,7 @@ namespace Vibrant.InfluxDB.Client.Tests
 
       public InfluxClientFixture()
       {
-         Client = new InfluxClient( new Uri( "http://localhost:8086" ) );
+         Client = new InfluxClient( new Uri( "http://localhost:8086" ), "root", "root" );
          Client.CreateDatabaseIfNotExistsAsync( DatabaseName ).Wait();
       }
 

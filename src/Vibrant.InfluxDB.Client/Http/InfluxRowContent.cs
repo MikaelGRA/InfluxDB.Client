@@ -13,11 +13,12 @@ using Vibrant.InfluxDB.Client.Helpers;
 using Vibrant.InfluxDB.Client.Parsers;
 using Vibrant.InfluxDB.Client.Rows;
 
-namespace Vibrant.InfluxDB.Client
+namespace Vibrant.InfluxDB.Client.Http
 {
    public class InfluxRowContent<TInfluxRow> : HttpContent
       where TInfluxRow : new()
    {
+
       private static readonly MediaTypeHeaderValue _mediaType = new MediaTypeHeaderValue( "text/plain" ) { CharSet = "utf-8" };
       private static readonly Encoding UTF8 = new UTF8Encoding( false );
 
@@ -52,14 +53,14 @@ namespace Vibrant.InfluxDB.Client
                   if ( value != null )
                   {
                      writer.Write( "," );
-                     writer.Write( kvp.Key );
+                     writer.Write( LineProtocolEscape.EscapeKey( kvp.Key ) );
                      writer.Write( "=" );
-                     writer.Write( value );
+                     writer.Write( LineProtocolEscape.EscapeTagValue( value ) );
                   }
                }
                writer.Write( " " );
 
-               using ( var enumerator = dp.GetAllFields().GetEnumerator() ) // exclude time????????
+               using ( var enumerator = dp.GetAllFields().GetEnumerator() )
                {
                   bool hasMore = enumerator.MoveNext();
                   bool hasValue = false;
@@ -76,9 +77,9 @@ namespace Vibrant.InfluxDB.Client
 
                   while ( hasValue )
                   {
-                     writer.Write( current.Key );
+                     writer.Write( LineProtocolEscape.EscapeKey( current.Key ) );
                      writer.Write( "=" );
-                     writer.Write( Convert.ToString( value, CultureInfo.InvariantCulture ) );
+                     writer.Write( LineProtocolEscape.EscapeFieldValue( value ) );
 
                      // get a hold of the next non-null value
                      hasValue = false;
@@ -126,13 +127,14 @@ namespace Vibrant.InfluxDB.Client
                {
                   foreach ( var kvp in tags )
                   {
-                     var value = kvp.Value.GetValue( dp );
+                     var property = kvp.Value;
+                     var value = property.GetValue( dp );
                      if ( value != null )
                      {
                         writer.Write( "," );
-                        writer.Write( kvp.Key );
+                        writer.Write( LineProtocolEscape.EscapeKey( kvp.Key ) );
                         writer.Write( "=" );
-                        writer.Write( value );
+                        writer.Write( LineProtocolEscape.EscapeTagValue( property.GetStringValue( value ) ) );
                      }
                   }
                }
@@ -143,10 +145,12 @@ namespace Vibrant.InfluxDB.Client
                   bool hasMore = enumerator.MoveNext();
                   bool hasValue = false;
                   object value = null;
+                  PropertyExpressionInfo<TInfluxRow> property = null;
                   KeyValuePair<string, PropertyExpressionInfo<TInfluxRow>> current = default( KeyValuePair<string, PropertyExpressionInfo<TInfluxRow>> );
                   while ( hasMore && !hasValue )
                   {
                      current = enumerator.Current;
+                     property = current.Value;
                      value = current.Value.GetValue( dp );
                      hasValue = value != null;
 
@@ -155,15 +159,23 @@ namespace Vibrant.InfluxDB.Client
 
                   while ( hasValue )
                   {
-                     writer.Write( current.Key );
+                     writer.Write( LineProtocolEscape.EscapeKey( current.Key ) );
                      writer.Write( "=" );
-                     writer.Write( Convert.ToString( value, CultureInfo.InvariantCulture ) );
+                     if ( property.Type.IsEnum )
+                     {
+                        writer.Write( LineProtocolEscape.EscapeFieldValue( property.GetStringValue( value ) ) );
+                     }
+                     else
+                     {
+                        writer.Write( LineProtocolEscape.EscapeFieldValue( value ) );
+                     }
 
                      // get a hold of the next non-null value
                      hasValue = false;
                      while ( hasMore && !hasValue )
                      {
                         current = enumerator.Current;
+                        property = current.Value;
                         value = current.Value.GetValue( dp );
                         hasValue = value != null;
 

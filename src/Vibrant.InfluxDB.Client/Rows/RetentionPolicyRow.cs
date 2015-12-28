@@ -15,7 +15,7 @@ namespace Vibrant.InfluxDB.Client.Rows
       public string Duration { get; set; }
 
       [InfluxField( "replicaN" )]
-      public int Replication { get; set; }
+      public long Replication { get; set; }
 
       [InfluxField( "default" )]
       public bool Default { get; set; }
