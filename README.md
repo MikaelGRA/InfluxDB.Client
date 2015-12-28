@@ -277,3 +277,7 @@ Finally if you need to execute a custom operation or multiple management operati
 
       public Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery )
 ```
+
+## Error handling
+
+In case an error occurrs, an InfluxException will be thrown. Catch this and inspect the Message to get an indication of what went wrong. However, if you execute multiple operations at once, and an error occurrs, you will have to inspect the ErrorMessage on the InfluxResult that is returned instead.
