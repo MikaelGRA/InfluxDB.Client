@@ -13,23 +13,23 @@ The library exposes all operations on InfluxDB and can be used for reading/writi
 1. Start by defining a class that represents a row in InfluxDB that you want to store.
 
 ```c#
-   public class ComputerInfo
-   {
-      [InfluxTimestamp]
-      public DateTime Timestamp { get; set; }
+public class ComputerInfo
+{
+   [InfluxTimestamp]
+   public DateTime Timestamp { get; set; }
 
-      [InfluxTag( "host" )]
-      public string Host { get; set; }
+   [InfluxTag( "host" )]
+   public string Host { get; set; }
 
-      [InfluxTag( "region" )]
-      public string Region { get; set; }
+   [InfluxTag( "region" )]
+   public string Region { get; set; }
 
-      [InfluxField( "cpu" )]
-      public double CPU { get; set; }
+   [InfluxField( "cpu" )]
+   public double CPU { get; set; }
 
-      [InfluxField( "ram" )]
-      public long RAM { get; set; }
-   }
+   [InfluxField( "ram" )]
+   public long RAM { get; set; }
+}
 ```
 
 On your POCO class you must specify these things:
@@ -42,34 +42,56 @@ Once you've defined your class, you're ready to use the InfluxClient, which is t
 Here's how to write to the database:
 
 ```c#
-      private ComputerInfo[] CreateTypedRowsStartingAt( DateTime start, int rows )
-      {
-         var rng = new Random();
-         var regions = new[] { "west-eu", "north-eu", "west-us", "east-us", "asia" };
-         var hosts = new[] { "some-host", "some-other-host" };
+private ComputerInfo[] CreateTypedRowsStartingAt( DateTime start, int rows )
+{
+   var rng = new Random();
+   var regions = new[] { "west-eu", "north-eu", "west-us", "east-us", "asia" };
+   var hosts = new[] { "some-host", "some-other-host" };
 
-         var timestamp = start;
-         var infos = new ComputerInfo[ rows ];
-         for ( int i = 0 ; i < rows ; i++ )
-         {
-            long ram = rng.Next( int.MaxValue );
-            double cpu = rng.NextDouble();
-            string region = regions[ rng.Next( regions.Length ) ];
-            string host = hosts[ rng.Next( hosts.Length ) ];
+   var timestamp = start;
+   var infos = new ComputerInfo[ rows ];
+   for ( int i = 0 ; i < rows ; i++ )
+   {
+      long ram = rng.Next( int.MaxValue );
+      double cpu = rng.NextDouble();
+      string region = regions[ rng.Next( regions.Length ) ];
+      string host = hosts[ rng.Next( hosts.Length ) ];
 
-            var info = new ComputerInfo { Timestamp = timestamp, CPU = cpu, RAM = ram, Host = host, Region = region };
-            infos[ i ] = info;
+      var info = new ComputerInfo { Timestamp = timestamp, CPU = cpu, RAM = ram, Host = host, Region = region };
+      infos[ i ] = info;
 
-            timestamp = timestamp.AddSeconds( 1 );
-         }
+      timestamp = timestamp.AddSeconds( 1 );
+   }
 
-         return infos;
-      }
-      
-      public async Task Should_Write_Typed_Rows_To_Database()
-      {
-         var client = new InfluxClient( new Uri( "http://localhost:8086" ) );
-         var infos = CreateTypedRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 500 );
-         await _client.WriteAsync( "mydb", "myMeasurementName", infos, TimestampPrecision.Nanosecond, Consistency.One );
-      }
+   return infos;
+}
+
+public async Task Should_Write_Typed_Rows_To_Database()
+{
+   var client = new InfluxClient( new Uri( "http://localhost:8086" ) );
+   var infos = CreateTypedRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 500 );
+   await _client.WriteAsync( "mydb", "myMeasurementName", infos, TimestampPrecision.Nanosecond, Consistency.One );
+}
+```
+
+Here's how to query from the database:
+```c#
+public async Task Should_Query_Typed_Data()
+{
+   var resultSet = await _client.ReadAsync<ComputerInfo>( $"SELECT * FROM myMeasurementName", "mydb" );
+   
+   // resultSet will contain 1 result in the Results collection (or multiple if you execute multiple queries at once)
+   var result = resultSet.Results[ 0 ];
+   
+   // result will contain 1 series in the Series collection (or potentially multiple if you specify a GROUP BY clause)
+   var series = result.Series[ 0 ];
+   
+   // series.Rows will be the list of ComputerInfo that you queried for
+   foreach ( var row in series.Rows )
+   {
+      Console.WriteLine( "CPU: " + row.CPU );
+      Console.WriteLine( "RAM: " + row.RAM );
+      // ...
+   }
+}
 ```
