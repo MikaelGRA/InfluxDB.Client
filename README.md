@@ -89,6 +89,7 @@ public async Task Should_Query_Typed_Data()
    // series.Rows will be the list of ComputerInfo that you queried for
    foreach ( var row in series.Rows )
    {
+      Console.WriteLine( "Timestamp: " + row.Timestamp );
       Console.WriteLine( "CPU: " + row.CPU );
       Console.WriteLine( "RAM: " + row.RAM );
       // ...
@@ -161,6 +162,7 @@ public async Task Should_Query_Dynamic_Data()
    // series.Rows will be the list of DynamicInfluxRow that you queried for (which can be cast to dynamic)
    foreach ( dynamic row in series.Rows )
    {
+      Console.WriteLine( "Timestamp: " + row.time ); // Can also access row.Timestamp
       Console.WriteLine( "CPU: " + row.cpu );
       Console.WriteLine( "RAM: " + row.ram );
       // ...
