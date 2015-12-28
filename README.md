@@ -265,3 +265,15 @@ All of these operations can be seen here:
 
       #endregion
 ```
+
+Finally if you need to execute a custom operation or multiple management operations at once, you can use one of the following methods:
+
+```c#
+      public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery, string db )
+
+      public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery )
+
+      public Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery, string db )
+
+      public Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery )
+```
