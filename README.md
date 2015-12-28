@@ -168,3 +168,100 @@ public async Task Should_Query_Dynamic_Data()
       // ...
    }
 }
+```
+
+## Other operations
+
+The InfluxClient also defines a host of other management operations. That can be divided up into two categories.
+1. Operations that does not return anything.
+2. Operations that returns an InfluxResult<TInfluxRow>, such as SHOW USERS, SHOW DATABASES, etc.. You can think of these operations as statically defined "Read" operations that queries the database, since they return the same types as ordinary queries.
+
+All of these operations can be seen here:
+
+```c#
+      #region Authentication and Authorization
+
+      public Task CreateAdminUserAsync( string username, string password )
+
+      public Task CreateUserAsync( string username, string password )
+
+      public Task GrantAdminPrivilegesAsync( string username )
+
+      public Task GrantPrivilegeAsync( DatabasePriviledge privilege, string db, string username )
+
+      public Task RevokeAdminPrivilegesAsync( string username )
+
+      public Task RevokePrivilegeAsync( DatabasePriviledge privilege, string db, string username )
+
+      public Task SetPasswordAsync( string username, string password )
+
+      public Task DropUserAsync( string username )
+
+      public async Task<InfluxResult<GrantsRow>> ShowGrantsAsync( string username )
+
+      #endregion
+
+      #region Database Management
+
+      public Task CreateDatabaseIfNotExistsAsync( string db )
+
+      public Task CreateDatabaseAsync( string db )
+
+      public Task DropDatabaseIfExistsAsync( string db )
+
+      public Task DropDatabaseAsync( string db )
+
+      public Task DropSeries( string db, string measurementName )
+
+      public Task DropSeries( string db, string measurementName, string where )
+
+      public Task DropMeasurementAsync( string measurementName, string db )
+
+      public Task CreateRetensionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
+
+      public Task ModifyRetensionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
+
+      public Task DeleteRetentionPolicyAsync( string policyName, string db )
+
+      #endregion
+
+      #region Continous Queries
+
+      public async Task<InfluxResult<ContinuousQueryRow>> ShowContinuousQueries( string db )
+
+      public Task DropContinuousQuery( string name, string db )
+
+      #endregion
+
+      #region Schema Exploration
+
+      public async Task<InfluxResult<DatabaseRow>> ShowDatabasesAsync()
+      
+      public async Task<InfluxResult<RetentionPolicyRow>> ShowRetensionPoliciesAsync( string db )
+
+      public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db )
+
+      public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db, string measurementName )
+
+      public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db, string measurementName, string where )
+
+      public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db )
+
+      public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db, string withMeasurement )
+
+      public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db, string withMeasurement, string where )
+
+      public async Task<InfluxResult<TagKeyRow>> ShowTagsKeysAsync( string db )
+
+      public async Task<InfluxResult<TagKeyRow>> ShowTagsKeysAsync( string db, string measurementName )
+
+      public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsync<TInfluxRow>( string db, string tagKey )
+
+      public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsync<TInfluxRow>( string db, string tagKey, string measurementName )
+
+      public async Task<InfluxResult<FieldKeyRow>> ShowFieldKeysAsync( string db )
+
+      public async Task<InfluxResult<FieldKeyRow>> ShowFieldKeysAsync( string db, string measurementName )
+
+      #endregion
+```
