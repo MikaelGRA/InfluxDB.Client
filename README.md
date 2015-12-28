@@ -221,7 +221,7 @@ All of these operations can be seen here:
 
       public Task ModifyRetensionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
 
-      public Task DeleteRetentionPolicyAsync( string policyName, string db )
+      public Task DropRetentionPolicyAsync( string policyName, string db )
 
       #endregion
 
@@ -251,9 +251,9 @@ All of these operations can be seen here:
 
       public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db, string withMeasurement, string where )
 
-      public async Task<InfluxResult<TagKeyRow>> ShowTagsKeysAsync( string db )
+      public async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( string db )
 
-      public async Task<InfluxResult<TagKeyRow>> ShowTagsKeysAsync( string db, string measurementName )
+      public async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( string db, string measurementName )
 
       public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsync<TInfluxRow>( string db, string tagKey )
 
