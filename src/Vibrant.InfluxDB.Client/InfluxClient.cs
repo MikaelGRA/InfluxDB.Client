@@ -19,6 +19,9 @@ using Vibrant.InfluxDB.Client.Http;
 
 namespace Vibrant.InfluxDB.Client
 {
+   /// <summary>
+   /// An InfluxClient exposes all HTTP operations on InfluxDB.
+   /// </summary>
    public class InfluxClient
    {
       private readonly HttpClient _client;
@@ -101,52 +104,108 @@ namespace Vibrant.InfluxDB.Client
 
       #region Authentication and Authorization
 
+      /// <summary>
+      /// CREATE a new admin user.
+      /// </summary>
+      /// <param name="username"></param>
+      /// <param name="password"></param>
+      /// <returns></returns>
       public Task CreateAdminUserAsync( string username, string password )
       {
          return ExecuteOperationWithNoResultAsync( $"CREATE USER {username} WITH PASSWORD '{password}' WITH ALL PRIVILEGES" );
       }
 
+      /// <summary>
+      /// CREATE a new non-admin user.
+      /// </summary>
+      /// <param name="username"></param>
+      /// <param name="password"></param>
+      /// <returns></returns>
       public Task CreateUserAsync( string username, string password )
       {
          return ExecuteOperationWithNoResultAsync( $"CREATE USER {username} WITH PASSWORD '{password}'" );
       }
 
+      /// GRANT administrative privileges to an existing user.
+      /// </summary>
+      /// <param name="username"></param>
+      /// <param name="password"></param>
+      /// <returns></returns>
       public Task GrantAdminPrivilegesAsync( string username )
       {
          return ExecuteOperationWithNoResultAsync( $"GRANT ALL PRIVILEGES TO {username}" );
       }
 
-      public Task GrantPriviledgeAsync( DatabasePriviledge privilege, string db, string username )
+      /// <summary>
+      /// GRANT READ, WRITE or ALL database privileges to an existing user.
+      /// </summary>
+      /// <param name="privilege"></param>
+      /// <param name="db"></param>
+      /// <param name="username"></param>
+      /// <returns></returns>
+      public Task GrantPrivilegeAsync( DatabasePriviledge privilege, string db, string username )
       {
          return ExecuteOperationWithNoResultAsync( $"GRANT {GetPrivilege( privilege )} ON \"{db}\" TO {username}" );
       }
 
+      /// <summary>
+      /// REVOKE administrative privileges from an admin user
+      /// </summary>
+      /// <param name="username"></param>
+      /// <returns></returns>
       public Task RevokeAdminPrivilegesAsync( string username )
       {
          return ExecuteOperationWithNoResultAsync( $"REVOKE ALL PRIVILEGES FROM {username}" );
       }
 
-      public Task RevokePriviledgeAsync( DatabasePriviledge privilege, string db, string username )
+      /// <summary>
+      /// REVOKE READ, WRITE, or ALL database privileges from an existing user.
+      /// </summary>
+      /// <param name="privilege"></param>
+      /// <param name="db"></param>
+      /// <param name="username"></param>
+      /// <returns></returns>
+      public Task RevokePrivilegeAsync( DatabasePriviledge privilege, string db, string username )
       {
          return ExecuteOperationWithNoResultAsync( $"REVOKE {GetPrivilege( privilege )} ON \"{db}\" FROM {username}" );
       }
 
+      /// <summary>
+      /// SET a user’s password.
+      /// </summary>
+      /// <param name="username"></param>
+      /// <param name="password"></param>
+      /// <returns></returns>
       public Task SetPasswordAsync( string username, string password )
       {
          return ExecuteOperationWithNoResultAsync( $"SET PASSWORD FOR {username} = '{password}'" );
       }
 
+      /// <summary>
+      /// DROP a user.
+      /// </summary>
+      /// <param name="username"></param>
+      /// <returns></returns>
       public Task DropUserAsync( string username )
       {
          return ExecuteOperationWithNoResultAsync( $"DROP USER {username}" );
       }
 
+      /// <summary>
+      /// SHOW all existing users and their admin status.
+      /// </summary>
+      /// <returns></returns>
       public async Task<InfluxResult<UserRow>> ShowUsersAsync()
       {
          var parserResult = await ExecuteQueryInternalAsync<UserRow>( $"SHOW USERS" ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
+      /// <summary>
+      /// SHOW a user’s database privileges.
+      /// </summary>
+      /// <param name="username"></param>
+      /// <returns></returns>
       public async Task<InfluxResult<GrantsRow>> ShowGrantsAsync( string username )
       {
          var parserResult = await ExecuteQueryInternalAsync<GrantsRow>( $"SHOW GRANTS FOR {username}" ).ConfigureAwait( false );
@@ -280,7 +339,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="policyName"></param>
       /// <param name="db"></param>
       /// <returns></returns>
-      public Task DeleteRetentionPolicyAsync( string policyName, string db )
+      public Task DropRetentionPolicyAsync( string policyName, string db )
       {
          return ExecuteOperationWithNoResultAsync( $"DROP RETENTION POLICY \"{policyName}\" ON \"{db}\"" );
       }
@@ -431,7 +490,7 @@ namespace Vibrant.InfluxDB.Client
       /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
       /// <returns></returns>
-      public async Task<InfluxResult<TagKeyRow>> ShowTagsKeysAsync( string db )
+      public async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( string db )
       {
          var parserResult = await ExecuteQueryInternalAsync<TagKeyRow>( "SHOW TAG KEYS", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -444,7 +503,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <param name="measurementName"></param>
       /// <returns></returns>
-      public async Task<InfluxResult<TagKeyRow>> ShowTagsKeysAsync( string db, string measurementName )
+      public async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( string db, string measurementName )
       {
          var parserResult = await ExecuteQueryInternalAsync<TagKeyRow>( $"SHOW TAG KEYS FROM \"{measurementName}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -576,7 +635,7 @@ namespace Vibrant.InfluxDB.Client
 
          // get metadata information from the store
          var fieldTask = ShowFieldKeysAsync( db, measurementName );
-         var tagTask = ShowTagsKeysAsync( db, measurementName );
+         var tagTask = ShowTagKeysAsync( db, measurementName );
          await Task.WhenAll( fieldTask, tagTask ).ConfigureAwait( false );
 
          var fields = fieldTask.Result.Series.First().Rows;
