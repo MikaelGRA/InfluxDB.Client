@@ -4,7 +4,15 @@ This library makes it easy to be a client for InfluxDB on .NET!
 
 ## Installation
 
-Nuget package to come...
+Install it through nuget with the following command.
+
+```
+Install-Package Vibrant.InfluxDB.Client
+```
+
+The package can be found [here](https://www.nuget.org/packages/Vibrant.InfluxDB.Client/).
+
+Or you can simply grab it in one of the github releases.
 
 ## Reading/Writing
 
