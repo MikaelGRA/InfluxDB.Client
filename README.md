@@ -239,9 +239,9 @@ All of these operations can be seen here:
 
       public Task DropMeasurementAsync( string measurementName, string db )
 
-      public Task CreateRetensionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
+      public Task CreateRetentionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
 
-      public Task AlterRetensionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
+      public Task AlterRetentionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
 
       public Task DropRetentionPolicyAsync( string policyName, string db )
 
