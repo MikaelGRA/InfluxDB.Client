@@ -59,68 +59,72 @@ namespace Vibrant.InfluxDB.Client.Parsers
                   {
                      var name = series.Name;
                      var columns = series.Columns;
-                     DatabaseMeasurementInfo meta = null;
+                     var dataPoints = new List<TInfluxRow>();
 
-                     // get a collection of tags/fields, and ensure all columns exists in it
-                     if ( !isExclusivelyTags )
+                     if ( series.Values != null )
                      {
-                        string seriesName = series.Name;
-                        meta = await client.GetMetaInformationAsync( db, seriesName, false ).ConfigureAwait( false );
+                        DatabaseMeasurementInfo meta = null;
 
-                        //check that we have all columns, otherwise call method again
-                        bool hasAllColumnsAndTags = HasAllColumns( meta, columns );
-                        if ( !hasAllColumnsAndTags )
+                        // get a collection of tags/fields, and ensure all columns exists in it
+                        if ( !isExclusivelyTags )
                         {
+                           string seriesName = series.Name;
                            meta = await client.GetMetaInformationAsync( db, seriesName, false ).ConfigureAwait( false );
-                           hasAllColumnsAndTags = HasAllColumns( meta, columns );
 
+                           //check that we have all columns, otherwise call method again
+                           bool hasAllColumnsAndTags = HasAllColumns( meta, columns );
                            if ( !hasAllColumnsAndTags )
                            {
-                              throw new InfluxException( "Could not determine which columns in the returned data is tags/fields." );
-                           }
-                        }
-                     }
+                              meta = await client.GetMetaInformationAsync( db, seriesName, false ).ConfigureAwait( false );
+                              hasAllColumnsAndTags = HasAllColumns( meta, columns );
 
-                     var dataPoints = new List<TInfluxRow>();
-                     foreach ( var values in series.Values )
-                     {
-                        var dataPoint = (IInfluxRow)new TInfluxRow();
-                        var seriesDataPoint = dataPoints as IHaveMeasurementName;
-                        if ( seriesDataPoint != null )
-                        {
-                           seriesDataPoint.MeasurementName = name;
-                        }
-
-                        for ( int i = 0 ; i < values.Count ; i++ )
-                        {
-                           if ( isExclusivelyTags )
-                           {
-                              dataPoint.WriteField( columns[ i ], values[ i ] );
-                           }
-                           else
-                           {
-                              // Is this a field or a tag?
-                              var columnName = columns[ i ];
-                              var value = values[ i ];
-                              if ( value != null )
+                              if ( !hasAllColumnsAndTags )
                               {
-                                 if ( columnName == InfluxConstants.TimeColumn )
-                                 {
-                                    dataPoint.WriteTimestamp( (DateTime)value );
-                                 }
-                                 else if ( meta.Tags.Contains( columnName ) )
-                                 {
-                                    dataPoint.WriteTag( columnName, (string)value );
-                                 }
-                                 else
-                                 {
-                                    dataPoint.WriteField( columnName, value );
-                                 }
+                                 throw new InfluxException( "Could not determine which columns in the returned data is tags/fields." );
                               }
                            }
                         }
 
-                        dataPoints.Add( (TInfluxRow)dataPoint );
+                        foreach ( var values in series.Values )
+                        {
+                           var dataPoint = (IInfluxRow)new TInfluxRow();
+                           var seriesDataPoint = dataPoints as IHaveMeasurementName;
+                           if ( seriesDataPoint != null )
+                           {
+                              seriesDataPoint.MeasurementName = name;
+                           }
+
+                           for ( int i = 0 ; i < values.Count ; i++ )
+                           {
+                              if ( isExclusivelyTags )
+                              {
+                                 dataPoint.WriteField( columns[ i ], values[ i ] );
+                              }
+                              else
+                              {
+                                 // Is this a field or a tag?
+                                 var columnName = columns[ i ];
+                                 var value = values[ i ];
+                                 if ( value != null )
+                                 {
+                                    if ( columnName == InfluxConstants.TimeColumn )
+                                    {
+                                       dataPoint.WriteTimestamp( (DateTime)value );
+                                    }
+                                    else if ( meta.Tags.Contains( columnName ) )
+                                    {
+                                       dataPoint.WriteTag( columnName, (string)value );
+                                    }
+                                    else
+                                    {
+                                       dataPoint.WriteField( columnName, value );
+                                    }
+                                 }
+                              }
+                           }
+
+                           dataPoints.Add( (TInfluxRow)dataPoint );
+                        }
                      }
 
                      influxSeries.Add( new InfluxSeries<TInfluxRow>( name, dataPoints, series.Tags ) );
@@ -144,49 +148,53 @@ namespace Vibrant.InfluxDB.Client.Parsers
                   {
                      var name = series.Name;
                      var columns = series.Columns;
-                     var properties = new PropertyExpressionInfo<TInfluxRow>[ columns.Count ];
-                     var propertyMap = TypeCache.GetOrCreateTypeCache<TInfluxRow>().All;
-                     for ( int i = 0 ; i < columns.Count ; i++ )
-                     {
-                        PropertyExpressionInfo<TInfluxRow> propertyInfo;
-                        if ( propertyMap.TryGetValue( columns[ i ], out propertyInfo ) )
-                        {
-                           properties[ i ] = propertyInfo;
-                        }
-                     }
-
                      var dataPoints = new List<TInfluxRow>();
-                     foreach ( var values in series.Values )
-                     {
-                        var dataPoint = new TInfluxRow();
-                        var seriesDataPoint = dataPoints as IHaveMeasurementName;
-                        if ( seriesDataPoint != null )
-                        {
-                           seriesDataPoint.MeasurementName = name;
-                        }
 
-                        for ( int i = 0 ; i < values.Count ; i++ )
+                     if ( series.Values != null )
+                     {
+                        var properties = new PropertyExpressionInfo<TInfluxRow>[ columns.Count ];
+                        var propertyMap = TypeCache.GetOrCreateTypeCache<TInfluxRow>().All;
+                        for ( int i = 0 ; i < columns.Count ; i++ )
                         {
-                           var value = values[ i ];
-                           var property = properties[ i ];
-                           if ( property != null )
+                           PropertyExpressionInfo<TInfluxRow> propertyInfo;
+                           if ( propertyMap.TryGetValue( columns[ i ], out propertyInfo ) )
                            {
-                              if ( value != null )
-                              {
-                                 if ( property.Type.IsEnum )
-                                 {
-                                    property.SetValue( dataPoint, property.GetEnumValue( value ) );
-                                 }
-                                 else
-                                 {
-                                    property.SetValue( dataPoint, Convert.ChangeType( value, property.Type ) );
-                                 }
-                              }
-                              // TODO: require that it is nullable in an ELSE?
+                              properties[ i ] = propertyInfo;
                            }
                         }
 
-                        dataPoints.Add( dataPoint );
+                        foreach ( var values in series.Values )
+                        {
+                           var dataPoint = new TInfluxRow();
+                           var seriesDataPoint = dataPoints as IHaveMeasurementName;
+                           if ( seriesDataPoint != null )
+                           {
+                              seriesDataPoint.MeasurementName = name;
+                           }
+
+                           for ( int i = 0 ; i < values.Count ; i++ )
+                           {
+                              var value = values[ i ];
+                              var property = properties[ i ];
+                              if ( property != null )
+                              {
+                                 if ( value != null )
+                                 {
+                                    if ( property.Type.IsEnum )
+                                    {
+                                       property.SetValue( dataPoint, property.GetEnumValue( value ) );
+                                    }
+                                    else
+                                    {
+                                       property.SetValue( dataPoint, Convert.ChangeType( value, property.Type ) );
+                                    }
+                                 }
+                                 // TODO: require that it is nullable in an ELSE?
+                              }
+                           }
+
+                           dataPoints.Add( dataPoint );
+                        }
                      }
 
                      influxSeries.Add( new InfluxSeries<TInfluxRow>( name, dataPoints, series.Tags ) );
