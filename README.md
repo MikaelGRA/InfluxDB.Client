@@ -2,6 +2,10 @@
 
 This library makes it easy to be a client for InfluxDB on .NET!
 
+## Installation
+
+Nuget package to come...
+
 ## Reading/Writing
 
 The library exposes all operations on InfluxDB and can be used for reading/writing data to/from in two primary ways:
@@ -137,7 +141,7 @@ private DynamicInfluxRow[] CreateDynamicRowsStartingAt( DateTime start, int rows
    return infos;
 }
 
-public async Task Should_Write_Typed_Rows_To_Database()
+public async Task Should_Write_Dynamic_Rows_To_Database()
 {
    var client = new InfluxClient( new Uri( "http://localhost:8086" ) );
    var infos = CreateDynamicRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 500 );
