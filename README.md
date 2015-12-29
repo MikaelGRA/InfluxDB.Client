@@ -183,6 +183,24 @@ The InfluxClient also defines a host of other management operations. That can be
 All of these operations can be seen here:
 
 ```c#
+      #region Ping
+
+      public Task<InfluxPingResult> PingAsync()
+
+      public Task<InfluxPingResult> PingAsync( int secondsToWaitForLeader )
+
+      #endregion
+
+      #region System Monitoring
+
+      public async Task<InfluxResult<TInfluxRow>> ShowStatsAsync<TInfluxRow>()
+
+      public async Task<InfluxResult<TInfluxRow>> ShowDiagnosticsAsync<TInfluxRow>()
+
+      public async Task<InfluxResult<ShardRow>> ShowShards()
+
+      #endregion
+      
       #region Authentication and Authorization
 
       public Task CreateAdminUserAsync( string username, string password )
@@ -233,6 +251,8 @@ All of these operations can be seen here:
 
       public async Task<InfluxResult<ContinuousQueryRow>> ShowContinuousQueries( string db )
 
+      public Task CreateContinuousQuery( string name, string db, string continuousQuery )
+      
       public Task DropContinuousQuery( string name, string db )
 
       #endregion
