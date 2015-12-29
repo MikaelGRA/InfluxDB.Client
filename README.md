@@ -190,9 +190,6 @@ All of these operations can be seen here:
 /// </summary>
 /// <returns></returns>
 public Task<InfluxPingResult> PingAsync()
-{
-   return ExecutePingInternalAsync( null );
-}
 
 /// <summary>
 /// Executes a ping and waits for the leader to respond.
@@ -200,9 +197,6 @@ public Task<InfluxPingResult> PingAsync()
 /// <param name="secondsToWaitForLeader"></param>
 /// <returns></returns>
 public Task<InfluxPingResult> PingAsync( int secondsToWaitForLeader )
-{
-   return ExecutePingInternalAsync( secondsToWaitForLeader );
-}
 
 #endregion
 
@@ -214,11 +208,6 @@ public Task<InfluxPingResult> PingAsync( int secondsToWaitForLeader )
 /// <typeparam name="TInfluxRow"></typeparam>
 /// <returns></returns>
 public async Task<InfluxResult<TInfluxRow>> ShowStatsAsync<TInfluxRow>()
-   where TInfluxRow : IInfluxRow, new()
-{
-   var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW STATS" ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// Shows InfluxDB diagnostics.
@@ -226,21 +215,12 @@ public async Task<InfluxResult<TInfluxRow>> ShowStatsAsync<TInfluxRow>()
 /// <typeparam name="TInfluxRow"></typeparam>
 /// <returns></returns>
 public async Task<InfluxResult<TInfluxRow>> ShowDiagnosticsAsync<TInfluxRow>()
-   where TInfluxRow : IInfluxRow, new()
-{
-   var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW DIAGNOSTICS" ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// Shows Shards.
 /// </summary>
 /// <returns></returns>
 public async Task<InfluxResult<ShardRow>> ShowShards()
-{
-   var parserResult = await ExecuteQueryInternalAsync<ShardRow>( $"SHOW SHARDS" ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 #endregion
 
@@ -253,9 +233,6 @@ public async Task<InfluxResult<ShardRow>> ShowShards()
 /// <param name="password"></param>
 /// <returns></returns>
 public Task CreateAdminUserAsync( string username, string password )
-{
-   return ExecuteOperationWithNoResultAsync( $"CREATE USER {username} WITH PASSWORD '{password}' WITH ALL PRIVILEGES" );
-}
 
 /// <summary>
 /// CREATE a new non-admin user.
@@ -264,9 +241,6 @@ public Task CreateAdminUserAsync( string username, string password )
 /// <param name="password"></param>
 /// <returns></returns>
 public Task CreateUserAsync( string username, string password )
-{
-   return ExecuteOperationWithNoResultAsync( $"CREATE USER {username} WITH PASSWORD '{password}'" );
-}
 
 /// GRANT administrative privileges to an existing user.
 /// </summary>
@@ -274,9 +248,6 @@ public Task CreateUserAsync( string username, string password )
 /// <param name="password"></param>
 /// <returns></returns>
 public Task GrantAdminPrivilegesAsync( string username )
-{
-   return ExecuteOperationWithNoResultAsync( $"GRANT ALL PRIVILEGES TO {username}" );
-}
 
 /// <summary>
 /// GRANT READ, WRITE or ALL database privileges to an existing user.
@@ -286,9 +257,6 @@ public Task GrantAdminPrivilegesAsync( string username )
 /// <param name="username"></param>
 /// <returns></returns>
 public Task GrantPrivilegeAsync( string db, DatabasePriviledge privilege, string username )
-{
-   return ExecuteOperationWithNoResultAsync( $"GRANT {GetPrivilege( privilege )} ON \"{db}\" TO {username}" );
-}
 
 /// <summary>
 /// REVOKE administrative privileges from an admin user
@@ -296,9 +264,6 @@ public Task GrantPrivilegeAsync( string db, DatabasePriviledge privilege, string
 /// <param name="username"></param>
 /// <returns></returns>
 public Task RevokeAdminPrivilegesAsync( string username )
-{
-   return ExecuteOperationWithNoResultAsync( $"REVOKE ALL PRIVILEGES FROM {username}" );
-}
 
 /// <summary>
 /// REVOKE READ, WRITE, or ALL database privileges from an existing user.
@@ -308,9 +273,6 @@ public Task RevokeAdminPrivilegesAsync( string username )
 /// <param name="username"></param>
 /// <returns></returns>
 public Task RevokePrivilegeAsync( string db, DatabasePriviledge privilege, string username )
-{
-   return ExecuteOperationWithNoResultAsync( $"REVOKE {GetPrivilege( privilege )} ON \"{db}\" FROM {username}" );
-}
 
 /// <summary>
 /// SET a user’s password.
@@ -319,9 +281,6 @@ public Task RevokePrivilegeAsync( string db, DatabasePriviledge privilege, strin
 /// <param name="password"></param>
 /// <returns></returns>
 public Task SetPasswordAsync( string username, string password )
-{
-   return ExecuteOperationWithNoResultAsync( $"SET PASSWORD FOR {username} = '{password}'" );
-}
 
 /// <summary>
 /// DROP a user.
@@ -329,19 +288,12 @@ public Task SetPasswordAsync( string username, string password )
 /// <param name="username"></param>
 /// <returns></returns>
 public Task DropUserAsync( string username )
-{
-   return ExecuteOperationWithNoResultAsync( $"DROP USER {username}" );
-}
 
 /// <summary>
 /// SHOW all existing users and their admin status.
 /// </summary>
 /// <returns></returns>
 public async Task<InfluxResult<UserRow>> ShowUsersAsync()
-{
-   var parserResult = await ExecuteQueryInternalAsync<UserRow>( $"SHOW USERS" ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// SHOW a user’s database privileges.
@@ -349,25 +301,6 @@ public async Task<InfluxResult<UserRow>> ShowUsersAsync()
 /// <param name="username"></param>
 /// <returns></returns>
 public async Task<InfluxResult<GrantsRow>> ShowGrantsAsync( string username )
-{
-   var parserResult = await ExecuteQueryInternalAsync<GrantsRow>( $"SHOW GRANTS FOR {username}" ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
-
-private string GetPrivilege( DatabasePriviledge privilege )
-{
-   switch ( privilege )
-   {
-      case DatabasePriviledge.Read:
-         return "READ";
-      case DatabasePriviledge.Write:
-         return "WRITE";
-      case DatabasePriviledge.All:
-         return "ALL";
-      default:
-         throw new ArgumentException( "Invalid value.", nameof( privilege ) );
-   }
-}
 
 #endregion
 
@@ -379,9 +312,6 @@ private string GetPrivilege( DatabasePriviledge privilege )
 /// <param name="db"></param>
 /// <returns></returns>
 public Task CreateDatabaseIfNotExistsAsync( string db )
-{
-   return ExecuteOperationWithNoResultAsync( $"CREATE DATABASE IF NOT EXISTS \"{db}\"" );
-}
 
 /// <summary>
 /// Create a database with CREATE DATABASE.
@@ -389,9 +319,6 @@ public Task CreateDatabaseIfNotExistsAsync( string db )
 /// <param name="db"></param>
 /// <returns></returns>
 public Task CreateDatabaseAsync( string db )
-{
-   return ExecuteOperationWithNoResultAsync( $"CREATE DATABASE \"{db}\"" );
-}
 
 /// <summary>
 /// Delete a database with DROP DATABASE IF EXUSTS,
@@ -399,9 +326,6 @@ public Task CreateDatabaseAsync( string db )
 /// <param name="db"></param>
 /// <returns></returns>
 public Task DropDatabaseIfExistsAsync( string db )
-{
-   return ExecuteOperationWithNoResultAsync( $"DROP DATABASE IF EXISTS \"{db}\"" );
-}
 
 /// <summary>
 /// Delete a database with DROP DATABASE
@@ -409,9 +333,6 @@ public Task DropDatabaseIfExistsAsync( string db )
 /// <param name="db"></param>
 /// <returns></returns>
 public Task DropDatabaseAsync( string db )
-{
-   return ExecuteOperationWithNoResultAsync( $"DROP DATABASE \"{db}\"" );
-}
 
 /// <summary>
 /// Delete series with DROP SERIES
@@ -420,9 +341,6 @@ public Task DropDatabaseAsync( string db )
 /// <param name="measurementName"></param>
 /// <returns></returns>
 public Task DropSeries( string db, string measurementName )
-{
-   return ExecuteOperationWithNoResultAsync( $"DROP SERIES FROM \"{measurementName}\"", db );
-}
 
 /// <summary>
 /// Delete series with DROP SERIES
@@ -432,9 +350,6 @@ public Task DropSeries( string db, string measurementName )
 /// <param name="where"></param>
 /// <returns></returns>
 public Task DropSeries( string db, string measurementName, string where )
-{
-   return ExecuteOperationWithNoResultAsync( $"DROP SERIES FROM \"{measurementName}\" WHERE {where}", db );
-}
 
 /// <summary>
 /// Delete measurements with DROP MEASUREMENT
@@ -443,9 +358,6 @@ public Task DropSeries( string db, string measurementName, string where )
 /// <param name="db"></param>
 /// <returns></returns>
 public Task DropMeasurementAsync( string db, string measurementName )
-{
-   return ExecuteOperationWithNoResultAsync( $"DROP MEASUREMENT \"{measurementName}\"", db );
-}
 
 /// <summary>
 /// Create retention policies with CREATE RETENTION POLICY
@@ -457,9 +369,6 @@ public Task DropMeasurementAsync( string db, string measurementName )
 /// <param name="isDefault"></param>
 /// <returns></returns>
 public Task CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault )
-{
-   return ExecuteOperationWithNoResultAsync( $"CREATE RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetDefault( isDefault )}" );
-}
 
 /// <summary>
 /// Modify retention policies with ALTER RETENTION POLICY
@@ -471,9 +380,6 @@ public Task CreateRetentionPolicyAsync( string db, string policyName, string dur
 /// <param name="isDefault"></param>
 /// <returns></returns>
 public Task AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault )
-{
-   return ExecuteOperationWithNoResultAsync( $"ALTER RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetDefault( isDefault )}" );
-}
 
 /// <summary>
 /// Delete retention policies with DROP RETENTION POLICY
@@ -482,14 +388,6 @@ public Task AlterRetentionPolicyAsync( string db, string policyName, string dura
 /// <param name="db"></param>
 /// <returns></returns>
 public Task DropRetentionPolicyAsync( string db, string policyName )
-{
-   return ExecuteOperationWithNoResultAsync( $"DROP RETENTION POLICY \"{policyName}\" ON \"{db}\"" );
-}
-
-private string GetDefault( bool isDefault )
-{
-   return isDefault ? "DEFAULT" : string.Empty;
-}
 
 #endregion
 
@@ -502,10 +400,6 @@ private string GetDefault( bool isDefault )
 /// <param name="db"></param>
 /// <returns></returns>
 public async Task<InfluxResult<ContinuousQueryRow>> ShowContinuousQueries( string db )
-{
-   var parserResult = await ExecuteQueryInternalAsync<ContinuousQueryRow>( "SHOW CONTINUOUS QUERIES", db, false ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// Creates a continuous query.
@@ -515,9 +409,6 @@ public async Task<InfluxResult<ContinuousQueryRow>> ShowContinuousQueries( strin
 /// <param name="continuousQuery"></param>
 /// <returns></returns>
 public Task CreateContinuousQuery( string db, string name, string continuousQuery )
-{
-   return ExecuteQueryInternalAsync( $"CREATE CONTINUOUS QUERY \"{name}\" ON \"{db}\"\n{continuousQuery}", db );
-}
 
 /// <summary>
 /// Drops a continuous query.
@@ -526,9 +417,6 @@ public Task CreateContinuousQuery( string db, string name, string continuousQuer
 /// <param name="db"></param>
 /// <returns></returns>
 public Task DropContinuousQuery( string db, string name )
-{
-   return ExecuteQueryInternalAsync( $"DROP CONTINUOUS QUERY \"{name}\" ON \"{db}\"", db );
-}
 
 #endregion
 
@@ -540,10 +428,6 @@ public Task DropContinuousQuery( string db, string name )
 /// <typeparam name="TInfluxRow"></typeparam>
 /// <returns></returns>
 public async Task<InfluxResult<DatabaseRow>> ShowDatabasesAsync()
-{
-   var parserResult = await ExecuteQueryInternalAsync<DatabaseRow>( $"SHOW DATABASES" ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// The SHOW RETENTION POLICIES query lists the existing retention policies on a given database.
@@ -552,10 +436,6 @@ public async Task<InfluxResult<DatabaseRow>> ShowDatabasesAsync()
 /// <param name="db"></param>
 /// <returns></returns>
 public async Task<InfluxResult<RetentionPolicyRow>> ShowRetentionPoliciesAsync( string db )
-{
-   var parserResult = await ExecuteQueryInternalAsync<RetentionPolicyRow>( $"SHOW RETENTION POLICIES ON \"{db}\"", db ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// The SHOW SERIES query returns the distinct series in your database.
@@ -564,11 +444,6 @@ public async Task<InfluxResult<RetentionPolicyRow>> ShowRetentionPoliciesAsync( 
 /// <param name="db"></param>
 /// <returns></returns>
 public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db )
-   where TInfluxRow : new()
-{
-   var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW SERIES", db ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// The SHOW SERIES query returns the distinct series in your database.
@@ -578,11 +453,6 @@ public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string 
 /// <param name="measurementName"></param>
 /// <returns></returns>
 public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db, string measurementName )
-   where TInfluxRow : new()
-{
-   var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW SERIES FROM \"{measurementName}\"", db ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// The SHOW SERIES query returns the distinct series in your database.
@@ -593,11 +463,6 @@ public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string 
 /// <param name="where"></param>
 /// <returns></returns>
 public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db, string measurementName, string where )
-   where TInfluxRow : new()
-{
-   var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW SERIES FROM \"{measurementName}\" WHERE {where}", db ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// The SHOW MEASUREMENTS query returns the measurements in your database.
@@ -606,10 +471,6 @@ public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string 
 /// <param name="db"></param>
 /// <returns></returns>
 public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db )
-{
-   var parserResult = await ExecuteQueryInternalAsync<MeasurementRow>( "SHOW MEASUREMENTS", db ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// The SHOW MEASUREMENTS query returns the measurements in your database.
@@ -619,10 +480,6 @@ public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db
 /// <param name="withMeasurement"></param>
 /// <returns></returns>
 public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db, string withMeasurement )
-{
-   var parserResult = await ExecuteQueryInternalAsync<MeasurementRow>( $"SHOW MEASUREMENTS WITH MEASUREMENT {withMeasurement}", db ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// The SHOW MEASUREMENTS query returns the measurements in your database.
@@ -633,10 +490,6 @@ public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db
 /// <param name="where"></param>
 /// <returns></returns>
 public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db, string withMeasurement, string where )
-{
-   var parserResult = await ExecuteQueryInternalAsync<MeasurementRow>( $"SHOW MEASUREMENTS WITH MEASUREMENT {withMeasurement} WHERE {where}", db ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// SHOW TAG KEYS returns the tag keys associated with each measurement.
@@ -645,10 +498,6 @@ public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db
 /// <param name="db"></param>
 /// <returns></returns>
 public async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( string db )
-{
-   var parserResult = await ExecuteQueryInternalAsync<TagKeyRow>( "SHOW TAG KEYS", db ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// SHOW TAG KEYS returns the tag keys associated with each measurement.
@@ -658,10 +507,6 @@ public async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( string db )
 /// <param name="measurementName"></param>
 /// <returns></returns>
 public async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( string db, string measurementName )
-{
-   var parserResult = await ExecuteQueryInternalAsync<TagKeyRow>( $"SHOW TAG KEYS FROM \"{measurementName}\"", db ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// The SHOW TAG VALUES query returns the set of tag values for a specific tag key across all measurements in the database.
@@ -671,11 +516,6 @@ public async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( string db, string m
 /// <param name="tagKey"></param>
 /// <returns></returns>
 public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsync<TInfluxRow>( string db, string tagKey )
-   where TInfluxRow : new()
-{
-   var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW TAG VALUES WITH KEY = \"{tagKey}\"", db ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// The SHOW TAG VALUES query returns the set of tag values for a specific tag key across all measurements in the database.
@@ -686,11 +526,6 @@ public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsync<TInfluxRow>( stri
 /// <param name="measurementName"></param>
 /// <returns></returns>
 public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsync<TInfluxRow>( string db, string tagKey, string measurementName )
-   where TInfluxRow : new()
-{
-   var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW TAG VALUES FROM \"{measurementName}\" WITH KEY = \"{tagKey}\"", db ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 
 /// <summary>
@@ -700,10 +535,6 @@ public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsync<TInfluxRow>( stri
 /// <param name="db"></param>
 /// <returns></returns>
 public async Task<InfluxResult<FieldKeyRow>> ShowFieldKeysAsync( string db )
-{
-   var parserResult = await ExecuteQueryInternalAsync<FieldKeyRow>( $"SHOW FIELD KEYS", db ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 /// <summary>
 /// The SHOW FIELD KEYS query returns the field keys across each measurement in the database.
@@ -713,10 +544,6 @@ public async Task<InfluxResult<FieldKeyRow>> ShowFieldKeysAsync( string db )
 /// <param name="measurementName"></param>
 /// <returns></returns>
 public async Task<InfluxResult<FieldKeyRow>> ShowFieldKeysAsync( string db, string measurementName )
-{
-   var parserResult = await ExecuteQueryInternalAsync<FieldKeyRow>( $"SHOW FIELD KEYS FROM \"{measurementName}\"", db ).ConfigureAwait( false );
-   return parserResult.Results.First();
-}
 
 #endregion
 
@@ -731,10 +558,6 @@ public async Task<InfluxResult<FieldKeyRow>> ShowFieldKeysAsync( string db, stri
 /// <param name="rows"></param>
 /// <returns></returns>
 public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows )
-   where TInfluxRow : new()
-{
-   return WriteAsync( db, x => measurementName, rows, DefaultWriteOptions );
-}
 
 /// <summary>
 /// Writes the rows with the specified write options.
@@ -746,10 +569,6 @@ public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerab
 /// <param name="options"></param>
 /// <returns></returns>
 public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
-   where TInfluxRow : new()
-{
-   return WriteAsync( db, x => measurementName, rows, options );
-}
 
 /// <summary>
 /// Writes the rows with default write options.
@@ -759,10 +578,6 @@ public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerab
 /// <param name="rows"></param>
 /// <returns></returns>
 public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows )
-   where TInfluxRow : IHaveMeasurementName, new()
-{
-   return WriteAsync( db, x => x.MeasurementName, rows, DefaultWriteOptions );
-}
 
 /// <summary>
 /// Writes the rows with the specified write options.
@@ -773,16 +588,6 @@ public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows )
 /// <param name="options"></param>
 /// <returns></returns>
 public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
-   where TInfluxRow : IHaveMeasurementName, new()
-{
-   return WriteAsync( db, x => x.MeasurementName, rows, options );
-}
-
-private Task WriteAsync<TInfluxRow>( string db, Func<TInfluxRow, string> getMeasurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
-   where TInfluxRow : new()
-{
-   return PostInternalIgnoreResultAsync( CreateWriteUrl( db, options ), new InfluxRowContent<TInfluxRow>( rows, getMeasurementName, options.Precision ) );
-}
 
 /// <summary>
 /// Executes the query and returns the result with the default query options.
@@ -792,10 +597,6 @@ private Task WriteAsync<TInfluxRow>( string db, Func<TInfluxRow, string> getMeas
 /// <param name="db"></param>
 /// <returns></returns>
 public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query )
-   where TInfluxRow : new()
-{
-   return ExecuteQueryInternalAsync<TInfluxRow>( query, db, DefaultQueryOptions );
-}
 
 /// <summary>
 /// Executes the query and returns the result with the specified query options.
@@ -806,10 +607,6 @@ public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, strin
 /// <param name="options"></param>
 /// <returns></returns>
 public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query, InfluxQueryOptions options )
-   where TInfluxRow : new()
-{
-   return ExecuteQueryInternalAsync<TInfluxRow>( query, db, options );
-}
 
 #endregion
 ```
@@ -817,13 +614,13 @@ public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, strin
 Finally if you need to execute a custom operation or multiple management operations at once, you can use one of the following methods:
 
 ```c#
-      public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery, string db )
+public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery, string db )
 
-      public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery )
+public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery )
 
-      public Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery, string db )
+public Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery, string db )
 
-      public Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery )
+public Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery )
 ```
 
 ## Error handling
