@@ -6,12 +6,12 @@
 //using System.Threading.Tasks;
 //using Vibrant.InfluxDB.Client.Dto;
 //using Vibrant.InfluxDB.Client.Helpers;
+//using Vibrant.InfluxDB.Client.IQToolkit;
 //using Vibrant.InfluxDB.Client.Linq;
-//using Vibrant.InfluxDB.Client.Visitors;
 
 //namespace Vibrant.InfluxDB.Client
 //{
-//   public class InfluxQueryProvider : QueryProvider
+//   public class InfluxQueryProvider<TInfluxRow> : QueryProvider
 //   {
 //      private readonly InfluxClient _client;
 //      private readonly Type _queryType;
@@ -41,11 +41,11 @@
 
 //      private TranslateResult Translate( Expression expression )
 //      {
-//         //expression = PartialEvaluator.Eval( expression );
-//         //ProjectionExpression proj = (ProjectionExpression)new QueryBinder().Bind( expression );
-//         //string commandText = new QueryFormatter().Format( proj.Source );
-//         //LambdaExpression projector = new ProjectionBuilder().Build( proj.Projector );
-//         //return new TranslateResult { CommandText = commandText, Projector = projector };
+//         expression = PartialEvaluator.Eval( expression );
+//         ProjectionExpression proj = (ProjectionExpression)new QueryBinder().Bind( expression );
+//         string commandText = new QueryFormatter().Format( proj.Source );
+//         LambdaExpression projector = new ProjectionBuilder().Build( proj.Projector );
+//         return new TranslateResult { CommandText = commandText, Projector = projector };
 
 //         return null;
 //      }

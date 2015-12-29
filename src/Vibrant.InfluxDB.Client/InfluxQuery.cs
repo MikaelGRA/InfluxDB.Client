@@ -4,6 +4,7 @@
 //using System.Linq;
 //using System.Linq.Expressions;
 //using System.Threading.Tasks;
+//using Vibrant.InfluxDB.Client.IQToolkit;
 //using Vibrant.InfluxDB.Client.Linq;
 
 //namespace Vibrant.InfluxDB.Client

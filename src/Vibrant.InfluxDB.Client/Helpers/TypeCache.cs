@@ -12,7 +12,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
       private static readonly Dictionary<Type, object> _typeCache = new Dictionary<Type, object>();
       private static readonly HashSet<Type> _validFieldTypes = new HashSet<Type> { typeof( string ), typeof( double ), typeof( long ), typeof( bool ) };
 
-      internal static DataPointTypeInfo<TInfluxRow> GetOrCreateTypeCache<TInfluxRow>()
+      internal static InfluxRowTypeInfo<TInfluxRow> GetOrCreateTypeCache<TInfluxRow>()
          where TInfluxRow : new()
       {
          lock ( _sync )
@@ -74,11 +74,11 @@ namespace Vibrant.InfluxDB.Client.Helpers
                   }
                }
 
-               cache = new DataPointTypeInfo<TInfluxRow>( timestamp, tags, fields, all );
+               cache = new InfluxRowTypeInfo<TInfluxRow>( timestamp, tags, fields, all );
 
                _typeCache.Add( typeof( TInfluxRow ), cache );
             }
-            return (DataPointTypeInfo<TInfluxRow>)cache;
+            return (InfluxRowTypeInfo<TInfluxRow>)cache;
          }
       }
    }

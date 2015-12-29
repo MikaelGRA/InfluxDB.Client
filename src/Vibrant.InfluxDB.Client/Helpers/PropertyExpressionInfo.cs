@@ -15,9 +15,12 @@ namespace Vibrant.InfluxDB.Client.Helpers
       internal readonly Type Type;
       internal readonly Dictionary<Enum, string> EnumToString;
       internal readonly Dictionary<string, Enum> StringToEnum;
+      internal readonly PropertyInfo Property;
 
       internal PropertyExpressionInfo( PropertyInfo property )
       {
+         Property = property;
+
          // Instance type of target entity class 
          ParameterExpression instanceParam = Expression.Parameter( typeof( TInfluxRow ), "x" );
 

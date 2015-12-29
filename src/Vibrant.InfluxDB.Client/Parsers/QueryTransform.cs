@@ -18,7 +18,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
          return typeof( IInfluxRow ).IsAssignableFrom( typeof( TInfluxRow ) );
       }
 
-      private static bool HasAllColumns( DatabaseSeriesInfo meta, List<string> columns )
+      private static bool HasAllColumns( DatabaseMeasurementInfo meta, List<string> columns )
       {
          foreach ( var fieldOrTag in columns )
          {
@@ -59,7 +59,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                   {
                      var name = series.Name;
                      var columns = series.Columns;
-                     DatabaseSeriesInfo meta = null;
+                     DatabaseMeasurementInfo meta = null;
 
                      // get a collection of tags/fields, and ensure all columns exists in it
                      if ( !isExclusivelyTags )

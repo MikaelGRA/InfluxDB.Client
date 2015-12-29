@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client
 {
-    public enum TimestampPrecision
-    {
+   public enum TimestampPrecision
+   {
       Nanosecond,
       Microsecond,
       Millisecond,
       Second,
       Minute,
       Hours
-    }
+   }
 }

@@ -4,18 +4,19 @@
 //using System.Linq.Expressions;
 //using System.Reflection;
 //using System.Threading.Tasks;
+//using Vibrant.InfluxDB.Client.Helpers;
+//using Vibrant.InfluxDB.Client.Linq;
 
 //namespace Vibrant.InfluxDB.Client.Visitors
 //{
-//   internal class QueryBinder : ExpressionVisitor
+//   internal class QueryBinder<TInfluxRow> : ExpressionVisitor
 //   {
-//      ColumnProjector columnProjector;
-//      Dictionary<ParameterExpression, Expression> map;
-//      int aliasCount;
+//      private InfluxLinqQuery<TInfluxRow> _linq;
+//      private InfluxRowTypeInfo<TInfluxRow> _rowType;
+//      private bool _selectTags;
 
 //      internal QueryBinder()
 //      {
-//         this.columnProjector = new ColumnProjector( this.CanBeColumn );
 //      }
 
 //      private bool CanBeColumn( Expression expression )
@@ -56,9 +57,7 @@
 //            switch ( m.Method.Name )
 //            {
 //               case "Where":
-//                  return this.BindWhere( m.Type, m.Arguments[ 0 ], (LambdaExpression)StripQuotes( m.Arguments[ 1 ] ) );
-//               case "Select":
-//                  return this.BindSelect( m.Type, m.Arguments[ 0 ], (LambdaExpression)StripQuotes( m.Arguments[ 1 ] ) );
+//                  return BindWhere( m.Type, m.Arguments[ 0 ], (LambdaExpression)StripQuotes( m.Arguments[ 1 ] ) );
 //            }
 //            throw new NotSupportedException( string.Format( "The method '{0}' is not supported", m.Method.Name ) );
 //         }
@@ -74,19 +73,6 @@
 //         ProjectedColumns pc = this.ProjectColumns( projection.Projector, alias, GetExistingAlias( projection.Source ) );
 //         return new ProjectionExpression(
 //             new SelectExpression( resultType, alias, pc.Columns, projection.Source, where ),
-//             pc.Projector
-//             );
-//      }
-
-//      private Expression BindSelect( Type resultType, Expression source, LambdaExpression selector )
-//      {
-//         ProjectionExpression projection = (ProjectionExpression)this.Visit( source );
-//         this.map[ selector.Parameters[ 0 ] ] = projection.Projector;
-//         Expression expression = this.Visit( selector.Body );
-//         string alias = this.GetNextAlias();
-//         ProjectedColumns pc = this.ProjectColumns( expression, alias, GetExistingAlias( projection.Source ) );
-//         return new ProjectionExpression(
-//             new SelectExpression( resultType, alias, pc.Columns, projection.Source, null ),
 //             pc.Projector
 //             );
 //      }
@@ -135,43 +121,27 @@
 
 //      private IEnumerable<MemberInfo> GetMappedMembers( Type rowType )
 //      {
-//         return rowType.GetProperties().Cast<MemberInfo>();
-//      }
-
-//      private ProjectionExpression GetTableProjection( object value )
-//      {
-//         IQueryable table = (IQueryable)value;
-//         string tableAlias = this.GetNextAlias();
-//         string selectAlias = this.GetNextAlias();
-//         List<MemberBinding> bindings = new List<MemberBinding>();
-//         List<ColumnDeclaration> columns = new List<ColumnDeclaration>();
-//         foreach ( MemberInfo mi in this.GetMappedMembers( table.ElementType ) )
-//         {
-//            string columnName = this.GetColumnName( mi );
-//            Type columnType = this.GetColumnType( mi );
-//            int ordinal = columns.Count;
-//            bindings.Add( Expression.Bind( mi, new ColumnExpression( columnType, selectAlias, columnName, ordinal ) ) );
-//            columns.Add( new ColumnDeclaration( columnName, new ColumnExpression( columnType, tableAlias, columnName, ordinal ) ) );
-//         }
-//         Expression projector = Expression.MemberInit( Expression.New( table.ElementType ), bindings );
-//         Type resultType = typeof( IEnumerable<> ).MakeGenericType( table.ElementType );
-//         return new ProjectionExpression(
-//             new SelectExpression(
-//                 resultType,
-//                 selectAlias,
-//                 columns,
-//                 new TableExpression( resultType, tableAlias, this.GetTableName( table ) ),
-//                 null
-//                 ),
-//             projector
-//             );
+//         return rowType.GetProperties();
 //      }
 
 //      protected override Expression VisitConstant( ConstantExpression c )
 //      {
-//         if ( this.IsTable( c.Value ) )
+//         if ( IsTable( c.Value ) )
 //         {
-//            return GetTableProjection( c.Value );
+//            IQueryable table = (IQueryable)c.Value;
+//            foreach ( var field in _rowType.Fields )
+//            {
+//               // construct select clause...
+//               _linq.Selects.Add( new FieldSelect<TInfluxRow>( field.Value ) );
+//            }
+
+//            if ( _selectTags )
+//            {
+//               foreach ( var tag in _rowType.Tags )
+//               {
+//                  _linq.Selects.Add( new FieldSelect<TInfluxRow>( tag.Value ) );
+//               }
+//            }
 //         }
 //         return c;
 //      }

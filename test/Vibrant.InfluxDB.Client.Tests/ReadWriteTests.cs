@@ -88,7 +88,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       public async Task Should_Write_Typed_Rows_To_Database( int rows )
       {
          var infos = CreateTypedRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows, false );
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos, TimestampPrecision.Nanosecond, Consistency.One );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos );
       }
 
       [Theory]
@@ -98,7 +98,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       public async Task Should_Write_Typed_Rows_With_Nulls_To_Database( int rows )
       {
          var infos = CreateTypedRowsStartingAt( new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows, true );
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos, TimestampPrecision.Nanosecond, Consistency.One );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos );
       }
 
       [Theory]
@@ -108,7 +108,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       public async Task Should_Write_Dynamic_Rows_To_Database( int rows )
       {
          var infos = CreateDynamicRowsStartingAt( new DateTime( 2012, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows );
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos, TimestampPrecision.Nanosecond, Consistency.One );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos );
       }
 
       [Fact]
@@ -126,7 +126,7 @@ namespace Vibrant.InfluxDB.Client.Tests
             CategoryTag = TestEnum2.Value3,
          };
 
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "variation", new[] { row }, TimestampPrecision.Nanosecond, Consistency.One );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "variation", new[] { row } );
 
          var resultSet = await _client.ReadAsync<VariationRow>( "SELECT * FROM variation", InfluxClientFixture.DatabaseName );
          Assert.Equal( 1, resultSet.Results.Count );
@@ -143,7 +143,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       {
          var start = new DateTime( 2013, 1, 1, 1, 1, 1, DateTimeKind.Utc );
          var infos = CreateTypedRowsStartingAt( start, 500, false );
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos, TimestampPrecision.Nanosecond, Consistency.One );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos );
 
 
          var from = start;

@@ -9,7 +9,7 @@ namespace Vibrant.InfluxDB.Client
    /// Set the number of nodes that must confirm the write. If the requirement is not met the return value will be partial write if some points in the batch fail, or write failure if all points in the batch fail.
    /// </summary>
    public enum Consistency
-    {
+   {
       /// <summary>
       /// The data must be written to disk by at least 1 valid node
       /// </summary>

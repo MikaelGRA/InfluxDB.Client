@@ -26,7 +26,7 @@ namespace Vibrant.InfluxDB.Client
    {
       private readonly HttpClient _client;
       private readonly HttpClientHandler _handler;
-      private Dictionary<DatabaseSeriesInfoKey, DatabaseSeriesInfo> _seriesMetaCache;
+      private Dictionary<DatabaseMeasurementInfoKey, DatabaseMeasurementInfo> _seriesMetaCache;
 
       public InfluxClient( Uri endpoint, string username, string password )
       {
@@ -34,7 +34,10 @@ namespace Vibrant.InfluxDB.Client
          _client = new HttpClient( _handler, true );
          _client.BaseAddress = endpoint;
 
-         _seriesMetaCache = new Dictionary<DatabaseSeriesInfoKey, DatabaseSeriesInfo>();
+         _seriesMetaCache = new Dictionary<DatabaseMeasurementInfoKey, DatabaseMeasurementInfo>();
+
+         DefaultWriteOptions = new InfluxWriteOptions();
+         DefaultQueryOptions = new InfluxQueryOptions();
 
          if ( !string.IsNullOrEmpty( username ) && !string.IsNullOrEmpty( password ) )
          {
@@ -51,6 +54,10 @@ namespace Vibrant.InfluxDB.Client
       {
 
       }
+
+      public InfluxWriteOptions DefaultWriteOptions { get; private set; }
+
+      public InfluxQueryOptions DefaultQueryOptions { get; private set; }
 
       #region Raw Operations
 
@@ -567,43 +574,71 @@ namespace Vibrant.InfluxDB.Client
       #endregion
 
       #region Data Management
-
+      
       /// <summary>
-      /// Writes the rows to the measurement.
+      /// Writes the rows with default write options.
       /// </summary>
       /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
       /// <param name="measurementName"></param>
-      /// <param name="dataPoints"></param>
+      /// <param name="rows"></param>
       /// <returns></returns>
-      public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> dataPoints, TimestampPrecision precision, Consistency consistency )
+      public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows )
          where TInfluxRow : new()
       {
-         return WriteAsync( db, x => measurementName, dataPoints, precision, consistency );
+         return WriteAsync( db, x => measurementName, rows, DefaultWriteOptions );
       }
 
       /// <summary>
-      /// Writes the rows. The rows themselves must define their own measurement name
-      /// by implementing IMeasurementInfluxRow.
+      /// Writes the rows with the specified write options.
       /// </summary>
       /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
-      /// <param name="dataPoints"></param>
+      /// <param name="measurementName"></param>
+      /// <param name="rows"></param>
+      /// <param name="options"></param>
       /// <returns></returns>
-      public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> dataPoints, TimestampPrecision precision, Consistency consistency )
-         where TInfluxRow : IHaveMeasurementName, new()
-      {
-         return WriteAsync( db, x => x.MeasurementName, dataPoints, precision, consistency );
-      }
-
-      private Task WriteAsync<TInfluxRow>( string db, Func<TInfluxRow, string> getMeasurementName, IEnumerable<TInfluxRow> dataPoints, TimestampPrecision precision, Consistency consistency )
+      public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
          where TInfluxRow : new()
       {
-         return PostInternalIgnoreResultAsync( CreateWriteUrl( db, precision.GetQueryParameter(), consistency.GetQueryParameter() ), new InfluxRowContent<TInfluxRow>( dataPoints, getMeasurementName, precision ) );
+         return WriteAsync( db, x => measurementName, rows, options );
       }
 
       /// <summary>
-      /// Reads rows from the database.
+      /// Writes the rows with default write options.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="rows"></param>
+      /// <returns></returns>
+      public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows )
+         where TInfluxRow : IHaveMeasurementName, new()
+      {
+         return WriteAsync( db, x => x.MeasurementName, rows, DefaultWriteOptions );
+      }
+
+      /// <summary>
+      /// Writes the rows with the specified write options.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="rows"></param>
+      /// <param name="options"></param>
+      /// <returns></returns>
+      public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
+         where TInfluxRow : IHaveMeasurementName, new()
+      {
+         return WriteAsync( db, x => x.MeasurementName, rows, options );
+      }
+
+      private Task WriteAsync<TInfluxRow>( string db, Func<TInfluxRow, string> getMeasurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
+         where TInfluxRow : new()
+      {
+         return PostInternalIgnoreResultAsync( CreateWriteUrl( db, options.Precision.GetQueryParameter(), options.Consistency.GetQueryParameter() ), new InfluxRowContent<TInfluxRow>( rows, getMeasurementName, options.Precision ) );
+      }
+
+      /// <summary>
+      /// Executes the query and returns the result with the default query options.
       /// </summary>
       /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="query"></param>
@@ -612,15 +647,29 @@ namespace Vibrant.InfluxDB.Client
       public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string query, string db )
          where TInfluxRow : new()
       {
-         return ExecuteQueryInternalAsync<TInfluxRow>( query, db, TimestampPrecision.Nanosecond );
+         return ExecuteQueryInternalAsync<TInfluxRow>( query, db, DefaultWriteOptions.Precision );
+      }
+
+      /// <summary>
+      /// Executes the query and returns the result with the specified query options.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="query"></param>
+      /// <param name="db"></param>
+      /// <param name="options"></param>
+      /// <returns></returns>
+      public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string query, string db, InfluxQueryOptions options )
+         where TInfluxRow : new()
+      {
+         return ExecuteQueryInternalAsync<TInfluxRow>( query, db, options.Precision );
       }
 
       #endregion
 
-      internal async Task<DatabaseSeriesInfo> GetMetaInformationAsync( string db, string measurementName, bool forceRefresh )
+      internal async Task<DatabaseMeasurementInfo> GetMetaInformationAsync( string db, string measurementName, bool forceRefresh )
       {
-         var key = new DatabaseSeriesInfoKey( db, measurementName );
-         DatabaseSeriesInfo info;
+         var key = new DatabaseMeasurementInfoKey( db, measurementName );
+         DatabaseMeasurementInfo info;
 
          if ( !forceRefresh )
          {
@@ -641,7 +690,7 @@ namespace Vibrant.InfluxDB.Client
          var fields = fieldTask.Result.Series.First().Rows;
          var tags = tagTask.Result.Series.First().Rows;
 
-         info = new DatabaseSeriesInfo();
+         info = new DatabaseMeasurementInfo();
          foreach ( var row in fields )
          {
             info.Fields.Add( row.FieldKey );
@@ -790,6 +839,9 @@ namespace Vibrant.InfluxDB.Client
             {
                throw new InfluxException( resultWrapper.Error );
             }
+            
+            // COMMENT: We really should throw exception here, but we are unable to
+            // distinguish between "no data" and "error query"
 
             //if ( isMeasurementsQuery && resultWrapper.Series == null )
             //{

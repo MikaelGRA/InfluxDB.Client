@@ -134,7 +134,7 @@ namespace Vibrant.InfluxDB.Client.Tests
             Timestamp = DateTime.UtcNow - TimeSpan.FromMinutes( 5 ),
          };
 
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "someSeries", new[] { state }, TimestampPrecision.Nanosecond, Consistency.One );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "someSeries", new[] { state } );
 
          var resultSet1 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM someSeries WHERE region = 'some-region' AND host = 'some-host'", InfluxClientFixture.DatabaseName );
          Assert.Equal( 1, resultSet1.Results.Count );
