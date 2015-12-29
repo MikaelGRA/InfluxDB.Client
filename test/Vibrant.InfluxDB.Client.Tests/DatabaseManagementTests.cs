@@ -117,7 +117,7 @@ namespace Vibrant.InfluxDB.Client.Tests
          var series1 = result1.Series[ 0 ];
          Assert.Equal( 1, series1.Rows.Count );
 
-         await _client.DropMeasurementAsync( InfluxClientFixture.DatabaseName, "dmt2" );
+         await _client.DropMeasurementAsync( "dmt2", InfluxClientFixture.DatabaseName );
 
          var resultSet2 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM dmt2 WHERE region = 'some-region' AND host = 'some-host'", InfluxClientFixture.DatabaseName );
          Assert.Equal( 1, resultSet2.Results.Count );
