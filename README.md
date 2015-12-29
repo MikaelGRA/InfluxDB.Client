@@ -2,6 +2,10 @@
 
 This library makes it easy to be a client for InfluxDB on .NET!
 
+## Installation
+
+Nuget package to come...
+
 ## Reading/Writing
 
 The library exposes all operations on InfluxDB and can be used for reading/writing data to/from in two primary ways:
