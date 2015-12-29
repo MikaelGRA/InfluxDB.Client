@@ -68,7 +68,7 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "variation", new[] { row } );
 
-         var resultSet = await _client.ReadAsync<VariationRow>( "SELECT * FROM variation", InfluxClientFixture.DatabaseName );
+         var resultSet = await _client.ReadAsync<VariationRow>( InfluxClientFixture.DatabaseName, "SELECT * FROM variation" );
          Assert.Equal( 1, resultSet.Results.Count );
 
          var result = resultSet.Results[ 0 ];
@@ -91,7 +91,7 @@ namespace Vibrant.InfluxDB.Client.Tests
          var from = start;
          var to = from.AddSeconds( 250 );
 
-         var resultSet = await _client.ReadAsync<ComputerInfo>( $"SELECT * FROM computerInfo WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'", InfluxClientFixture.DatabaseName );
+         var resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM computerInfo WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'" );
          Assert.Equal( 1, resultSet.Results.Count );
 
          var result = resultSet.Results[ 0 ];

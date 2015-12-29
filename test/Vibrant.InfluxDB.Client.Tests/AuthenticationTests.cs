@@ -99,7 +99,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       {
          await _client.CreateUserAsync( "at4User", "somePassword" );
 
-         await _client.GrantPrivilegeAsync( DatabasePriviledge.Read, InfluxClientFixture.DatabaseName, "at4User" );
+         await _client.GrantPrivilegeAsync( InfluxClientFixture.DatabaseName, DatabasePriviledge.Read, "at4User" );
 
          var result = await _client.ShowGrantsAsync( "at4User" );
          Assert.Equal( 1, result.Series.Count );
@@ -107,7 +107,7 @@ namespace Vibrant.InfluxDB.Client.Tests
          var series = result.Series[ 0 ];
          Assert.Contains( series.Rows, x => x.Database == InfluxClientFixture.DatabaseName && x.Privilege == DatabasePriviledge.Read );
 
-         await _client.RevokePrivilegeAsync( DatabasePriviledge.Read, InfluxClientFixture.DatabaseName, "at4User" );
+         await _client.RevokePrivilegeAsync( InfluxClientFixture.DatabaseName, DatabasePriviledge.Read, "at4User" );
 
          result = await _client.ShowGrantsAsync( "at4User" );
          Assert.Equal( 1, result.Series.Count );

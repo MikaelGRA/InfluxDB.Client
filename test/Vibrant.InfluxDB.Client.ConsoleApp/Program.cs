@@ -21,7 +21,7 @@ namespace Vibrant.InfluxDB.Client.ConsoleApp
             //var from = DateTime.Parse( "21-12-2015 20:39:44" );
             //var to = DateTime.Parse( "23-12-2015 20:28:29" );
 
-            var resultSet = client.ReadAsync<ComputerInfo>( $"SELECT * FROM computerInfo", "mydb" ).Result;
+            var resultSet = client.ReadAsync<ComputerInfo>( "mydb", $"SELECT * FROM computerInfo" ).Result;
 
             //var resultSet = client.ShowGrantsAsync( "root" ).Result;
 

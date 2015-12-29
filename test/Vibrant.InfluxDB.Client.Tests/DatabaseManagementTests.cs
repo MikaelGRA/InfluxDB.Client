@@ -75,7 +75,7 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "dmt1", new[] { state } );
 
-         var resultSet1 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM dmt1 WHERE region = 'some-region' AND host = 'some-host'", InfluxClientFixture.DatabaseName );
+         var resultSet1 = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, "SELECT * FROM dmt1 WHERE region = 'some-region' AND host = 'some-host'" );
          Assert.Equal( 1, resultSet1.Results.Count );
 
          var result1 = resultSet1.Results[ 0 ];
@@ -86,7 +86,7 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          await _client.DropSeries( InfluxClientFixture.DatabaseName, "dmt1", "region = 'some-region' AND host = 'some-host'" );
 
-         var resultSet2 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM dmt1 WHERE region = 'some-region' AND host = 'some-host'", InfluxClientFixture.DatabaseName );
+         var resultSet2 = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, "SELECT * FROM dmt1 WHERE region = 'some-region' AND host = 'some-host'" );
          Assert.Equal( 1, resultSet2.Results.Count );
 
          var result2 = resultSet2.Results[ 0 ];
@@ -108,7 +108,7 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "dmt2", new[] { state } );
 
-         var resultSet1 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM dmt2 WHERE region = 'some-region' AND host = 'some-host'", InfluxClientFixture.DatabaseName );
+         var resultSet1 = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, "SELECT * FROM dmt2 WHERE region = 'some-region' AND host = 'some-host'" );
          Assert.Equal( 1, resultSet1.Results.Count );
 
          var result1 = resultSet1.Results[ 0 ];
@@ -117,9 +117,9 @@ namespace Vibrant.InfluxDB.Client.Tests
          var series1 = result1.Series[ 0 ];
          Assert.Equal( 1, series1.Rows.Count );
 
-         await _client.DropMeasurementAsync( "dmt2", InfluxClientFixture.DatabaseName );
+         await _client.DropMeasurementAsync( InfluxClientFixture.DatabaseName, "dmt2" );
 
-         var resultSet2 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM dmt2 WHERE region = 'some-region' AND host = 'some-host'", InfluxClientFixture.DatabaseName );
+         var resultSet2 = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, "SELECT * FROM dmt2 WHERE region = 'some-region' AND host = 'some-host'" );
          Assert.Equal( 1, resultSet2.Results.Count );
 
          var result2 = resultSet2.Results[ 0 ];
@@ -139,7 +139,7 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "dmt3", new[] { state } );
 
-         var resultSet1 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM dmt3", InfluxClientFixture.DatabaseName );
+         var resultSet1 = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, "SELECT * FROM dmt3" );
          Assert.Equal( 1, resultSet1.Results.Count );
 
          var result1 = resultSet1.Results[ 0 ];
@@ -150,7 +150,7 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          await _client.DropSeries( InfluxClientFixture.DatabaseName, "dmt3" );
 
-         var resultSet2 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM dmt3", InfluxClientFixture.DatabaseName );
+         var resultSet2 = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, "SELECT * FROM dmt3" );
          Assert.Equal( 1, resultSet2.Results.Count );
 
          var result2 = resultSet2.Results[ 0 ];
@@ -161,7 +161,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       [Fact]
       public async Task Should_Create_Show_Modify_And_Drop_Retention_Policy()
       {
-         await _client.CreateRetentionPolicyAsync( "dmt4RetentionPolicy", InfluxClientFixture.DatabaseName, "1d", 1, false );
+         await _client.CreateRetentionPolicyAsync( InfluxClientFixture.DatabaseName, "dmt4RetentionPolicy", "1d", 1, false );
 
          var result = await _client.ShowRetentionPoliciesAsync( InfluxClientFixture.DatabaseName );
          Assert.Equal( 1, result.Series.Count );
@@ -169,9 +169,9 @@ namespace Vibrant.InfluxDB.Client.Tests
          var series = result.Series[ 0 ];
          Assert.Contains( series.Rows, x => x.Name == "dmt4RetentionPolicy" );
 
-         await _client.AlterRetentionPolicyAsync( "dmt4RetentionPolicy", InfluxClientFixture.DatabaseName, "4d", 1, false );
+         await _client.AlterRetentionPolicyAsync( InfluxClientFixture.DatabaseName, "dmt4RetentionPolicy", "4d", 1, false );
          
-         await _client.DropRetentionPolicyAsync( "dmt4RetentionPolicy", InfluxClientFixture.DatabaseName );
+         await _client.DropRetentionPolicyAsync( InfluxClientFixture.DatabaseName, "dmt4RetentionPolicy" );
       }
 
       [Fact]
@@ -179,7 +179,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       {
          await Assert.ThrowsAsync( typeof( InfluxException ), async () =>
           {
-             await _client.DropRetentionPolicyAsync( "dmt5RetentionPolicy", InfluxClientFixture.DatabaseName );
+             await _client.DropRetentionPolicyAsync( InfluxClientFixture.DatabaseName, "dmt5RetentionPolicy" );
           } );
       }
    }

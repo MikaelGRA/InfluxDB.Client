@@ -211,7 +211,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <param name="username"></param>
       /// <returns></returns>
-      public Task GrantPrivilegeAsync( DatabasePriviledge privilege, string db, string username )
+      public Task GrantPrivilegeAsync( string db, DatabasePriviledge privilege, string username )
       {
          return ExecuteOperationWithNoResultAsync( $"GRANT {GetPrivilege( privilege )} ON \"{db}\" TO {username}" );
       }
@@ -233,7 +233,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <param name="username"></param>
       /// <returns></returns>
-      public Task RevokePrivilegeAsync( DatabasePriviledge privilege, string db, string username )
+      public Task RevokePrivilegeAsync( string db, DatabasePriviledge privilege, string username )
       {
          return ExecuteOperationWithNoResultAsync( $"REVOKE {GetPrivilege( privilege )} ON \"{db}\" FROM {username}" );
       }
@@ -368,7 +368,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="measurementName"></param>
       /// <param name="db"></param>
       /// <returns></returns>
-      public Task DropMeasurementAsync( string measurementName, string db )
+      public Task DropMeasurementAsync( string db, string measurementName )
       {
          return ExecuteOperationWithNoResultAsync( $"DROP MEASUREMENT \"{measurementName}\"", db );
       }
@@ -382,7 +382,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="replicationLevel"></param>
       /// <param name="isDefault"></param>
       /// <returns></returns>
-      public Task CreateRetentionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
+      public Task CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault )
       {
          return ExecuteOperationWithNoResultAsync( $"CREATE RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetDefault( isDefault )}" );
       }
@@ -396,7 +396,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="replicationLevel"></param>
       /// <param name="isDefault"></param>
       /// <returns></returns>
-      public Task AlterRetentionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
+      public Task AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault )
       {
          return ExecuteOperationWithNoResultAsync( $"ALTER RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetDefault( isDefault )}" );
       }
@@ -407,7 +407,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="policyName"></param>
       /// <param name="db"></param>
       /// <returns></returns>
-      public Task DropRetentionPolicyAsync( string policyName, string db )
+      public Task DropRetentionPolicyAsync( string db, string policyName )
       {
          return ExecuteOperationWithNoResultAsync( $"DROP RETENTION POLICY \"{policyName}\" ON \"{db}\"" );
       }
@@ -440,7 +440,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <param name="continuousQuery"></param>
       /// <returns></returns>
-      public Task CreateContinuousQuery( string name, string db, string continuousQuery )
+      public Task CreateContinuousQuery( string db, string name, string continuousQuery )
       {
          return ExecuteQueryInternalAsync( $"CREATE CONTINUOUS QUERY \"{name}\" ON \"{db}\"\n{continuousQuery}", db );
       }
@@ -451,7 +451,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="name"></param>
       /// <param name="db"></param>
       /// <returns></returns>
-      public Task DropContinuousQuery( string name, string db )
+      public Task DropContinuousQuery( string db, string name )
       {
          return ExecuteQueryInternalAsync( $"DROP CONTINUOUS QUERY \"{name}\" ON \"{db}\"", db );
       }
@@ -717,7 +717,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="query"></param>
       /// <param name="db"></param>
       /// <returns></returns>
-      public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string query, string db )
+      public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query )
          where TInfluxRow : new()
       {
          return ExecuteQueryInternalAsync<TInfluxRow>( query, db, DefaultQueryOptions );
@@ -731,7 +731,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <param name="options"></param>
       /// <returns></returns>
-      public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string query, string db, InfluxQueryOptions options )
+      public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query, InfluxQueryOptions options )
          where TInfluxRow : new()
       {
          return ExecuteQueryInternalAsync<TInfluxRow>( query, db, options );
