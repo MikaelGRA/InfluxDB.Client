@@ -1,4 +1,4 @@
-# InfluxDB.Client
+# InfluxDB Client for .NET
 
 This library makes it easy to be a client for InfluxDB on .NET!
 
