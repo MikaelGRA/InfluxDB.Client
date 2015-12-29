@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Vibrant.InfluxDB.Client.Dto;
-using Vibrant.InfluxDB.Client.Helpers;
+using Vibrant.InfluxDB.Client.Metadata;
 using Vibrant.InfluxDB.Client.Parsers;
 using Vibrant.InfluxDB.Client.Resources;
 using Vibrant.InfluxDB.Client.Rows;
@@ -823,33 +823,33 @@ namespace Vibrant.InfluxDB.Client
          where TInfluxRow : new()
       {
          var queryResult = await GetInternalAsync( CreateQueryUrl( query, db, options ), true ).ConfigureAwait( false );
-         return await QueryTransform.ParseQueryAsync<TInfluxRow>( this, queryResult, db, false ).ConfigureAwait( false );
+         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, false ).ConfigureAwait( false );
       }
 
       private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db, bool isMeasurementQuery = false )
          where TInfluxRow : new()
       {
          var queryResult = await GetInternalAsync( CreateQueryUrl( query, db ), isMeasurementQuery ).ConfigureAwait( false );
-         return await QueryTransform.ParseQueryAsync<TInfluxRow>( this, queryResult, db, !isMeasurementQuery ).ConfigureAwait( false );
+         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, !isMeasurementQuery ).ConfigureAwait( false );
       }
 
       private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query )
          where TInfluxRow : new()
       {
          var queryResult = await GetInternalAsync( CreateQueryUrl( query ), false ).ConfigureAwait( false );
-         return await QueryTransform.ParseQueryAsync<TInfluxRow>( this, queryResult, null, false ).ConfigureAwait( false );
+         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, null, false ).ConfigureAwait( false );
       }
 
       private async Task<InfluxResultSet> ExecuteQueryInternalAsync( string query, string db )
       {
          var queryResult = await GetInternalAsync( CreateQueryUrl( query, db ), false ).ConfigureAwait( false );
-         return QueryTransform.ParseQuery( queryResult );
+         return ResultSetFactory.Create( queryResult );
       }
 
       private async Task<InfluxResultSet> ExecuteQueryInternalAsync( string query )
       {
          var queryResult = await GetInternalAsync( CreateQueryUrl( query ), false ).ConfigureAwait( false );
-         return QueryTransform.ParseQuery( queryResult );
+         return ResultSetFactory.Create( queryResult );
       }
 
       private Task<InfluxPingResult> ExecutePingInternalAsync( int? secondsToWaitForLeader )

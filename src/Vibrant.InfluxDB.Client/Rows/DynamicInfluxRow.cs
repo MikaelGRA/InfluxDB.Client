@@ -8,32 +8,32 @@ namespace Vibrant.InfluxDB.Client.Rows
 {
    public class DynamicInfluxRow : DynamicObject, IInfluxRow
    {
-      public DateTime ReadTimestamp()
+      public DateTime? GetTimestamp()
       {
          return Timestamp;
       }
 
-      public void WriteTimestamp( DateTime value )
+      public void SetTimestamp( DateTime? value )
       {
          Timestamp = value;
       }
 
-      public object ReadField( string name )
+      public object GetField( string name )
       {
          return Fields[ name ];
       }
 
-      public void WriteField( string name, object value )
+      public void SetField( string name, object value )
       {
          Fields.Add( name, value );
       }
 
-      public string ReadTag( string name )
+      public string GetTag( string name )
       {
          return Tags[ name ];
       }
 
-      public void WriteTag( string name, string value )
+      public void SetTag( string name, string value )
       {
          Tags.Add( name, value );
       }
@@ -48,7 +48,7 @@ namespace Vibrant.InfluxDB.Client.Rows
          return Fields;
       }
 
-      public DateTime Timestamp { get; set; }
+      public DateTime? Timestamp { get; set; }
 
       public IDictionary<string, string> Tags { get; private set; }
 
@@ -64,8 +64,14 @@ namespace Vibrant.InfluxDB.Client.Rows
       {
          if ( binder.Name == "Timestamp" || binder.Name == InfluxConstants.TimeColumn )
          {
-            // TODO: What if null???
-            result = Timestamp;
+            if ( Timestamp.HasValue )
+            {
+               result = Timestamp.Value;
+            }
+            else
+            {
+               result = null;
+            }
             return true;
          }
 
@@ -79,7 +85,9 @@ namespace Vibrant.InfluxDB.Client.Rows
             result = result2;
             return true;
          }
-         return false;
+
+         // always return true, simply return a null if a value does not exist
+         return true;
       }
    }
 }

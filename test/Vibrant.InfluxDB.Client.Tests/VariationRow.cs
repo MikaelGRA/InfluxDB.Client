@@ -35,6 +35,9 @@ namespace Vibrant.InfluxDB.Client.Tests
       [InfluxField( "category" )]
       public TestEnum1 Category { get; set; }
 
+      [InfluxField( "categoryField that is nullable" )]
+      public TestEnum1? CategoryNullable { get; set; }
+
       // override object.Equals
       public override bool Equals( object obj )
       {
@@ -50,7 +53,8 @@ namespace Vibrant.InfluxDB.Client.Tests
             && Percent == other.Percent
             && Indicator == other.Indicator
             && OtherTimestamp == other.OtherTimestamp
-            && Category == other.Category;
+            && Category == other.Category
+            && CategoryNullable == other.CategoryNullable;
       }
 
       // override object.GetHashCode

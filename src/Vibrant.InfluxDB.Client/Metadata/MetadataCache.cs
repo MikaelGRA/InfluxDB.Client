@@ -4,15 +4,15 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Vibrant.InfluxDB.Client.Helpers
+namespace Vibrant.InfluxDB.Client.Metadata
 {
-   internal static class TypeCache
+   internal static class MetadataCache
    {
       private static readonly object _sync = new object();
       private static readonly Dictionary<Type, object> _typeCache = new Dictionary<Type, object>();
       private static readonly HashSet<Type> _validFieldTypes = new HashSet<Type> { typeof( string ), typeof( double ), typeof( long ), typeof( bool ), typeof( DateTime ) };
 
-      internal static InfluxRowTypeInfo<TInfluxRow> GetOrCreateTypeCache<TInfluxRow>()
+      internal static InfluxRowTypeInfo<TInfluxRow> GetOrCreate<TInfluxRow>()
          where TInfluxRow : new()
       {
          lock ( _sync )

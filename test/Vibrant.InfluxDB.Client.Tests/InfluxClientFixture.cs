@@ -42,7 +42,7 @@ namespace Vibrant.InfluxDB.Client.Tests
 
             if ( includeNulls )
             {
-               var info = new ComputerInfo { Timestamp = timestamp, RAM = ram, Host = host, Region = region };
+               var info = new ComputerInfo { Timestamp = timestamp, RAM = ram, Region = region };
                infos[ i ] = info;
             }
             else

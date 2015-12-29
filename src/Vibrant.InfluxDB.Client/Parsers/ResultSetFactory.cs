@@ -5,13 +5,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Vibrant.InfluxDB.Client.Dto;
-using Vibrant.InfluxDB.Client.Helpers;
+using Vibrant.InfluxDB.Client.Metadata;
 using Vibrant.InfluxDB.Client.Resources;
 using Vibrant.InfluxDB.Client.Rows;
 
 namespace Vibrant.InfluxDB.Client.Parsers
 {
-   internal static class QueryTransform
+   internal static class ResultSetFactory
    {
       internal static bool IsCustomDataPoint<TInfluxRow>()
       {
@@ -30,7 +30,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
          return true;
       }
 
-      internal static InfluxResultSet ParseQuery( QueryResult queryResult )
+      internal static InfluxResultSet Create( QueryResult queryResult )
       {
          List<InfluxResult> results = new List<InfluxResult>();
          foreach ( var result in queryResult.Results )
@@ -40,11 +40,11 @@ namespace Vibrant.InfluxDB.Client.Parsers
          return new InfluxResultSet( results );
       }
 
-      internal async static Task<InfluxResultSet<TInfluxRow>> ParseQueryAsync<TInfluxRow>(
+      internal async static Task<InfluxResultSet<TInfluxRow>> CreateAsync<TInfluxRow>(
          InfluxClient client,
          QueryResult queryResult,
          string db,
-         bool isExclusivelyTags )
+         bool isExclusivelyFields )
          where TInfluxRow : new()
       {
          if ( IsCustomDataPoint<TInfluxRow>() )
@@ -66,7 +66,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                         DatabaseMeasurementInfo meta = null;
 
                         // get a collection of tags/fields, and ensure all columns exists in it
-                        if ( !isExclusivelyTags )
+                        if ( !isExclusivelyFields )
                         {
                            string seriesName = series.Name;
                            meta = await client.GetMetaInformationAsync( db, seriesName, false ).ConfigureAwait( false );
@@ -96,9 +96,9 @@ namespace Vibrant.InfluxDB.Client.Parsers
 
                            for ( int i = 0 ; i < values.Count ; i++ )
                            {
-                              if ( isExclusivelyTags )
+                              if ( isExclusivelyFields )
                               {
-                                 dataPoint.WriteField( columns[ i ], values[ i ] );
+                                 dataPoint.SetField( columns[ i ], values[ i ] );
                               }
                               else
                               {
@@ -109,15 +109,15 @@ namespace Vibrant.InfluxDB.Client.Parsers
                                  {
                                     if ( columnName == InfluxConstants.TimeColumn )
                                     {
-                                       dataPoint.WriteTimestamp( (DateTime)value );
+                                       dataPoint.SetTimestamp( (DateTime)value );
                                     }
                                     else if ( meta.Tags.Contains( columnName ) )
                                     {
-                                       dataPoint.WriteTag( columnName, (string)value );
+                                       dataPoint.SetTag( columnName, (string)value );
                                     }
                                     else
                                     {
-                                       dataPoint.WriteField( columnName, value );
+                                       dataPoint.SetField( columnName, value );
                                     }
                                  }
                               }
@@ -153,7 +153,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      if ( series.Values != null )
                      {
                         var properties = new PropertyExpressionInfo<TInfluxRow>[ columns.Count ];
-                        var propertyMap = TypeCache.GetOrCreateTypeCache<TInfluxRow>().All;
+                        var propertyMap = MetadataCache.GetOrCreate<TInfluxRow>().All;
                         for ( int i = 0 ; i < columns.Count ; i++ )
                         {
                            PropertyExpressionInfo<TInfluxRow> propertyInfo;
@@ -207,111 +207,5 @@ namespace Vibrant.InfluxDB.Client.Parsers
             return new InfluxResultSet<TInfluxRow>( results );
          }
       }
-
-
-
-
-
-      //internal static InfluxQueryResultSet<TInfluxRow> ParseQuery<TInfluxRow>( JsonTextReader reader )
-      //   where TInfluxRow : IDataPoint, new()
-      //{
-      //   List<InfluxQueryResult<TInfluxRow>> results = new List<InfluxQueryResult<TInfluxRow>>();
-
-      //   reader.Read(); // Consume None, go to StartObject
-      //   reader.Read(); // Consume StartObject, go to PropertyName
-      //   reader.Read(); // Consume PropertyName ("results"), go to StartArray
-      //   while ( reader.Read() && reader.TokenType != JsonToken.EndObject ) // Consnume StartArray/EndObject, go to StartObject/EndObject
-      //   {
-
-      //      while ( reader.Read() && reader.TokenType == JsonToken.PropertyName ) // Consume StartObject, go to PropertyName
-      //      {
-      //         var influxSeries = new List<InfluxSeries<TInfluxRow>>();
-
-      //         reader.Read(); // Consume PropertyName ("series"), go to StartArray
-      //         while ( reader.Read() && reader.TokenType == JsonToken.StartObject ) // Consume StartArray/EndObject, go to StartObject/EndArray
-      //         {
-      //            string name = null;
-      //            var columns = new List<string>();
-      //            var dataPoints = new List<TInfluxRow>();
-      //            PropertyExpressionInfo<TInfluxRow>[] properties = null;
-      //            Dictionary<string, string> tags = null;
-
-      //            while ( reader.Read() && reader.TokenType == JsonToken.PropertyName ) // Consume StartObject/Value, go to PropertyName/EndObject
-      //            {
-      //               string propertyName = (string)reader.Value;
-
-      //               reader.Read(); // Consume PropertyName, go to Value/StartArray/StartObject
-
-      //               switch ( propertyName )
-      //               {
-      //                  case "name":
-      //                     name = (string)reader.Value;
-      //                     break;
-      //                  case "columns":
-      //                     while ( reader.Read() && reader.TokenType != JsonToken.EndArray ) // Consume StartArray/Value, go to Value/EndArray
-      //                     {
-      //                        columns.Add( (string)reader.Value );
-      //                     }
-      //                     properties = new PropertyExpressionInfo<TInfluxRow>[ columns.Count ];
-      //                     var propertyMap = TypeCache.GetOrCreateTypeCache<TInfluxRow>().All;
-      //                     for ( int i = 0 ; i < columns.Count ; i++ )
-      //                     {
-      //                        PropertyExpressionInfo<TInfluxRow> propertyInfo;
-      //                        if ( !propertyMap.TryGetValue( columns[ i ], out propertyInfo ) )
-      //                        {
-      //                           throw new InfluxException( $"Could not find the property mapped to the field/tag '{columns[ i ]}' on the type {typeof( TInfluxRow ).Name}." );
-      //                        }
-      //                        properties[ i ] = propertyInfo;
-      //                     }
-      //                     break;
-      //                  case "tags":
-      //                     tags = new Dictionary<string, string>();
-      //                     while ( reader.Read() && reader.TokenType != JsonToken.EndObject )
-      //                     {
-      //                        var tagName = (string)reader.Value;
-      //                        reader.Read();
-      //                        var tagValue = (string)reader.Value;
-      //                        tags.Add( tagName, tagValue );
-      //                     }
-      //                     break;
-      //                  case "values":
-      //                     while ( reader.Read() && reader.TokenType != JsonToken.EndArray ) // Consume StartArray/Value, go to Value/EndArray
-      //                     {
-      //                        var dataPoint = new TInfluxRow();
-      //                        var seriesDataPoint = dataPoints as ISeriesDataPoint;
-      //                        if ( seriesDataPoint != null )
-      //                        {
-      //                           seriesDataPoint.SeriesName = name;
-      //                        }
-
-      //                        int i = 0;
-      //                        while ( reader.Read() && reader.TokenType != JsonToken.EndArray ) // Consume StartArray/Value, go to Value/EndArray
-      //                        {
-      //                           properties[ i ]?.SetValue( dataPoint, reader.Value ); // WHAT VALUE? Will probably work....?
-
-      //                           i++;
-      //                        }
-
-      //                        dataPoints.Add( dataPoint );
-      //                     }
-      //                     break;
-      //                  default:
-      //                     throw new InfluxException( "An unknown exception occurred during query parsing." );
-      //               }
-
-      //            }
-
-      //            // can construct object
-      //            influxSeries.Add( new InfluxSeries<TInfluxRow>( name, dataPoints, tags ) ); // ADD TAGS
-
-      //         }
-
-      //         results.Add( new InfluxQueryResult<TInfluxRow>( influxSeries ) );
-      //      }
-
-      //   }
-
-      //   return new InfluxQueryResultSet<TInfluxRow>( results );
-      //}
    }
 }

@@ -54,10 +54,10 @@
     <Compile Include="Dto\QueryResult.cs" />
     <Compile Include="Dto\SeriesResult.cs" />
     <Compile Include="Dto\SeriesResultWrapper.cs" />
-    <Compile Include="Helpers\DatabaseMeasurementInfo.cs" />
-    <Compile Include="Helpers\InfluxRowTypeInfo.cs" />
-    <Compile Include="Helpers\PropertyExpressionInfo.cs" />
-    <Compile Include="Helpers\TypeCache.cs" />
+    <Compile Include="Metadata\DatabaseMeasurementInfo.cs" />
+    <Compile Include="Metadata\InfluxRowTypeInfo.cs" />
+    <Compile Include="Metadata\PropertyExpressionInfo.cs" />
+    <Compile Include="Metadata\MetadataCache.cs" />
     <Compile Include="Http\HttpContentExtensions.cs" />
     <Compile Include="InfluxPingResult.cs" />
     <Compile Include="InfluxQueryOptions.cs" />
@@ -112,7 +112,7 @@
     <Compile Include="IQToolkit\TypedSubtreeFinder.cs" />
     <Compile Include="IQToolkit\TypeHelper.cs" />
     <Compile Include="IQToolkit\Updatable.cs" />
-    <Compile Include="Parsers\QueryTransform.cs" />
+    <Compile Include="Parsers\ResultSetFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\Errors.Designer.cs">
       <AutoGen>True</AutoGen>

@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Vibrant.InfluxDB.Client.Helpers
+namespace Vibrant.InfluxDB.Client.Metadata
 {
    internal class InfluxRowTypeInfo<TInfluxRow>
    {

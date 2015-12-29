@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Vibrant.InfluxDB.Client.Helpers
+namespace Vibrant.InfluxDB.Client.Metadata
 {
    internal struct DatabaseMeasurementInfoKey
    {

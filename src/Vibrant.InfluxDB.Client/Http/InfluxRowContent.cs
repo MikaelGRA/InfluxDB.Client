@@ -9,16 +9,15 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Vibrant.InfluxDB.Client.Helpers;
+using Vibrant.InfluxDB.Client.Metadata;
 using Vibrant.InfluxDB.Client.Parsers;
 using Vibrant.InfluxDB.Client.Rows;
 
 namespace Vibrant.InfluxDB.Client.Http
 {
-   public class InfluxRowContent<TInfluxRow> : HttpContent
+   internal class InfluxRowContent<TInfluxRow> : HttpContent
       where TInfluxRow : new()
    {
-
       private static readonly MediaTypeHeaderValue _mediaType = new MediaTypeHeaderValue( "text/plain" ) { CharSet = "utf-8" };
       private static readonly Encoding UTF8 = new UTF8Encoding( false );
 
@@ -26,7 +25,7 @@ namespace Vibrant.InfluxDB.Client.Http
       private readonly Func<TInfluxRow, string> _getMeasurementName;
       private readonly TimestampPrecision _precision;
 
-      public InfluxRowContent( IEnumerable<TInfluxRow> dataPoints, Func<TInfluxRow, string> getMeasurementName, TimestampPrecision precision )
+      internal InfluxRowContent( IEnumerable<TInfluxRow> dataPoints, Func<TInfluxRow, string> getMeasurementName, TimestampPrecision precision )
       {
          _dataPoints = dataPoints;
          _getMeasurementName = getMeasurementName;
@@ -40,9 +39,8 @@ namespace Vibrant.InfluxDB.Client.Http
          var precision = _precision;
          var getMeasurementName = _getMeasurementName;
 
-         if ( QueryTransform.IsCustomDataPoint<TInfluxRow>() )
+         if ( ResultSetFactory.IsCustomDataPoint<TInfluxRow>() )
          {
-
             var writer = new StreamWriter( stream, UTF8 );
             foreach ( IInfluxRow dp in _dataPoints )
             {
@@ -99,25 +97,26 @@ namespace Vibrant.InfluxDB.Client.Http
                      }
                   }
                }
-               writer.Write( " " );
 
-               var ts = dp.ReadTimestamp();
-               long ticks = ts.ToPrecision( precision );
-               writer.Write( ticks );
+               // it is allowed to not specify a timestamp
+               var ts = dp.GetTimestamp();
+               if ( ts != null )
+               {
+                  writer.Write( " " );
+                  long ticks = ts.Value.ToPrecision( precision );
+                  writer.Write( ticks );
+               }
+
                writer.Write( "\n" );
             }
             writer.Flush();
          }
          else
          {
-            var cache = TypeCache.GetOrCreateTypeCache<TInfluxRow>();
+            var cache = MetadataCache.GetOrCreate<TInfluxRow>();
             var tags = cache.Tags;
             var fields = cache.Fields;
             var timestamp = cache.Timestamp;
-            if ( timestamp == null )
-            {
-               throw new InvalidOperationException( "Cannot serialize data points without an influx timestamp" );
-            }
 
             var writer = new StreamWriter( stream, UTF8 );
             foreach ( var dp in _dataPoints )
@@ -189,15 +188,18 @@ namespace Vibrant.InfluxDB.Client.Http
                      }
                   }
                }
-               writer.Write( " " );
 
-               var ts = (DateTime)timestamp.GetValue( dp );
-               long ticks = ts.ToPrecision( precision );
-               if ( ticks < 0 )
+               if ( timestamp != null )
                {
-                  throw new InfluxException( "Timestamp cannot be earlier than epoch (1. Jan. 1970)." );
+                  var ts = timestamp.GetValue( dp );
+                  if ( ts != null )
+                  {
+                     writer.Write( " " );
+                     long ticks = ( (DateTime)ts ).ToPrecision( precision );
+                     writer.Write( ticks );
+                  }
                }
-               writer.Write( ticks );
+
                writer.Write( "\n" );
             }
             writer.Flush();

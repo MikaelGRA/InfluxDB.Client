@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Vibrant.InfluxDB.Client.Helpers;
+using Vibrant.InfluxDB.Client.Metadata;
 
 namespace Vibrant.InfluxDB.Client.Parsers
 {
@@ -49,6 +49,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
 
       internal static string EscapeKey( string value )
       {
+         // attempt to get a cached value here, as there will be a limited set of different tags
          string cachedValue;
          if ( !EscapedKeys.TryGetValue( value, out cachedValue ) )
          {
@@ -60,6 +61,8 @@ namespace Vibrant.InfluxDB.Client.Parsers
 
       private static string Escape( string value )
       {
+         // https://docs.influxdata.com/influxdb/v0.9/write_protocols/line/
+
          StringBuilder builder = new StringBuilder( value.Length );
          for ( int i = 0 ; i < value.Length ; i++ )
          {

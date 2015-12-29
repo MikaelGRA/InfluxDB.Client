@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Vibrant.InfluxDB.Client.Parsers;
 
-namespace Vibrant.InfluxDB.Client.Helpers
+namespace Vibrant.InfluxDB.Client.Metadata
 {
    internal class PropertyExpressionInfo<TInfluxRow>
    {

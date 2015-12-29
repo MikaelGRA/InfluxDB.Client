@@ -100,5 +100,27 @@ namespace Vibrant.InfluxDB.Client.Tests
          var series = result.Series[ 0 ];
          Assert.Equal( 250, series.Rows.Count );
       }
+
+      [Fact]
+      public async Task Should_Write_Type_With_Null_Timestamp()
+      {
+         var row = new SimpleRow
+         {
+            Value = 13.37
+         };
+
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "simpleRow", new[] { row } );
+
+         var resultSet = await _client.ReadAsync<SimpleRow>( InfluxClientFixture.DatabaseName, "SELECT * FROM simpleRow" );
+         Assert.Equal( 1, resultSet.Results.Count );
+
+         var result = resultSet.Results[ 0 ];
+         Assert.Equal( 1, result.Series.Count );
+
+         var series = result.Series[ 0 ];
+         Assert.Equal( 1, series.Rows.Count );
+
+         Assert.Equal( row.Value, series.Rows[ 0 ].Value );
+      }
    }
 }

@@ -7,17 +7,17 @@ namespace Vibrant.InfluxDB.Client.Rows
 {
    public interface IInfluxRow
    {
-      void WriteTimestamp( DateTime value );
+      void SetTimestamp( DateTime? value );
 
-      DateTime ReadTimestamp();
+      DateTime? GetTimestamp();
 
-      void WriteField( string name, object value );
+      void SetField( string name, object value );
 
-      object ReadField( string name );
+      object GetField( string name );
 
-      void WriteTag( string name, string value );
+      void SetTag( string name, string value );
 
-      string ReadTag( string name );
+      string GetTag( string name );
 
       IEnumerable<KeyValuePair<string, string>> GetAllTags();
 
