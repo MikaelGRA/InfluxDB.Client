@@ -622,6 +622,12 @@ public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, strin
 #endregion
 ```
 
+To get an exact indication for what each of the parameters are refer to the documentation page provided by influxDB:
+ * https://docs.influxdata.com/influxdb/v0.9/query_language/data_exploration/
+ * https://docs.influxdata.com/influxdb/v0.9/query_language/schema_exploration/
+ * https://docs.influxdata.com/influxdb/v0.9/query_language/database_management/
+ * https://docs.influxdata.com/influxdb/v0.9/query_language/continuous_queries/
+
 Finally if you need to execute a custom operation or multiple management operations at once, you can use one of the following methods:
 
 ```c#
