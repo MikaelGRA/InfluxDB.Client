@@ -39,7 +39,7 @@ public class ComputerInfo
 On your POCO class you must specify these things:
  * 1 property with the type DateTime as the timestamp used in InfluxDB by adding the [InfluxTimestamp] attribute.
  * 0-* properties with the type string or a user-defined enum with the [InfluxTag] attribute that InfluxDB will use as indexed tags.
- * 1-* properties with the type string, long, double, bool or a user-defined enum with the [InfluxField] attribute that InfluxDB will use as fields.
+ * 1-* properties with the type string, long, double, bool, DateTime or a user-defined enum with the [InfluxField] attribute that InfluxDB will use as fields.
 
 Once you've defined your class, you're ready to use the InfluxClient, which is the main entry point to the API:
 
@@ -183,6 +183,24 @@ The InfluxClient also defines a host of other management operations. That can be
 All of these operations can be seen here:
 
 ```c#
+      #region Ping
+
+      public Task<InfluxPingResult> PingAsync()
+
+      public Task<InfluxPingResult> PingAsync( int secondsToWaitForLeader )
+
+      #endregion
+
+      #region System Monitoring
+
+      public async Task<InfluxResult<TInfluxRow>> ShowStatsAsync<TInfluxRow>()
+
+      public async Task<InfluxResult<TInfluxRow>> ShowDiagnosticsAsync<TInfluxRow>()
+
+      public async Task<InfluxResult<ShardRow>> ShowShards()
+
+      #endregion
+      
       #region Authentication and Authorization
 
       public Task CreateAdminUserAsync( string username, string password )
@@ -221,9 +239,9 @@ All of these operations can be seen here:
 
       public Task DropMeasurementAsync( string measurementName, string db )
 
-      public Task CreateRetensionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
+      public Task CreateRetentionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
 
-      public Task ModifyRetensionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
+      public Task AlterRetentionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
 
       public Task DropRetentionPolicyAsync( string policyName, string db )
 
@@ -233,6 +251,8 @@ All of these operations can be seen here:
 
       public async Task<InfluxResult<ContinuousQueryRow>> ShowContinuousQueries( string db )
 
+      public Task CreateContinuousQuery( string name, string db, string continuousQuery )
+      
       public Task DropContinuousQuery( string name, string db )
 
       #endregion
