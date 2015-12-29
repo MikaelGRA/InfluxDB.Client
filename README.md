@@ -70,7 +70,7 @@ public async Task Should_Write_Typed_Rows_To_Database()
 {
    var client = new InfluxClient( new Uri( "http://localhost:8086" ) );
    var infos = CreateTypedRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 500 );
-   await _client.WriteAsync( "mydb", "myMeasurementName", infos, TimestampPrecision.Nanosecond, Consistency.One );
+   await _client.WriteAsync( "mydb", "myMeasurementName", infos );
 }
 ```
 
@@ -141,7 +141,7 @@ public async Task Should_Write_Typed_Rows_To_Database()
 {
    var client = new InfluxClient( new Uri( "http://localhost:8086" ) );
    var infos = CreateDynamicRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 500 );
-   await _client.WriteAsync( "mydb", "myMeasurementName", infos, TimestampPrecision.Nanosecond, Consistency.One );
+   await _client.WriteAsync( "mydb", "myMeasurementName", infos );
 }
 ```
 
