@@ -2,6 +2,10 @@
 
 This library makes it easy to be a client for InfluxDB on .NET!
 
+The basic idea behing the library is that it should be able to turn queries directly into objects of your own classes. Much like micro-ORMS such as dapper.
+
+The goal is that we want to be able to support LINQ syntax in the future.
+
 ## Installation
 
 Install it through nuget with the following command.
@@ -16,7 +20,7 @@ Or you can simply grab it in one of the github releases.
 
 ## Reading/Writing
 
-The library exposes all operations on InfluxDB and can be used for reading/writing data to/from in two primary ways:
+The library exposes all operations on InfluxDB (0.9.x) and can be used for reading/writing data to/from in two primary ways:
  * Using your own POCO classes.
  * Using dynamic classes.
 
@@ -109,13 +113,11 @@ public async Task Should_Query_Typed_Data()
 }
 ```
 
-The goal is that there will be an linq-to-influx provider that allows you to use LINQ to execute queries. But for now, you must write the queries yourself.
-
 ### Using dynamic classes
 
 POCO classes does not fit every use-case. This becomes obvious once you are implementing a system and you don't know what the fields/tags will be at compile time. In this case you must use dynamic classes.
 
-In order for this to work, you must use the interfacae IInfluxRow that specifies reading/writing methods for tags and fields. This library already includes one implementatioon of this interfaces that uses dictionaries and supports the DLR. This class is called DynamicInfluxRow. 
+In order for this to work, you must use the interface IInfluxRow that specifies reading/writing methods for tags and fields. This library already includes one implementatioon of this interfaces that uses dictionaries and has basic support for the DLR. This class is called DynamicInfluxRow. 
 
 Here's how to write using dynamic classes.
 
@@ -160,6 +162,7 @@ public async Task Should_Write_Dynamic_Rows_To_Database()
 Do note, that if you use dynamic classes, user-defined enums are not supported, as there is no way to differentiate between a string and an enum.
 
 Here's how to query from the database:
+
 ```c#
 public async Task Should_Query_Dynamic_Data()
 {
@@ -185,10 +188,10 @@ public async Task Should_Query_Dynamic_Data()
 ## Other operations
 
 The InfluxClient also defines a host of other management operations. That can be divided up into two categories.
-1. Operations that does not return anything.
-2. Operations that returns an InfluxResult<TInfluxRow>, such as SHOW USERS, SHOW DATABASES, etc.. You can think of these operations as statically defined "Read" operations that queries the database, since they return the same types as ordinary queries.
+ * Operations that does not return anything.
+ * Operations that returns an InfluxResult<TInfluxRow>, such as SHOW USERS, SHOW DATABASES, etc.. You can think of these operations as statically defined "Read" operations that queries the database, since they return the same types as ordinary queries.
 
-All of these operations can be seen here:
+The interface for all these operations can be seen below:
 
 ```c#
 #region Ping
