@@ -29,7 +29,34 @@ namespace Vibrant.InfluxDB.Client.Tests
       [InfluxField( "indicator" )]
       public bool Indicator { get; set; }
 
+      [InfluxField( "timestamp" )]
+      public DateTime OtherTimestamp { get; set; }
+
       [InfluxField( "category" )]
       public TestEnum1 Category { get; set; }
+
+      // override object.Equals
+      public override bool Equals( object obj )
+      {
+         var other = obj as VariationRow;
+         if ( other == null )
+            return false;
+
+         return Timestamp == other.Timestamp
+            && Type == other.Type
+            && CategoryTag == other.CategoryTag
+            && Message == other.Message
+            && Count == other.Count
+            && Percent == other.Percent
+            && Indicator == other.Indicator
+            && OtherTimestamp == other.OtherTimestamp
+            && Category == other.Category;
+      }
+
+      // override object.GetHashCode
+      public override int GetHashCode()
+      {
+         throw new NotImplementedException();
+      }
    }
 }

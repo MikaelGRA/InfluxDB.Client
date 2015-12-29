@@ -20,67 +20,6 @@ namespace Vibrant.InfluxDB.Client.Tests
          _client = fixture.Client;
       }
 
-      private ComputerInfo[] CreateTypedRowsStartingAt( DateTime start, int rows, bool includeNulls )
-      {
-         var rng = new Random();
-         var regions = new[] { "west-eu", "north-eu", "west-us", "east-us", "asia" };
-         var hosts = new[] { "ma-lt", "surface-book" };
-
-         var timestamp = start;
-         var infos = new ComputerInfo[ rows ];
-         for ( int i = 0 ; i < rows ; i++ )
-         {
-            long ram = rng.Next( int.MaxValue );
-            double cpu = rng.NextDouble();
-            string region = regions[ rng.Next( regions.Length ) ];
-            string host = hosts[ rng.Next( hosts.Length ) ];
-
-            if ( includeNulls )
-            {
-               var info = new ComputerInfo { Timestamp = timestamp, RAM = ram, Host = host, Region = region };
-               infos[ i ] = info;
-            }
-            else
-            {
-               var info = new ComputerInfo { Timestamp = timestamp, CPU = cpu, RAM = ram, Host = host, Region = region };
-               infos[ i ] = info;
-            }
-
-            timestamp = timestamp.AddSeconds( 1 );
-         }
-
-         return infos;
-      }
-
-      private DynamicInfluxRow[] CreateDynamicRowsStartingAt( DateTime start, int rows )
-      {
-         var rng = new Random();
-         var regions = new[] { "west-eu", "north-eu", "west-us", "east-us", "asia" };
-         var hosts = new[] { "ma-lt", "surface-book" };
-         
-         var timestamp = start;
-         var infos = new DynamicInfluxRow[ rows ];
-         for ( int i = 0 ; i < rows ; i++ )
-         {
-            long ram = rng.Next( int.MaxValue );
-            double cpu = rng.NextDouble();
-            string region = regions[ rng.Next( regions.Length ) ];
-            string host = hosts[ rng.Next( hosts.Length ) ];
-
-            var info = new DynamicInfluxRow();
-            info.Fields.Add( "cpu", cpu );
-            info.Fields.Add( "ram", ram );
-            info.Tags.Add( "host", host );
-            info.Tags.Add( "region", region );
-            info.Timestamp = timestamp;
-
-            infos[ i ] = info;
-
-            timestamp = timestamp.AddSeconds( 1 );
-         }
-         return infos;
-      }
-
       [Fact]
       public async Task Should_Show_Database()
       {
@@ -134,9 +73,9 @@ namespace Vibrant.InfluxDB.Client.Tests
             Timestamp = DateTime.UtcNow - TimeSpan.FromMinutes( 5 ),
          };
 
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "someSeries", new[] { state } );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "dmt1", new[] { state } );
 
-         var resultSet1 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM someSeries WHERE region = 'some-region' AND host = 'some-host'", InfluxClientFixture.DatabaseName );
+         var resultSet1 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM dmt1 WHERE region = 'some-region' AND host = 'some-host'", InfluxClientFixture.DatabaseName );
          Assert.Equal( 1, resultSet1.Results.Count );
 
          var result1 = resultSet1.Results[ 0 ];
@@ -145,14 +84,103 @@ namespace Vibrant.InfluxDB.Client.Tests
          var series1 = result1.Series[ 0 ];
          Assert.Equal( 1, series1.Rows.Count );
 
-         await _client.DropSeries( InfluxClientFixture.DatabaseName, "someSeries", "region = 'some-region' AND host = 'some-host'" );
+         await _client.DropSeries( InfluxClientFixture.DatabaseName, "dmt1", "region = 'some-region' AND host = 'some-host'" );
 
-         var resultSet2 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM someSeries WHERE region = 'some-region' AND host = 'some-host'", InfluxClientFixture.DatabaseName );
+         var resultSet2 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM dmt1 WHERE region = 'some-region' AND host = 'some-host'", InfluxClientFixture.DatabaseName );
          Assert.Equal( 1, resultSet2.Results.Count );
 
          var result2 = resultSet2.Results[ 0 ];
          Assert.Equal( 0, result2.Series.Count );
          Assert.False( result2.Succeeded );
+      }
+
+      [Fact]
+      public async Task Should_Create_And_Drop_Measurement()
+      {
+         var state = new ComputerInfo
+         {
+            CPU = 0.42,
+            RAM = 1024,
+            Host = "some-host",
+            Region = "some-region",
+            Timestamp = DateTime.UtcNow - TimeSpan.FromMinutes( 5 ),
+         };
+
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "dmt2", new[] { state } );
+
+         var resultSet1 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM dmt2 WHERE region = 'some-region' AND host = 'some-host'", InfluxClientFixture.DatabaseName );
+         Assert.Equal( 1, resultSet1.Results.Count );
+
+         var result1 = resultSet1.Results[ 0 ];
+         Assert.Equal( 1, result1.Series.Count );
+
+         var series1 = result1.Series[ 0 ];
+         Assert.Equal( 1, series1.Rows.Count );
+
+         await _client.DropMeasurementAsync( InfluxClientFixture.DatabaseName, "dmt2" );
+
+         var resultSet2 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM dmt2 WHERE region = 'some-region' AND host = 'some-host'", InfluxClientFixture.DatabaseName );
+         Assert.Equal( 1, resultSet2.Results.Count );
+
+         var result2 = resultSet2.Results[ 0 ];
+         Assert.Equal( 0, result2.Series.Count );
+         Assert.False( result2.Succeeded );
+      }
+
+      [Fact]
+      public async Task Should_Create_And_Drop_Series_With_Null_Tags()
+      {
+         var state = new ComputerInfo
+         {
+            CPU = 0.42,
+            RAM = 1024,
+            Timestamp = DateTime.UtcNow - TimeSpan.FromMinutes( 5 ),
+         };
+
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "dmt3", new[] { state } );
+
+         var resultSet1 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM dmt3", InfluxClientFixture.DatabaseName );
+         Assert.Equal( 1, resultSet1.Results.Count );
+
+         var result1 = resultSet1.Results[ 0 ];
+         Assert.Equal( 1, result1.Series.Count );
+
+         var series1 = result1.Series[ 0 ];
+         Assert.Equal( 1, series1.Rows.Count );
+
+         await _client.DropSeries( InfluxClientFixture.DatabaseName, "dmt3" );
+
+         var resultSet2 = await _client.ReadAsync<ComputerInfo>( "SELECT * FROM dmt3", InfluxClientFixture.DatabaseName );
+         Assert.Equal( 1, resultSet2.Results.Count );
+
+         var result2 = resultSet2.Results[ 0 ];
+         Assert.Equal( 0, result2.Series.Count );
+         Assert.False( result2.Succeeded );
+      }
+
+      [Fact]
+      public async Task Should_Create_Show_Modify_And_Drop_Retention_Policy()
+      {
+         await _client.CreateRetentionPolicyAsync( "dmt4RetentionPolicy", InfluxClientFixture.DatabaseName, "1d", 1, false );
+
+         var result = await _client.ShowRetentionPoliciesAsync( InfluxClientFixture.DatabaseName );
+         Assert.Equal( 1, result.Series.Count );
+
+         var series = result.Series[ 0 ];
+         Assert.Contains( series.Rows, x => x.Name == "dmt4RetentionPolicy" );
+
+         await _client.AlterRetentionPolicyAsync( "dmt4RetentionPolicy", InfluxClientFixture.DatabaseName, "4d", 1, false );
+         
+         await _client.DropRetentionPolicyAsync( "dmt4RetentionPolicy", InfluxClientFixture.DatabaseName );
+      }
+
+      [Fact]
+      public async Task Should_Throw_When_Dropping_Nonexisting_Retention_Policy()
+      {
+         await Assert.ThrowsAsync( typeof( InfluxException ), async () =>
+          {
+             await _client.DropRetentionPolicyAsync( "dmt5RetentionPolicy", InfluxClientFixture.DatabaseName );
+          } );
       }
    }
 }

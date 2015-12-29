@@ -30,6 +30,12 @@ namespace Vibrant.InfluxDB.Client.Parsers
          {
             return ( (bool)valueAsObject ) ? True : False;
          }
+         else if ( valueAsObject is DateTime )
+         {
+            var valueAsDateTime = (DateTime)valueAsObject;
+
+            return "\"" + valueAsDateTime.ToIso8601() + "\"";
+         }
          else
          {
             return Convert.ToString( valueAsObject, CultureInfo.InvariantCulture );

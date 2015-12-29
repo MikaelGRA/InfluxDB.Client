@@ -61,6 +61,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComputerInfo.cs" />
+    <Compile Include="AuthenticationTests.cs" />
+    <Compile Include="RegionRow.cs" />
+    <Compile Include="SchemaExplorationTests.cs" />
+    <Compile Include="PingTests.cs" />
     <Compile Include="ReadWriteTests.cs" />
     <Compile Include="InfluxClientCollection.cs" />
     <Compile Include="InfluxClientFixture.cs" />

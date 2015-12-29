@@ -10,7 +10,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
    {
       private static readonly object _sync = new object();
       private static readonly Dictionary<Type, object> _typeCache = new Dictionary<Type, object>();
-      private static readonly HashSet<Type> _validFieldTypes = new HashSet<Type> { typeof( string ), typeof( double ), typeof( long ), typeof( bool ) };
+      private static readonly HashSet<Type> _validFieldTypes = new HashSet<Type> { typeof( string ), typeof( double ), typeof( long ), typeof( bool ), typeof( DateTime ) };
 
       internal static InfluxRowTypeInfo<TInfluxRow> GetOrCreateTypeCache<TInfluxRow>()
          where TInfluxRow : new()

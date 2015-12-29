@@ -53,6 +53,11 @@ namespace Vibrant.InfluxDB.Client
 
       public static string ToIso8601( this DateTime that )
       {
+         if ( that.Kind == DateTimeKind.Local )
+         {
+            that = that.ToUniversalTime();
+         }
+
          return that.ToString( "yyyy-MM-ddTHH:mm:ss.fffffffZ" );
       }
    }

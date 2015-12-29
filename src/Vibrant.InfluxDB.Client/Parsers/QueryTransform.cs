@@ -149,11 +149,10 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      for ( int i = 0 ; i < columns.Count ; i++ )
                      {
                         PropertyExpressionInfo<TInfluxRow> propertyInfo;
-                        if ( !propertyMap.TryGetValue( columns[ i ], out propertyInfo ) )
+                        if ( propertyMap.TryGetValue( columns[ i ], out propertyInfo ) )
                         {
-                           throw new InfluxException( $"Could not find the property mapped to the field/tag '{columns[ i ]}' on the type {typeof( TInfluxRow ).Name}." );
+                           properties[ i ] = propertyInfo;
                         }
-                        properties[ i ] = propertyInfo;
                      }
 
                      var dataPoints = new List<TInfluxRow>();
@@ -170,18 +169,21 @@ namespace Vibrant.InfluxDB.Client.Parsers
                         {
                            var value = values[ i ];
                            var property = properties[ i ];
-                           if ( value != null )
+                           if ( property != null )
                            {
-                              if ( property.Type.IsEnum )
+                              if ( value != null )
                               {
-                                 property.SetValue( dataPoint, property.GetEnumValue( value ) );
+                                 if ( property.Type.IsEnum )
+                                 {
+                                    property.SetValue( dataPoint, property.GetEnumValue( value ) );
+                                 }
+                                 else
+                                 {
+                                    property.SetValue( dataPoint, Convert.ChangeType( value, property.Type ) );
+                                 }
                               }
-                              else
-                              {
-                                 property.SetValue( dataPoint, Convert.ChangeType( value, property.Type ) );
-                              }
+                              // TODO: require that it is nullable in an ELSE?
                            }
-                           // TODO: require that it is nullable in an ELSE?
                         }
 
                         dataPoints.Add( dataPoint );

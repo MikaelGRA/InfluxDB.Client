@@ -158,10 +158,6 @@ namespace Vibrant.InfluxDB.Client
          return parserResult.Results.First();
       }
 
-      #endregion
-
-      #region Shards
-
       /// <summary>
       /// Shows Shards.
       /// </summary>
@@ -386,7 +382,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="replicationLevel"></param>
       /// <param name="isDefault"></param>
       /// <returns></returns>
-      public Task CreateRetensionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
+      public Task CreateRetentionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
       {
          return ExecuteOperationWithNoResultAsync( $"CREATE RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetDefault( isDefault )}" );
       }
@@ -400,7 +396,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="replicationLevel"></param>
       /// <param name="isDefault"></param>
       /// <returns></returns>
-      public Task ModifyRetensionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
+      public Task AlterRetentionPolicyAsync( string policyName, string db, string duration, int replicationLevel, bool isDefault )
       {
          return ExecuteOperationWithNoResultAsync( $"ALTER RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetDefault( isDefault )}" );
       }
@@ -481,7 +477,7 @@ namespace Vibrant.InfluxDB.Client
       /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
       /// <returns></returns>
-      public async Task<InfluxResult<RetentionPolicyRow>> ShowRetensionPoliciesAsync( string db )
+      public async Task<InfluxResult<RetentionPolicyRow>> ShowRetentionPoliciesAsync( string db )
       {
          var parserResult = await ExecuteQueryInternalAsync<RetentionPolicyRow>( $"SHOW RETENTION POLICIES ON \"{db}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -603,7 +599,7 @@ namespace Vibrant.InfluxDB.Client
       public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsync<TInfluxRow>( string db, string tagKey )
          where TInfluxRow : new()
       {
-         var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW FIELD VALUES WITH KEY = \"{tagKey}\"", db ).ConfigureAwait( false );
+         var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW TAG VALUES WITH KEY = \"{tagKey}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -618,7 +614,7 @@ namespace Vibrant.InfluxDB.Client
       public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsync<TInfluxRow>( string db, string tagKey, string measurementName )
          where TInfluxRow : new()
       {
-         var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW FIELD VALUES FROM \"{measurementName}\" WITH KEY = \"{tagKey}\"", db ).ConfigureAwait( false );
+         var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW TAG VALUES FROM \"{measurementName}\" WITH KEY = \"{tagKey}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -974,14 +970,21 @@ namespace Vibrant.InfluxDB.Client
       {
          if ( !response.IsSuccessStatusCode )
          {
-            var errorResult = await response.Content.ReadAsJsonAsync<ErrorResult>();
-            if ( errorResult?.Error != null )
+            try
             {
-               throw new InfluxException( errorResult.Error );
+               var errorResult = await response.Content.ReadAsJsonAsync<ErrorResult>();
+               if ( errorResult?.Error != null )
+               {
+                  throw new InfluxException( errorResult.Error );
+               }
+               else
+               {
+                  response.EnsureSuccessStatusCode();
+               }
             }
-            else
+            catch ( JsonSerializationException e )
             {
-               response.EnsureSuccessStatusCode();
+               throw new InfluxException( "An error occurred while parsing the error response after an unsuccessful request.", e );
             }
          }
       }

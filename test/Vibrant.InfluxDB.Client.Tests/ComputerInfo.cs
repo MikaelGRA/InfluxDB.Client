@@ -23,4 +23,13 @@ namespace Vibrant.InfluxDB.Client.Tests
       [InfluxField( "ram" )]
       public long RAM { get; set; }
    }
+
+   public class ComputerInfoMeta
+   {
+      [InfluxField( "host" )]
+      public string Host { get; set; }
+
+      [InfluxField( "region" )]
+      public string Region { get; set; }
+   }
 }
