@@ -11,8 +11,11 @@ namespace Vibrant.InfluxDB.Client
       public InfluxQueryOptions()
       {
          Precision = TimestampPrecision.Nanosecond;
+         ChunkSize = null;
       }
 
       public TimestampPrecision Precision { get; set; }
+
+      public int? ChunkSize { get; set; }
    }
 }

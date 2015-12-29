@@ -58,6 +58,7 @@
     <Compile Include="Helpers\PropertyExpressionInfo.cs" />
     <Compile Include="Helpers\TypeCache.cs" />
     <Compile Include="Http\HttpContentExtensions.cs" />
+    <Compile Include="InfluxPingResult.cs" />
     <Compile Include="InfluxQueryOptions.cs" />
     <Compile Include="InfluxWriteOptions.cs" />
     <Compile Include="Linq\FieldSelect.cs" />
@@ -79,8 +80,6 @@
     <Compile Include="InfluxSeries.cs" />
     <Compile Include="InfluxTagAttribute.cs" />
     <Compile Include="InfluxTimestampAttribute.cs" />
-    <Compile Include="InvalidInfluxQueryableException.cs" />
-    <Compile Include="InvalidQueryException.cs" />
     <Compile Include="IQToolkit\AsyncQueryable.cs" />
     <Compile Include="IQToolkit\AsyncUpdatable.cs" />
     <Compile Include="IQToolkit\CompoundKey.cs" />
@@ -124,6 +123,7 @@
     <Compile Include="Rows\FieldKeyRow.cs" />
     <Compile Include="Rows\MeasurementRow.cs" />
     <Compile Include="Rows\RetentionPolicyRow.cs" />
+    <Compile Include="Rows\ShardRow.cs" />
     <Compile Include="Rows\TagKeyRow.cs" />
     <Compile Include="Rows\UserRow.cs" />
     <Compile Include="TimestampPrecision.cs" />

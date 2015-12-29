@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace Vibrant.InfluxDB.Client.Parsers
 {
    internal static class LineProtocolEscape
    {
+      private static readonly IDictionary<string, string> EscapedKeys = new ConcurrentDictionary<string, string>();
+
       private const string True = "true";
       private const string False = "false";
 
@@ -35,30 +38,21 @@ namespace Vibrant.InfluxDB.Client.Parsers
 
       internal static string EscapeTagValue( string value )
       {
-         StringBuilder builder = new StringBuilder( value.Length );
-         for ( int i = 0 ; i < value.Length ; i++ )
-         {
-            var c = value[ i ];
-            switch ( c )
-            {
-               case ',':
-                  builder.Append( "\\," );
-                  break;
-               case ' ':
-                  builder.Append( "\\ " );
-                  break;
-               case '=':
-                  builder.Append( "\\=" );
-                  break;
-               default:
-                  builder.Append( c );
-                  break;
-            }
-         }
-         return builder.ToString();
+         return Escape( value );
       }
 
       internal static string EscapeKey( string value )
+      {
+         string cachedValue;
+         if ( !EscapedKeys.TryGetValue( value, out cachedValue ) )
+         {
+            cachedValue = Escape( value );
+            EscapedKeys.Add( value, cachedValue );
+         }
+         return cachedValue;
+      }
+
+      private static string Escape( string value )
       {
          StringBuilder builder = new StringBuilder( value.Length );
          for ( int i = 0 ; i < value.Length ; i++ )

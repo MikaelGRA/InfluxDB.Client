@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Vibrant.InfluxDB.Client.Parsers;
 
 namespace Vibrant.InfluxDB.Client.Helpers
 {
@@ -16,8 +17,9 @@ namespace Vibrant.InfluxDB.Client.Helpers
       internal readonly Dictionary<Enum, string> EnumToString;
       internal readonly Dictionary<string, Enum> StringToEnum;
       internal readonly PropertyInfo Property;
+      internal readonly string EscapedKey;
 
-      internal PropertyExpressionInfo( PropertyInfo property )
+      internal PropertyExpressionInfo( string key, PropertyInfo property )
       {
          Property = property;
 
@@ -38,7 +40,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
 
          var setterLambda = Expression.Lambda<Action<TInfluxRow, object>>( assignProperty, true, instanceParam, valueParam );
          SetValue = setterLambda.Compile();
-
+         
          var type = property.PropertyType;
          if ( type.IsGenericType && type.GetGenericTypeDefinition() == typeof( Nullable<> ) )
          {
@@ -73,6 +75,8 @@ namespace Vibrant.InfluxDB.Client.Helpers
                StringToEnum.Add( stringValue, value );
             }
          }
+
+         EscapedKey = LineProtocolEscape.EscapeKey( key );
       }
 
       internal Enum GetEnumValue( object value )

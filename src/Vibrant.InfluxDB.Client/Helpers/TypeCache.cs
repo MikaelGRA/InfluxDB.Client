@@ -37,12 +37,12 @@ namespace Vibrant.InfluxDB.Client.Helpers
 
                   if ( allAttributes.Count > 1 )
                   {
-                     throw new InvalidInfluxQueryableException( "An implementation of IQueryableDataPoint properties can only have one InfluxAttribute." );
+                     throw new InfluxException( "A property can only have one InfluxAttribute." );
                   }
 
                   if ( timestampAttribute != null )
                   {
-                     timestamp = new PropertyExpressionInfo<TInfluxRow>( propertyInfo );
+                     timestamp = new PropertyExpressionInfo<TInfluxRow>( "time", propertyInfo );
                      if ( timestamp.Type != typeof( DateTime ) )
                      {
                         throw new InfluxException( $"The property {propertyInfo.Name} on the type {type.Name} must be a DateTime." );
@@ -52,7 +52,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
                   }
                   else if ( fieldAttribute != null )
                   {
-                     var expression = new PropertyExpressionInfo<TInfluxRow>( propertyInfo );
+                     var expression = new PropertyExpressionInfo<TInfluxRow>( fieldAttribute.Name, propertyInfo );
                      if ( !_validFieldTypes.Contains( expression.Type ) && !expression.Type.IsEnum )
                      {
                         throw new InfluxException( $"The property {propertyInfo.Name} on the type {type.Name} must be a string, double, long or bool." );
@@ -63,7 +63,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
                   }
                   else if ( tagAttribute != null )
                   {
-                     var expression = new PropertyExpressionInfo<TInfluxRow>( propertyInfo );
+                     var expression = new PropertyExpressionInfo<TInfluxRow>( tagAttribute.Name, propertyInfo );
                      if ( expression.Type != typeof( string ) && !expression.Type.IsEnum )
                      {
                         throw new InfluxException( $"The property {propertyInfo.Name} on the type {type.Name} must be a string or an enum." );
