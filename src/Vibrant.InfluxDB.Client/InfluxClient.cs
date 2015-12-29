@@ -22,15 +22,24 @@ namespace Vibrant.InfluxDB.Client
    /// <summary>
    /// An InfluxClient exposes all HTTP operations on InfluxDB.
    /// </summary>
-   public class InfluxClient
+   public sealed class InfluxClient : IDisposable
    {
+      private readonly Dictionary<DatabaseMeasurementInfoKey, DatabaseMeasurementInfo> _seriesMetaCache;
       private readonly HttpClient _client;
       private readonly HttpClientHandler _handler;
-      private Dictionary<DatabaseMeasurementInfoKey, DatabaseMeasurementInfo> _seriesMetaCache;
+      private bool _disposed;
 
+      /// <summary>
+      /// Constructs an InfluxClient that uses the specified credentials.
+      /// </summary>
+      /// <param name="endpoint"></param>
+      /// <param name="username"></param>
+      /// <param name="password"></param>
       public InfluxClient( Uri endpoint, string username, string password )
       {
          _handler = new HttpClientHandler();
+         _handler.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+
          _client = new HttpClient( _handler, true );
          _client.BaseAddress = endpoint;
 
@@ -49,14 +58,24 @@ namespace Vibrant.InfluxDB.Client
          }
       }
 
+      /// <summary>
+      /// Constructs an InfluxClient that does not use any credentials.
+      /// </summary>
+      /// <param name="endpoint"></param>
       public InfluxClient( Uri endpoint )
          : this( endpoint, null, null )
       {
 
       }
 
+      /// <summary>
+      /// Gets the default write options.
+      /// </summary>
       public InfluxWriteOptions DefaultWriteOptions { get; private set; }
 
+      /// <summary>
+      /// Gets the default query optionns.
+      /// </summary>
       public InfluxQueryOptions DefaultQueryOptions { get; private set; }
 
       #region Raw Operations
@@ -988,5 +1007,32 @@ namespace Vibrant.InfluxDB.Client
             }
          }
       }
+
+      #region IDisposable
+
+      ~InfluxClient()
+      {
+         Dispose( false );
+      }
+
+      public void Dispose()
+      {
+         if ( !_disposed )
+         {
+            Dispose( true );
+            _disposed = true;
+            GC.SuppressFinalize( this );
+         }
+      }
+
+      private void Dispose( bool disposing )
+      {
+         if ( disposing )
+         {
+            _client.Dispose();
+         }
+      }
+
+      #endregion
    }
 }

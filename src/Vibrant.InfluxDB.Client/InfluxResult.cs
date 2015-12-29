@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client
 {
+   /// <summary>
+   /// Result of a query to influxdb that does not return a table.
+   /// </summary>
    public class InfluxResult
    {
       internal InfluxResult( string error )
@@ -18,6 +21,10 @@ namespace Vibrant.InfluxDB.Client
       public bool Succeeded { get; private set; }
    }
 
+   /// <summary>
+   /// Result of a query to influxdb that returns one or more tables.
+   /// </summary>
+   /// <typeparam name="TInfluxRow"></typeparam>
    public class InfluxResult<TInfluxRow> : InfluxResult
    {
       internal InfluxResult( List<InfluxSeries<TInfluxRow>> series, string error )
@@ -26,9 +33,17 @@ namespace Vibrant.InfluxDB.Client
          Series = series.AsReadOnly();
       }
 
+      /// <summary>
+      /// Gets the series.
+      /// </summary>
       public IReadOnlyList<InfluxSeries<TInfluxRow>> Series { get; private set; }
 
-      public InfluxSeries<TInfluxRow> FindGroup( IEnumerable<KeyValuePair<string, string>> tags )
+      /// <summary>
+      /// Finds the serie that can be identified by the specified tags.
+      /// </summary>
+      /// <param name="tags"></param>
+      /// <returns></returns>
+      public InfluxSeries<TInfluxRow> FindGroup( IEnumerable<KeyValuePair<string, object>> tags )
       {
          if ( tags == null )
             throw new ArgumentNullException( nameof( tags ) );
@@ -46,16 +61,23 @@ namespace Vibrant.InfluxDB.Client
          return null;
       }
 
-      private bool Matches( InfluxSeries<TInfluxRow> result, IEnumerable<KeyValuePair<string, string>> tags )
+      private bool Matches( InfluxSeries<TInfluxRow> result, IEnumerable<KeyValuePair<string, object>> tags )
       {
          foreach ( var tag in tags )
          {
-            string tagValue;
+            object tagValue;
             if ( result.GroupedTags.TryGetValue( tag.Key, out tagValue ) )
             {
-               if ( tagValue != tag.Value )
+               if ( tagValue != null )
                {
-                  return false;
+                  if ( !tagValue.Equals( tag.Value ) )
+                  {
+                     return false;
+                  }
+               }
+               else
+               {
+                  return tag.Value == null;
                }
             }
          }

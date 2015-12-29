@@ -8,6 +8,9 @@ namespace Vibrant.InfluxDB.Client
 {
    public class InfluxPingResult
    {
+      /// <summary>
+      /// Gets the version of InfluxDB.
+      /// </summary>
       public string Version { get; set; }
    }
 }

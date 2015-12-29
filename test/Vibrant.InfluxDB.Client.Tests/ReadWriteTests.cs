@@ -122,5 +122,43 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          Assert.Equal( row.Value, series.Rows[ 0 ].Value );
       }
+
+      [Fact]
+      public async Task Should_Write_And_Query_Grouped_Data()
+      {
+         var start = new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc );
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( start, 5000, false );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo", infos );
+
+         var resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedComputerInfo GROUP BY region" );
+         Assert.Equal( 1, resultSet.Results.Count );
+
+         var result = resultSet.Results[ 0 ];
+         foreach ( var region in InfluxClientFixture.Regions )
+         {
+            var kvp = new KeyValuePair<string, object>( "region", region );
+            var group = result.FindGroup( new[] { kvp } );
+            Assert.NotNull( group );
+         }
+      }
+
+      [Fact]
+      public async Task Should_Write_And_Query_Grouped_On_Enumerated_Data()
+      {
+         var start = new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc );
+         var infos = InfluxClientFixture.CreateEnumeratedRowsStartingAt( start, 5000 );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedEnumeratedRows", infos );
+
+         var resultSet = await _client.ReadAsync<EnumeratedRow>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedEnumeratedRows GROUP BY type" );
+         Assert.Equal( 1, resultSet.Results.Count );
+
+         var result = resultSet.Results[ 0 ];
+         foreach ( var type in InfluxClientFixture.TestEnums )
+         {
+            var kvp = new KeyValuePair<string, object>( "type", type );
+            var group = result.FindGroup( new[] { kvp } );
+            Assert.NotNull( group );
+         }
+      }
    }
 }

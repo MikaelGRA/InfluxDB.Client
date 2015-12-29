@@ -58,6 +58,11 @@ namespace Vibrant.InfluxDB.Client.Metadata
                         throw new InfluxException( $"The property {propertyInfo.Name} on the type {type.Name} must be a string, double, long or bool." );
                      }
 
+                     if ( string.IsNullOrEmpty( fieldAttribute.Name ) )
+                     {
+                        throw new InfluxException( $"The property {propertyInfo.Name} on the type {type.Name} cannot have an empty InfluxField name." );
+                     }
+
                      fields.Add( fieldAttribute.Name, expression );
                      all.Add( fieldAttribute.Name, expression );
                   }
@@ -67,6 +72,11 @@ namespace Vibrant.InfluxDB.Client.Metadata
                      if ( expression.Type != typeof( string ) && !expression.Type.IsEnum )
                      {
                         throw new InfluxException( $"The property {propertyInfo.Name} on the type {type.Name} must be a string or an enum." );
+                     }
+
+                     if ( string.IsNullOrEmpty( tagAttribute.Name ) )
+                     {
+                        throw new InfluxException( $"The property {propertyInfo.Name} on the type {type.Name} cannot have an empty InfluxTag name." );
                      }
 
                      tags.Add( tagAttribute.Name, expression );

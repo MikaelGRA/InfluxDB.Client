@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client
 {
+   /// <summary>
+   /// InfluxQueryOptions are applied to queries made to InfluxDB.
+   /// </summary>
    public sealed class InfluxQueryOptions
    {
       public InfluxQueryOptions()
@@ -14,8 +17,15 @@ namespace Vibrant.InfluxDB.Client
          ChunkSize = null;
       }
 
+      /// <summary>
+      /// Gets or sets the Precision. Default is nanoseconds.
+      /// </summary>
       public TimestampPrecision Precision { get; set; }
 
+      /// <summary>
+      /// Gets or sets the ChunkSize. Default is null. Which means
+      /// it uses the InfluxDB default of 10000.
+      /// </summary>
       public int? ChunkSize { get; set; }
    }
 }

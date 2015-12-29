@@ -26,6 +26,7 @@ namespace Vibrant.InfluxDB.Client.Tests
 
       public static readonly string[] Regions = new[] { "west-eu", "north-eu", "west-us", "east-us", "asia" };
       public static readonly string[] Hosts = new[] { "ma-lt", "surface-book" };
+      public static readonly TestEnum1?[] TestEnums = new TestEnum1?[] { null, TestEnum1.Value1, TestEnum1.Value2, TestEnum1.Value3 };
 
       public static ComputerInfo[] CreateTypedRowsStartingAt( DateTime start, int rows, bool includeNulls )
       {
@@ -50,6 +51,26 @@ namespace Vibrant.InfluxDB.Client.Tests
                var info = new ComputerInfo { Timestamp = timestamp, CPU = cpu, RAM = ram, Host = host, Region = region };
                infos[ i ] = info;
             }
+
+            timestamp = timestamp.AddSeconds( 1 );
+         }
+
+         return infos;
+      }
+
+      public static EnumeratedRow[] CreateEnumeratedRowsStartingAt( DateTime start, int rows )
+      {
+         var rng = new Random();
+
+         var timestamp = start;
+         var infos = new EnumeratedRow[ rows ];
+         for ( int i = 0 ; i < rows ; i++ )
+         {
+            var value = rng.NextDouble();
+            var type = TestEnums[ rng.Next( TestEnums.Length ) ];
+
+            var info = new EnumeratedRow { Timestamp = timestamp, Value = value,  Type = type };
+            infos[ i ] = info;
 
             timestamp = timestamp.AddSeconds( 1 );
          }

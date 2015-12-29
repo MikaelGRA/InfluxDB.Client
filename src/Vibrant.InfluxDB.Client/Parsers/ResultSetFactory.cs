@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -127,7 +128,10 @@ namespace Vibrant.InfluxDB.Client.Parsers
                         }
                      }
 
-                     influxSeries.Add( new InfluxSeries<TInfluxRow>( name, dataPoints, series.Tags ) );
+                     // create new dictionary, with correct typing
+                     var tags = series.Tags?.ToDictionary( x => x.Key, x => x.Value == string.Empty ? null : (object)x.Value ) ?? null;
+
+                     influxSeries.Add( new InfluxSeries<TInfluxRow>( name, dataPoints, tags ) );
                   }
                }
 
@@ -139,6 +143,8 @@ namespace Vibrant.InfluxDB.Client.Parsers
          else
          {
             List<InfluxResult<TInfluxRow>> results = new List<InfluxResult<TInfluxRow>>();
+            var propertyMap = MetadataCache.GetOrCreate<TInfluxRow>().All;
+
             foreach ( var result in queryResult.Results )
             {
                var influxSeries = new List<InfluxSeries<TInfluxRow>>();
@@ -153,7 +159,6 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      if ( series.Values != null )
                      {
                         var properties = new PropertyExpressionInfo<TInfluxRow>[ columns.Count ];
-                        var propertyMap = MetadataCache.GetOrCreate<TInfluxRow>().All;
                         for ( int i = 0 ; i < columns.Count ; i++ )
                         {
                            PropertyExpressionInfo<TInfluxRow> propertyInfo;
@@ -197,7 +202,54 @@ namespace Vibrant.InfluxDB.Client.Parsers
                         }
                      }
 
-                     influxSeries.Add( new InfluxSeries<TInfluxRow>( name, dataPoints, series.Tags ) );
+                     // create new dictionary, with correct typing
+                     Dictionary<string, object> tags = null;
+                     if ( series.Tags != null )
+                     {
+                        tags = new Dictionary<string, object>();
+                        foreach ( var kvp in series.Tags )
+                        {
+                           object value;
+                           if ( kvp.Value != string.Empty )
+                           {
+                              PropertyExpressionInfo<TInfluxRow> property;
+                              if ( propertyMap.TryGetValue( kvp.Key, out property ) )
+                              {
+                                 // we know this is either an enum or a string
+                                 if ( property.Type.IsEnum )
+                                 {
+                                    Enum valueAsEnum;
+                                    if ( property.StringToEnum.TryGetValue( kvp.Value, out valueAsEnum ) )
+                                    {
+                                       value = valueAsEnum;
+                                    }
+                                    else
+                                    {
+                                       // could not find the value, simply use the string representation
+                                       value = kvp.Value;
+                                    }
+                                 }
+                                 else
+                                 {
+                                    // since kvp.Value is just a string, so go for it
+                                    value = kvp.Value;
+                                 }
+                              }
+                              else
+                              {
+                                 value = kvp.Value;
+                              }
+                           }
+                           else
+                           {
+                              value = null;
+                           }
+
+                           tags.Add( kvp.Key, value );
+                        }
+                     }
+
+                     influxSeries.Add( new InfluxSeries<TInfluxRow>( name, dataPoints, tags ) );
                   }
                }
 
