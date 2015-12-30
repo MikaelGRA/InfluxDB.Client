@@ -227,7 +227,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                            // if we still dont have all columns, we cant do anything, throw exception
                            if ( !hasAllColumnsAndTags )
                            {
-                              throw new InfluxException( "Could not determine which columns in the returned data are tags/fields." );
+                              throw new InfluxException( Errors.IndeterminateColumns );
                            }
                         }
                      }

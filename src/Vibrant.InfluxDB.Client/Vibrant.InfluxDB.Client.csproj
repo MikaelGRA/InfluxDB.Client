@@ -55,6 +55,7 @@
     <Compile Include="Dto\QueryResult.cs" />
     <Compile Include="Dto\SeriesResult.cs" />
     <Compile Include="Dto\SeriesResultWrapper.cs" />
+    <Compile Include="InfluxAttribute.cs" />
     <Compile Include="Metadata\DatabaseMeasurementInfo.cs" />
     <Compile Include="Metadata\InfluxRowTypeInfo.cs" />
     <Compile Include="Metadata\PropertyExpressionInfo.cs" />

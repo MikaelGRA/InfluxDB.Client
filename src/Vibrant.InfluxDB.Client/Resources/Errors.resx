@@ -117,7 +117,37 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CouldNotParseEnum" xml:space="preserve">
+    <value>Could not parse an incoming value to an enum for the property {0} on the type {1}. The value was {2}.</value>
+  </data>
+  <data name="CountNotConvertEnumToString" xml:space="preserve">
+    <value>Could not convert the incominng value {0} to the enum on the property {1} on the type {2}.</value>
+  </data>
+  <data name="IndeterminateColumns" xml:space="preserve">
+    <value>Could not determine which columns in the returned data are tags and which are fields.</value>
+  </data>
+  <data name="InvalidFieldType" xml:space="preserve">
+    <value>The property {0} on the type {1} which is used as an InfluxField must be one of the following types: string, double, long, bool, DateTime, Nullable&lt;double&gt;, Nullable&lt;long&gt;, Nullable&lt;bool&gt;, Nullable&lt;DateTime&gt; or a user-defined enum.</value>
+  </data>
+  <data name="InvalidNameProperty" xml:space="preserve">
+    <value>The property {0} on the type {1} must specify a non-empty name for either an InfluxField or InfluxTag.</value>
+  </data>
+  <data name="InvalidTagType" xml:space="preserve">
+    <value>The property {0} on the type {1} which is used as an InfluxTag must be either a string or a user-defined enum.</value>
+  </data>
+  <data name="InvalidTimestampType" xml:space="preserve">
+    <value>The property {0} on the type {1} which is used as the InfluxTimestamp must be either a DateTime or a Nullable&lt;DateTime&gt;.</value>
+  </data>
+  <data name="MultipleAttributesOnSingleProperty" xml:space="preserve">
+    <value>The property {0} on the type {1} has multiple InfluxAttributes. This is not allowed. Please specify only InfluxTimestamp, InfluxTag or InfluxField.</value>
+  </data>
+  <data name="ParsingError" xml:space="preserve">
+    <value>An error occurred while parsing the error response after an unsuccessful request.</value>
+  </data>
   <data name="UnexpectedQueryResult" xml:space="preserve">
     <value>No measurements were returned in the query. Likely because the measurement does not exist, no data exists for the queried period or because there was an error in the identifiers used in the query.</value>
+  </data>
+  <data name="UnknownError" xml:space="preserve">
+    <value>An unknown error occurred. Please inspect the inner exception.</value>
   </data>
 </root>

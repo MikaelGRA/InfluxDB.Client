@@ -9,7 +9,7 @@ namespace Vibrant.InfluxDB.Client
    /// Attribute placed on the property that should be considered the InfluxDB timestamp.
    /// </summary>
    [AttributeUsage( AttributeTargets.Property, Inherited = false, AllowMultiple = false )]
-   public sealed class InfluxTimestampAttribute : Attribute
+   public sealed class InfluxTimestampAttribute : InfluxAttribute
    {
    }
 }

@@ -9,7 +9,7 @@ namespace Vibrant.InfluxDB.Client
    /// Attribute to be placed on properties that are considered tags by InfluxDB.
    /// </summary>
    [AttributeUsage( AttributeTargets.Property, Inherited = false, AllowMultiple = false )]
-   public sealed class InfluxTagAttribute : Attribute
+   public sealed class InfluxTagAttribute : InfluxAttribute
    {
       private readonly string _name;
 

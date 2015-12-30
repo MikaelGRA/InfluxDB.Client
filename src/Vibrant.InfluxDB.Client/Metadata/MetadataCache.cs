@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Vibrant.InfluxDB.Client.Resources;
 
 namespace Vibrant.InfluxDB.Client.Metadata
 {
@@ -22,22 +23,24 @@ namespace Vibrant.InfluxDB.Client.Metadata
 
             if ( !_typeCache.TryGetValue( type, out cache ) )
             {
-               var tags = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>( StringComparer.InvariantCultureIgnoreCase );
-               var fields = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>( StringComparer.InvariantCultureIgnoreCase );
-               var all = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>( StringComparer.InvariantCultureIgnoreCase );
+               var tags = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>( StringComparer.InvariantCulture );
+               var fields = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>( StringComparer.InvariantCulture );
+               var all = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>( StringComparer.InvariantCulture );
                PropertyExpressionInfo<TInfluxRow> timestamp = null;
                foreach ( var propertyInfo in type.GetProperties() )
                {
                   var fieldAttribute = propertyInfo.GetCustomAttribute<InfluxFieldAttribute>();
                   var tagAttribute = propertyInfo.GetCustomAttribute<InfluxTagAttribute>();
                   var timestampAttribute = propertyInfo.GetCustomAttribute<InfluxTimestampAttribute>();
+
+                  // list all attributes so we can ensure the attributes specified on a property are valid
                   var allAttributes = new Attribute[] { fieldAttribute, tagAttribute, timestampAttribute }
                      .Where( x => x != null )
                      .ToList();
 
                   if ( allAttributes.Count > 1 )
                   {
-                     throw new InfluxException( "A property can only have one InfluxAttribute." );
+                     throw new InfluxException( string.Format( Errors.MultipleAttributesOnSingleProperty, propertyInfo.Name, type.Name ) );
                   }
 
                   if ( timestampAttribute != null )
@@ -45,7 +48,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
                      timestamp = new PropertyExpressionInfo<TInfluxRow>( "time", propertyInfo );
                      if ( timestamp.Type != typeof( DateTime ) )
                      {
-                        throw new InfluxException( $"The property {propertyInfo.Name} on the type {type.Name} must be a DateTime." );
+                        throw new InfluxException( string.Format( Errors.InvalidTimestampType, propertyInfo.Name, type.Name ) );
                      }
 
                      all.Add( "time", timestamp );
@@ -55,12 +58,12 @@ namespace Vibrant.InfluxDB.Client.Metadata
                      var expression = new PropertyExpressionInfo<TInfluxRow>( fieldAttribute.Name, propertyInfo );
                      if ( !_validFieldTypes.Contains( expression.Type ) && !expression.Type.IsEnum )
                      {
-                        throw new InfluxException( $"The property {propertyInfo.Name} on the type {type.Name} must be a string, double, long or bool." );
+                        throw new InfluxException( string.Format( Errors.InvalidFieldType, propertyInfo.Name, type.Name ) );
                      }
 
                      if ( string.IsNullOrEmpty( fieldAttribute.Name ) )
                      {
-                        throw new InfluxException( $"The property {propertyInfo.Name} on the type {type.Name} cannot have an empty InfluxField name." );
+                        throw new InfluxException( string.Format( Errors.InvalidNameProperty, propertyInfo.Name, type.Name ) );
                      }
 
                      fields.Add( fieldAttribute.Name, expression );
@@ -71,12 +74,12 @@ namespace Vibrant.InfluxDB.Client.Metadata
                      var expression = new PropertyExpressionInfo<TInfluxRow>( tagAttribute.Name, propertyInfo );
                      if ( expression.Type != typeof( string ) && !expression.Type.IsEnum )
                      {
-                        throw new InfluxException( $"The property {propertyInfo.Name} on the type {type.Name} must be a string or an enum." );
+                        throw new InfluxException( string.Format( Errors.InvalidTagType, propertyInfo.Name, type.Name ) );
                      }
 
                      if ( string.IsNullOrEmpty( tagAttribute.Name ) )
                      {
-                        throw new InfluxException( $"The property {propertyInfo.Name} on the type {type.Name} cannot have an empty InfluxTag name." );
+                        throw new InfluxException( string.Format( Errors.InvalidNameProperty, propertyInfo.Name, type.Name ) );
                      }
 
                      tags.Add( tagAttribute.Name, expression );

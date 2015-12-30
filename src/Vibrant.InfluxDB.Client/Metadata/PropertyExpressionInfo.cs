@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Vibrant.InfluxDB.Client.Parsers;
+using Vibrant.InfluxDB.Client.Resources;
 
 namespace Vibrant.InfluxDB.Client.Metadata
 {
@@ -40,7 +41,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
 
          var setterLambda = Expression.Lambda<Action<TInfluxRow, object>>( assignProperty, true, instanceParam, valueParam );
          SetValue = setterLambda.Compile();
-         
+
          var type = property.PropertyType;
          if ( type.IsGenericType && type.GetGenericTypeDefinition() == typeof( Nullable<> ) )
          {
@@ -52,6 +53,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
             Type = type;
          }
 
+         // ensure we can convert between string/enum
          if ( Type.IsEnum )
          {
             EnumToString = new Dictionary<Enum, string>();
@@ -85,14 +87,14 @@ namespace Vibrant.InfluxDB.Client.Metadata
          var valueAsString = value as string;
          if ( valueAsString == null )
          {
-            throw new InfluxException( $"Could not parse the value for the enum {Type.Name} because the retrieved value was not a string." );
+            throw new InfluxException( string.Format( Errors.CouldNotParseEnum, Property.Name, typeof( TInfluxRow ).Name, value.ToString() ) );
          }
 
          // attempt parsing
          Enum valueAsEnum;
          if ( !StringToEnum.TryGetValue( valueAsString, out valueAsEnum ) )
          {
-            throw new InfluxException( $"Could not parse the value '{valueAsString}' as the enum {Type.Name}." );
+            throw new InfluxException( string.Format( Errors.CouldNotParseEnum, Property.Name, typeof( TInfluxRow ).Name, value.ToString() ) );
          }
 
          return valueAsEnum;
@@ -109,12 +111,12 @@ namespace Vibrant.InfluxDB.Client.Metadata
          var valueAsEnum = value as Enum;
          if ( valueAsEnum == null )
          {
-            throw new InfluxException( $"Could not cast the value {value} to an enum." );
+            throw new InfluxException( string.Format( Errors.CountNotConvertEnumToString, value.ToString(), Property.Name, typeof( TInfluxRow ).Name ) );
          }
 
          if ( !EnumToString.TryGetValue( valueAsEnum, out valueAsString ) )
          {
-            throw new InfluxException( $"Could not convert the value {value} to its string representation for the enum {Type.Name}." );
+            throw new InfluxException( string.Format( Errors.CountNotConvertEnumToString, value.ToString(), Property.Name, typeof( TInfluxRow ).Name ) );
          }
 
          return valueAsString;

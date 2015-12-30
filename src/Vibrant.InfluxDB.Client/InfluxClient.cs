@@ -901,7 +901,7 @@ namespace Vibrant.InfluxDB.Client
          }
          catch ( HttpRequestException e )
          {
-            throw new InfluxException( "An unknown error occurred.", e );
+            throw new InfluxException( Errors.UnknownError, e );
          }
       }
 
@@ -920,7 +920,7 @@ namespace Vibrant.InfluxDB.Client
          }
          catch ( HttpRequestException e )
          {
-            throw new InfluxException( "An unknown error occurred.", e );
+            throw new InfluxException( Errors.UnknownError, e );
          }
       }
 
@@ -944,7 +944,7 @@ namespace Vibrant.InfluxDB.Client
          }
          catch ( HttpRequestException e )
          {
-            throw new InfluxException( "An unknown error occurred.", e );
+            throw new InfluxException( Errors.UnknownError, e );
          }
       }
 
@@ -960,7 +960,7 @@ namespace Vibrant.InfluxDB.Client
          }
          catch ( HttpRequestException e )
          {
-            throw new InfluxException( "An unknown error occurred.", e );
+            throw new InfluxException( Errors.UnknownError, e );
          }
       }
 
@@ -1003,7 +1003,7 @@ namespace Vibrant.InfluxDB.Client
             }
             catch ( JsonSerializationException e )
             {
-               throw new InfluxException( "An error occurred while parsing the error response after an unsuccessful request.", e );
+               throw new InfluxException( Errors.ParsingError, e );
             }
          }
       }
