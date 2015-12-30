@@ -127,6 +127,8 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          var at5UserClient = new InfluxClient( new Uri( "http://localhost:8083" ), "at5User", "otherPassword" );
          
+         // TODO: Some operations
+         
          await _client.DropUserAsync( "at5User" );
       }
    }

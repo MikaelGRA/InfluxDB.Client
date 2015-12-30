@@ -8,6 +8,11 @@ namespace Vibrant.InfluxDB.Client
 {
    public class InfluxPingResult
    {
+      internal InfluxPingResult()
+      {
+
+      }
+
       /// <summary>
       /// Gets the version of InfluxDB.
       /// </summary>

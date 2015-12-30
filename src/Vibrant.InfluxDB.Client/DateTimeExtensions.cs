@@ -51,6 +51,11 @@ namespace Vibrant.InfluxDB.Client
          }
       }
 
+      /// <summary>
+      /// Gets a string that can be used as part of a query to InfluxDB.
+      /// </summary>
+      /// <param name="that"></param>
+      /// <returns></returns>
       public static string ToIso8601( this DateTime that )
       {
          if ( that.Kind == DateTimeKind.Local )

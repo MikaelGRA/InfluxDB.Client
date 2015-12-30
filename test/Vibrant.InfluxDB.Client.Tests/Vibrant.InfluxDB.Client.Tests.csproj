@@ -68,6 +68,7 @@
     <Compile Include="AuthenticationTests.cs" />
     <Compile Include="ContinuousQueryTests.cs" />
     <Compile Include="EnumeratedRow.cs" />
+    <Compile Include="RawTests.cs" />
     <Compile Include="RegionRow.cs" />
     <Compile Include="SchemaExplorationTests.cs" />
     <Compile Include="PingTests.cs" />

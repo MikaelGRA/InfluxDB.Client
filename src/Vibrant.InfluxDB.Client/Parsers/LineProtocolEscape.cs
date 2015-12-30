@@ -12,7 +12,6 @@ namespace Vibrant.InfluxDB.Client.Parsers
    internal static class LineProtocolEscape
    {
       private static readonly IDictionary<string, string> EscapedKeys = new ConcurrentDictionary<string, string>();
-
       private const string True = "true";
       private const string False = "false";
 
@@ -20,11 +19,11 @@ namespace Vibrant.InfluxDB.Client.Parsers
       {
          if ( valueAsObject is long || valueAsObject is int )
          {
-            return valueAsObject + "i";
+            return valueAsObject.ToString() + 'i';
          }
          else if ( valueAsObject is string )
          {
-            return "\"" + ( (string)valueAsObject ).Replace( "\"", "\\\"" ) + "\"";
+            return '\"' + ( (string)valueAsObject ).Replace( "\"", "\\\"" ) + '\"';
          }
          else if ( valueAsObject is bool )
          {
@@ -34,7 +33,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
          {
             var valueAsDateTime = (DateTime)valueAsObject;
 
-            return "\"" + valueAsDateTime.ToIso8601() + "\"";
+            return '\"' + valueAsDateTime.ToIso8601() + '\"';
          }
          else
          {

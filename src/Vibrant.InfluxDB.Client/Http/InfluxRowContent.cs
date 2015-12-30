@@ -36,28 +36,35 @@ namespace Vibrant.InfluxDB.Client.Http
 
       protected override Task SerializeToStreamAsync( Stream stream, TransportContext context )
       {
+         var writer = new StreamWriter( stream, UTF8 );
+
          var precision = _precision;
          var getMeasurementName = _getMeasurementName;
 
-         if ( ResultSetFactory.IsCustomDataPoint<TInfluxRow>() )
+         if ( ResultSetFactory.IsIInfluxRow<TInfluxRow>() )
          {
-            var writer = new StreamWriter( stream, UTF8 );
             foreach ( IInfluxRow dp in _dataPoints )
             {
+               // write measurement name
                writer.Write( getMeasurementName( (TInfluxRow)dp ) );
+
+               // write all tags
                foreach ( var kvp in dp.GetAllTags() )
                {
                   var value = kvp.Value;
                   if ( value != null )
                   {
-                     writer.Write( "," );
+                     writer.Write( ',' );
                      writer.Write( LineProtocolEscape.EscapeKey( kvp.Key ) );
-                     writer.Write( "=" );
+                     writer.Write( '=' );
                      writer.Write( LineProtocolEscape.EscapeTagValue( value ) );
                   }
                }
-               writer.Write( " " );
 
+               // write tag to field seperator
+               writer.Write( ' ' );
+
+               // write all fields
                using ( var enumerator = dp.GetAllFields().GetEnumerator() )
                {
                   bool hasMore = enumerator.MoveNext();
@@ -76,7 +83,7 @@ namespace Vibrant.InfluxDB.Client.Http
                   while ( hasValue )
                   {
                      writer.Write( LineProtocolEscape.EscapeKey( current.Key ) );
-                     writer.Write( "=" );
+                     writer.Write( '=' );
                      writer.Write( LineProtocolEscape.EscapeFieldValue( value ) );
 
                      // get a hold of the next non-null value
@@ -93,23 +100,22 @@ namespace Vibrant.InfluxDB.Client.Http
                      // we have just written a value, and now we have the next non-null value
                      if ( hasValue )
                      {
-                        writer.Write( "," );
+                        writer.Write( ',' );
                      }
                   }
                }
-
-               // it is allowed to not specify a timestamp
+               
+               // write timestamp, if exists
                var ts = dp.GetTimestamp();
                if ( ts != null )
                {
-                  writer.Write( " " );
+                  writer.Write( ' ' );
                   long ticks = ts.Value.ToPrecision( precision );
                   writer.Write( ticks );
                }
 
-               writer.Write( "\n" );
+               writer.Write( '\n' );
             }
-            writer.Flush();
          }
          else
          {
@@ -118,10 +124,12 @@ namespace Vibrant.InfluxDB.Client.Http
             var fields = cache.Fields;
             var timestamp = cache.Timestamp;
 
-            var writer = new StreamWriter( stream, UTF8 );
             foreach ( var dp in _dataPoints )
             {
+               // write measurement name
                writer.Write( getMeasurementName( dp ) );
+
+               // write all tags
                if ( tags.Count > 0 )
                {
                   foreach ( var kvp in tags )
@@ -130,15 +138,18 @@ namespace Vibrant.InfluxDB.Client.Http
                      var value = property.GetValue( dp );
                      if ( value != null )
                      {
-                        writer.Write( "," );
+                        writer.Write( ',' );
                         writer.Write( property.EscapedKey );
-                        writer.Write( "=" );
+                        writer.Write( '=' );
                         writer.Write( LineProtocolEscape.EscapeTagValue( property.GetStringValue( value ) ) );
                      }
                   }
                }
-               writer.Write( " " );
 
+               // write tag to fields seperator
+               writer.Write( ' ' );
+
+               // write all fields
                using ( var enumerator = fields.GetEnumerator() )
                {
                   bool hasMore = enumerator.MoveNext();
@@ -159,7 +170,7 @@ namespace Vibrant.InfluxDB.Client.Http
                   while ( hasValue )
                   {
                      writer.Write( property.EscapedKey );
-                     writer.Write( "=" );
+                     writer.Write( '=' );
                      if ( property.Type.IsEnum )
                      {
                         writer.Write( LineProtocolEscape.EscapeFieldValue( property.GetStringValue( value ) ) );
@@ -184,26 +195,29 @@ namespace Vibrant.InfluxDB.Client.Http
                      // we have just written a value, and now we have the next non-null value
                      if ( hasValue )
                      {
-                        writer.Write( "," );
+                        writer.Write( ',' );
                      }
                   }
                }
 
+               // write timestamp, if exists
                if ( timestamp != null )
                {
                   var ts = timestamp.GetValue( dp );
                   if ( ts != null )
                   {
-                     writer.Write( " " );
+                     writer.Write( ' ' );
                      long ticks = ( (DateTime)ts ).ToPrecision( precision );
                      writer.Write( ticks );
                   }
                }
 
-               writer.Write( "\n" );
+               writer.Write( '\n' );
             }
-            writer.Flush();
          }
+
+         writer.Flush();
+
          return Task.FromResult( 0 );
       }
 
