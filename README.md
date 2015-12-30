@@ -20,7 +20,7 @@ Or you can simply grab it in one of the github releases.
 
 ## Reading/Writing
 
-The library exposes all HTTP operations on InfluxDB (0.9.x) and can be used for reading/writing data to/from in two primary ways:
+The library exposes all HTTP operations on InfluxDB (0.9.6) and can be used for reading/writing data to/from in two primary ways:
  * Using your own POCO classes.
  * Using dynamic classes.
 
