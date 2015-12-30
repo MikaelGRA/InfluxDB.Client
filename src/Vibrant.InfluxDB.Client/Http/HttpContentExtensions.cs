@@ -35,7 +35,7 @@ namespace Vibrant.InfluxDB.Client.Http
       private async static Task<T> ReadAsJsonAsyncCore<T>( HttpContent content, CancellationToken cancellationToken )
       {
          cancellationToken.ThrowIfCancellationRequested();
-         var readStream = await content.ReadAsStreamAsync();
+         var readStream = await content.ReadAsStreamAsync().ConfigureAwait( false );
          var reader = new JsonTextReader( new StreamReader( readStream, Encoding.UTF8 ) );
          T result = Serializer.Deserialize<T>( reader );
          return result;

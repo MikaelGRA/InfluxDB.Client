@@ -991,7 +991,7 @@ namespace Vibrant.InfluxDB.Client
          {
             try
             {
-               var errorResult = await response.Content.ReadAsJsonAsync<ErrorResult>();
+               var errorResult = await response.Content.ReadAsJsonAsync<ErrorResult>().ConfigureAwait( false );
                if ( errorResult?.Error != null )
                {
                   throw new InfluxException( errorResult.Error );
