@@ -2,7 +2,7 @@
 
 This library makes it easy to be a client for InfluxDB on .NET!
 
-The basic idea behing the library is that it should be able to turn queries directly into objects of your own classes. Much like micro-ORMS such as dapper.
+The basic idea behind the library is that it should be able to turn queries directly into objects of your own classes. Much like micro-ORMS such as dapper.
 
 The goal is that we want to be able to support LINQ syntax in the future.
 
