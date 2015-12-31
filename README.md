@@ -20,7 +20,7 @@ Or you can simply grab it in one of the github releases.
 
 ## Reading/Writing
 
-The library exposes all HTTP operations on InfluxDB (0.9.x) and can be used for reading/writing data to/from in two primary ways:
+The library exposes all HTTP operations on InfluxDB (0.9.6) and can be used for reading/writing data to/from in two primary ways:
  * Using your own POCO classes.
  * Using dynamic classes.
 
@@ -159,7 +159,7 @@ public async Task Should_Write_Dynamic_Rows_To_Database()
 }
 ```
 
-Do note, that if you use dynamic classes, user-defined enums are not supported, as there is no way to differentiate between a string and an enum.
+Do note, that if you use dynamic classes, user-defined enums and DateTimes as fields/tags are not supported, as there is no way to differentiate between a string and an enum.
 
 Here's how to query from the database:
 
