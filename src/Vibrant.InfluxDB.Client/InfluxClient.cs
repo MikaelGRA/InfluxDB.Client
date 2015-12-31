@@ -40,7 +40,7 @@ namespace Vibrant.InfluxDB.Client
          _handler = new HttpClientHandler();
          _handler.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
 
-         _client = new HttpClient( _handler, true );
+         _client = new HttpClient( _handler, false );
          _client.BaseAddress = endpoint;
 
          _seriesMetaCache = new Dictionary<DatabaseMeasurementInfoKey, DatabaseMeasurementInfo>();
@@ -1032,6 +1032,7 @@ namespace Vibrant.InfluxDB.Client
          if ( disposing )
          {
             _client.Dispose();
+            _handler.Dispose();
          }
       }
 

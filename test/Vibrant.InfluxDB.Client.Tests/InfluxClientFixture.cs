@@ -7,8 +7,10 @@ using Vibrant.InfluxDB.Client.Rows;
 
 namespace Vibrant.InfluxDB.Client.Tests
 {
-   public class InfluxClientFixture : IDisposable
+   public sealed class InfluxClientFixture : IDisposable
    {
+      private bool _disposed;
+
       public const string DatabaseName = "unittestdb";
 
       public InfluxClient Client { get; set; }
@@ -17,11 +19,6 @@ namespace Vibrant.InfluxDB.Client.Tests
       {
          Client = new InfluxClient( new Uri( "http://localhost:8086" ), "root", "root" );
          Client.CreateDatabaseIfNotExistsAsync( DatabaseName ).Wait();
-      }
-
-      public void Dispose()
-      {
-         Client.DropDatabaseIfExistsAsync( DatabaseName ).Wait();
       }
 
       public static readonly string[] Regions = new[] { "west-eu", "north-eu", "west-us", "east-us", "asia" };
@@ -104,5 +101,38 @@ namespace Vibrant.InfluxDB.Client.Tests
          }
          return infos;
       }
+
+      #region IDisposable
+
+      /// <summary>
+      /// Destructor.
+      /// </summary>
+      ~InfluxClientFixture()
+      {
+         Dispose( false );
+      }
+
+      /// <summary>
+      /// Disposes the InfluxClient and the internal HttpClient that it uses.
+      /// </summary>
+      public void Dispose()
+      {
+         if ( !_disposed )
+         {
+            Dispose( true );
+            _disposed = true;
+            GC.SuppressFinalize( this );
+         }
+      }
+
+      private void Dispose( bool disposing )
+      {
+         if ( disposing )
+         {
+            Client.DropDatabaseIfExistsAsync( DatabaseName ).Wait();
+         }
+      }
+
+      #endregion
    }
 }

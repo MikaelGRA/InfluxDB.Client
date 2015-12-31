@@ -60,7 +60,8 @@ namespace Vibrant.InfluxDB.Client.Tests
       // override object.GetHashCode
       public override int GetHashCode()
       {
-         throw new NotImplementedException();
+         // NOT USED
+         return 5;
       }
    }
 }
