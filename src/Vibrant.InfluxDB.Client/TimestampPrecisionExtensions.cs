@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client
 {
-   public static class TimestampPrecisionExtensions
+   internal static class TimestampPrecisionExtensions
    {
-      public static string GetQueryParameter( this TimestampPrecision that )
+      internal static string GetQueryParameter( this TimestampPrecision that )
       {
          switch ( that )
          {

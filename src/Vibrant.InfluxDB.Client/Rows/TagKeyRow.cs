@@ -5,9 +5,15 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client.Rows
 {
-    public class TagKeyRow
-    {
+   /// <summary>
+   /// Class representing a row returned by the SHOW TAG KEYS query.
+   /// </summary>
+   public class TagKeyRow
+   {
+      /// <summary>
+      /// Gets the tag key.
+      /// </summary>
       [InfluxField( "tagKey" )]
-      public string TagKey { get; set; }
+      public string TagKey { get; private set; }
    }
 }
