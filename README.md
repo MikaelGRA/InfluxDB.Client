@@ -159,7 +159,7 @@ public async Task Should_Write_Dynamic_Rows_To_Database()
 }
 ```
 
-Do note, that if you use dynamic classes, user-defined enums and DateTimes as fields/tags are not supported, as there is no way to differentiate between a string and an enum.
+Do note, that if you use dynamic classes, user-defined enums and DateTimes as fields/tags are not supported, as there is no way to differentiate between a string and an enum/DateTime.
 
 Here's how to query from the database:
 
