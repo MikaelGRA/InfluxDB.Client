@@ -9,27 +9,27 @@ namespace Vibrant.InfluxDB.Client.Tests
    public class ComputerInfo
    {
       [InfluxTimestamp]
-      public DateTime Timestamp { get; set; }
+      internal DateTime Timestamp { get; set; }
 
       [InfluxTag( "host" )]
-      public string Host { get; set; }
+      internal string Host { get; set; }
 
       [InfluxTag( "region" )]
-      public string Region { get; set; }
+      internal string Region { get; set; }
 
       [InfluxField( "cpu" )]
-      public double? CPU { get; set; }
+      internal double? CPU { get; set; }
 
       [InfluxField( "ram" )]
-      public long RAM { get; set; }
+      internal long RAM { get; set; }
    }
 
    public class ComputerInfoMeta
    {
       [InfluxField( "host" )]
-      public string Host { get; set; }
+      internal string Host { get; set; }
 
       [InfluxField( "region" )]
-      public string Region { get; set; }
+      internal string Region { get; set; }
    }
 }

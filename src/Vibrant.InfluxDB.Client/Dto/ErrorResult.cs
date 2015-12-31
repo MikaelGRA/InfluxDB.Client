@@ -6,9 +6,9 @@ using Newtonsoft.Json;
 
 namespace Vibrant.InfluxDB.Client.Dto
 {
-   public class ErrorResult
+   internal class ErrorResult
    {
       [JsonProperty( "error" )]
-      public string Error { get; set; }
+      internal string Error { get; set; }
    }
 }

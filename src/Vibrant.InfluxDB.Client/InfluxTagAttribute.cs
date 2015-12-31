@@ -22,6 +22,9 @@ namespace Vibrant.InfluxDB.Client
          _name = name;
       }
 
+      /// <summary>
+      /// Gets the name of the tag used by InfluxDB.
+      /// </summary>
       public string Name
       {
          get { return _name; }

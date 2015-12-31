@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client
 {
+   /// <summary>
+   /// Class representing the result of a ping to InfluxDB.
+   /// </summary>
    public class InfluxPingResult
    {
       internal InfluxPingResult()

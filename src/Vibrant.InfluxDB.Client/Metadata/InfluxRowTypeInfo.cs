@@ -22,7 +22,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
          All = new ReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>>( all );
 
 
-         PropertiesByClr = All.ToDictionary( x => x.Value.Property.Name, x => x.Value );
+         PropertiesByClrName = All.ToDictionary( x => x.Value.Property.Name, x => x.Value );
 
          var newLambda = Expression.Lambda<Func<TInfluxRow>>( Expression.New( typeof( TInfluxRow ) ), true );
          New = newLambda.Compile();
@@ -38,6 +38,6 @@ namespace Vibrant.InfluxDB.Client.Metadata
 
       internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> All;
 
-      internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> PropertiesByClr;
+      internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> PropertiesByClrName;
    }
 }

@@ -27,7 +27,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
                var fields = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>( StringComparer.InvariantCulture );
                var all = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>( StringComparer.InvariantCulture );
                PropertyExpressionInfo<TInfluxRow> timestamp = null;
-               foreach ( var propertyInfo in type.GetProperties() )
+               foreach ( var propertyInfo in type.GetProperties( BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public ) )
                {
                   var fieldAttribute = propertyInfo.GetCustomAttribute<InfluxFieldAttribute>();
                   var tagAttribute = propertyInfo.GetCustomAttribute<InfluxTagAttribute>();

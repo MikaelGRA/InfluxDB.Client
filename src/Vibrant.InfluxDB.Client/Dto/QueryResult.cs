@@ -6,9 +6,9 @@ using Newtonsoft.Json;
 
 namespace Vibrant.InfluxDB.Client.Dto
 {
-    public class QueryResult
+   internal class QueryResult
     {
       [JsonProperty( "results" )]
-      public List<SeriesResultWrapper> Results { get; set; }
+      internal List<SeriesResultWrapper> Results { get; set; }
    }
 }

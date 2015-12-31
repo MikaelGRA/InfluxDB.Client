@@ -11,6 +11,9 @@ namespace Vibrant.InfluxDB.Client
    /// </summary>
    public sealed class InfluxWriteOptions
    {
+      /// <summary>
+      /// Constructs a new InfluxWriteOptions with default values.
+      /// </summary>
       public InfluxWriteOptions()
       {
          Consistency = Consistency.All;

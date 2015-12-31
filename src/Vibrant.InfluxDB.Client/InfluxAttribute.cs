@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client
 {
+   /// <summary>
+   /// Base-class for various InfluxAttributes.
+   /// </summary>
    public class InfluxAttribute : Attribute
    {
    }

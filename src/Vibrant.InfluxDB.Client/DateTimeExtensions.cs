@@ -6,10 +6,19 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client
 {
+   /// <summary>
+   /// Some simple DateTimeExxtensions that makes it easier to work with InfluxDB.
+   /// </summary>
    public static class DateTimeExtensions
    {
       private static readonly DateTime Epoch = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
 
+      /// <summary>
+      /// Returns a long representing the number of ticks (in the given precision) the TimeSpan represents.
+      /// </summary>
+      /// <param name="that"></param>
+      /// <param name="precision"></param>
+      /// <returns></returns>
       public static long ToPrecision( this TimeSpan that, TimestampPrecision precision )
       {
          switch ( precision )
@@ -31,6 +40,12 @@ namespace Vibrant.InfluxDB.Client
          }
       }
 
+      /// <summary>
+      /// Returns a long representing the number of ticks (in the given precision) the DateTime is from 1. Jan 1970.
+      /// </summary>
+      /// <param name="that"></param>
+      /// <param name="precision"></param>
+      /// <returns></returns>
       public static long ToPrecision( this DateTime that, TimestampPrecision precision )
       {
          switch ( precision )

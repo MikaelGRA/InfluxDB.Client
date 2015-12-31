@@ -40,7 +40,7 @@ namespace Vibrant.InfluxDB.Client.ConsoleApp
 
             Console.WriteLine( resultSet );
          }
-         catch ( Exception e )
+         catch ( Exception )
          {
 
             throw;

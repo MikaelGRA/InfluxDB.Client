@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client.Tests
 {
-   public class SimpleRow
+   internal class SimpleRow
    {
       [InfluxTimestamp]
-      public DateTime? Timestamp { get; set; }
+      internal DateTime? Timestamp { get; set; }
 
       [InfluxField( "value" )]
-      public double Value { get; set; }
+      internal double Value { get; set; }
    }
 }

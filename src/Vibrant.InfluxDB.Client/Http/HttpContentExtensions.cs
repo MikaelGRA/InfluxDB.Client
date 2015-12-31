@@ -28,9 +28,8 @@ namespace Vibrant.InfluxDB.Client.Http
       internal static Task<T> ReadAsJsonAsync<T>( this HttpContent content, CancellationToken cancellationToken = default( CancellationToken ) )
       {
          if ( content == null )
-         {
             throw new ArgumentNullException( nameof( content ) );
-         }
+
          return ReadAsJsonAsyncCore<T>( content, cancellationToken );
       }
 

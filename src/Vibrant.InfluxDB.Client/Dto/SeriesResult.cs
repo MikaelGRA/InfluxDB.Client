@@ -6,18 +6,18 @@ using Newtonsoft.Json;
 
 namespace Vibrant.InfluxDB.Client.Dto
 {
-   public class SeriesResult
+   internal class SeriesResult
    {
       [JsonProperty( "tags" )]
-      public Dictionary<string, string> Tags { get; set; }
+      internal Dictionary<string, string> Tags { get; set; }
 
       [JsonProperty( "name" )]
-      public string Name { get; set; }
+      internal string Name { get; set; }
 
       [JsonProperty( "columns" )]
-      public List<string> Columns { get; set; }
+      internal List<string> Columns { get; set; }
 
       [JsonProperty( "values" )]
-      public List<List<object>> Values { get; set; }
+      internal List<List<object>> Values { get; set; }
    }
 }

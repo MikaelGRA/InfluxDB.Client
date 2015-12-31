@@ -6,12 +6,12 @@ using Newtonsoft.Json;
 
 namespace Vibrant.InfluxDB.Client.Dto
 {
-    public class SeriesResultWrapper
+   internal class SeriesResultWrapper
     {
       [JsonProperty( "series" )]
-      public List<SeriesResult> Series { get; set; }
+      internal List<SeriesResult> Series { get; set; }
 
       [JsonProperty( "error" )]
-      public string Error { get; set; }
+      internal string Error { get; set; }
    }
 }

@@ -53,7 +53,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
          if ( !EscapedKeys.TryGetValue( value, out cachedValue ) )
          {
             cachedValue = Escape( value );
-            EscapedKeys.Add( value, cachedValue );
+            EscapedKeys[ value ] = cachedValue;
          }
          return cachedValue;
       }

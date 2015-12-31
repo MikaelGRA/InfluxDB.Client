@@ -11,6 +11,9 @@ namespace Vibrant.InfluxDB.Client
    /// </summary>
    public sealed class InfluxQueryOptions
    {
+      /// <summary>
+      /// Constructs an InfluxQueryOptions with default values.
+      /// </summary>
       public InfluxQueryOptions()
       {
          Precision = TimestampPrecision.Nanosecond;

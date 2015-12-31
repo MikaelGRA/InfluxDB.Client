@@ -213,10 +213,10 @@ namespace Vibrant.InfluxDB.Client
          return ExecuteOperationWithNoResultAsync( $"CREATE USER {username} WITH PASSWORD '{password}'" );
       }
 
+      /// <summary>
       /// GRANT administrative privileges to an existing user.
       /// </summary>
       /// <param name="username"></param>
-      /// <param name="password"></param>
       /// <returns></returns>
       public Task GrantAdminPrivilegesAsync( string username )
       {
@@ -443,7 +443,6 @@ namespace Vibrant.InfluxDB.Client
       /// <summary>
       /// To see the continuous queries you have defined, query SHOW CONTINUOUS QUERIES and InfluxDB will return the name and query for each continuous query in the database.
       /// </summary>
-      /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
       /// <returns></returns>
       public async Task<InfluxResult<ContinuousQueryRow>> ShowContinuousQueries( string db )
@@ -482,7 +481,6 @@ namespace Vibrant.InfluxDB.Client
       /// <summary>
       /// Get a list of all the databases in your system.
       /// </summary>
-      /// <typeparam name="TInfluxRow"></typeparam>
       /// <returns></returns>
       public async Task<InfluxResult<DatabaseRow>> ShowDatabasesAsync()
       {
@@ -493,7 +491,6 @@ namespace Vibrant.InfluxDB.Client
       /// <summary>
       /// The SHOW RETENTION POLICIES query lists the existing retention policies on a given database.
       /// </summary>
-      /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
       /// <returns></returns>
       public async Task<InfluxResult<RetentionPolicyRow>> ShowRetentionPoliciesAsync( string db )
@@ -547,7 +544,6 @@ namespace Vibrant.InfluxDB.Client
       /// <summary>
       /// The SHOW MEASUREMENTS query returns the measurements in your database.
       /// </summary>
-      /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
       /// <returns></returns>
       public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db )
@@ -559,7 +555,6 @@ namespace Vibrant.InfluxDB.Client
       /// <summary>
       /// The SHOW MEASUREMENTS query returns the measurements in your database.
       /// </summary>
-      /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
       /// <param name="withMeasurement"></param>
       /// <returns></returns>
@@ -572,7 +567,6 @@ namespace Vibrant.InfluxDB.Client
       /// <summary>
       /// The SHOW MEASUREMENTS query returns the measurements in your database.
       /// </summary>
-      /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
       /// <param name="withMeasurement"></param>
       /// <param name="where"></param>
@@ -586,7 +580,6 @@ namespace Vibrant.InfluxDB.Client
       /// <summary>
       /// SHOW TAG KEYS returns the tag keys associated with each measurement.
       /// </summary>
-      /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
       /// <returns></returns>
       public async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( string db )
@@ -598,7 +591,6 @@ namespace Vibrant.InfluxDB.Client
       /// <summary>
       /// SHOW TAG KEYS returns the tag keys associated with each measurement.
       /// </summary>
-      /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
       /// <param name="measurementName"></param>
       /// <returns></returns>
@@ -641,7 +633,6 @@ namespace Vibrant.InfluxDB.Client
       /// <summary>
       /// The SHOW FIELD KEYS query returns the field keys across each measurement in the database.
       /// </summary>
-      /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
       /// <returns></returns>
       public async Task<InfluxResult<FieldKeyRow>> ShowFieldKeysAsync( string db )
@@ -653,7 +644,6 @@ namespace Vibrant.InfluxDB.Client
       /// <summary>
       /// The SHOW FIELD KEYS query returns the field keys across each measurement in the database.
       /// </summary>
-      /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
       /// <param name="measurementName"></param>
       /// <returns></returns>
@@ -836,7 +826,7 @@ namespace Vibrant.InfluxDB.Client
       {
          if ( secondsToWaitForLeader.HasValue )
          {
-            return $"ping?wait_for_leader={(int)secondsToWaitForLeader.Value}s";
+            return $"ping?wait_for_leader={secondsToWaitForLeader.Value}s";
          }
          else
          {
@@ -1016,11 +1006,17 @@ namespace Vibrant.InfluxDB.Client
 
       #region IDisposable
 
+      /// <summary>
+      /// Destructor.
+      /// </summary>
       ~InfluxClient()
       {
          Dispose( false );
       }
 
+      /// <summary>
+      /// Disposes the InfluxClient and the internal HttpClient that it uses.
+      /// </summary>
       public void Dispose()
       {
          if ( !_disposed )

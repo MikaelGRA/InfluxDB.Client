@@ -6,12 +6,21 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client.Rows
 {
+   /// <summary>
+   /// Class representing a row returned by the SHOW GRANTS.
+   /// </summary>
    public class GrantsRow
    {
+      /// <summary>
+      /// Gets the database of the grant.
+      /// </summary>
       [InfluxField( "database" )]
-      public string Database { get; set; }
+      public string Database { get; private set; }
 
+      /// <summary>
+      /// Gets the privilege of the grant.
+      /// </summary>
       [InfluxField( "privilege" )]
-      public DatabasePriviledge Privilege { get; set; }
+      public DatabasePriviledge Privilege { get; private set; }
    }
 }
