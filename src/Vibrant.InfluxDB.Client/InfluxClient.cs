@@ -779,17 +779,23 @@ namespace Vibrant.InfluxDB.Client
          var tagTask = ShowTagKeysAsync( db, measurementName );
          await Task.WhenAll( fieldTask, tagTask ).ConfigureAwait( false );
 
-         var fields = fieldTask.Result.Series.First().Rows;
-         var tags = tagTask.Result.Series.First().Rows;
+         var fields = fieldTask.Result.Series.FirstOrDefault()?.Rows;
+         var tags = tagTask.Result.Series.FirstOrDefault()?.Rows;
 
          info = new DatabaseMeasurementInfo();
-         foreach ( var row in fields )
+         if ( fields != null )
          {
-            info.Fields.Add( row.FieldKey );
+            foreach ( var row in fields )
+            {
+               info.Fields.Add( row.FieldKey );
+            }
          }
-         foreach ( var row in tags )
+         if ( tags != null )
          {
-            info.Tags.Add( row.TagKey );
+            foreach ( var row in tags )
+            {
+               info.Tags.Add( row.TagKey );
+            }
          }
 
          lock ( _seriesMetaCache )

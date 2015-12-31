@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -63,7 +64,7 @@ namespace Vibrant.InfluxDB.Client
             that = that.ToUniversalTime();
          }
 
-         return that.ToString( "yyyy-MM-ddTHH:mm:ss.fffffffZ" );
+         return that.ToString( "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture );
       }
    }
 }

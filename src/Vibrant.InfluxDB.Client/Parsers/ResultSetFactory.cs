@@ -14,6 +14,8 @@ namespace Vibrant.InfluxDB.Client.Parsers
 {
    internal static class ResultSetFactory
    {
+      private static readonly DateTimeStyles DateTimeStyles = DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal;
+
       internal static bool IsIInfluxRow<TInfluxRow>()
       {
          return typeof( IInfluxRow ).IsAssignableFrom( typeof( TInfluxRow ) );
@@ -93,7 +95,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      foreach ( var values in series.Values )
                      {
                         // construct the data points based on the attributes
-                        var dataPoint = new TInfluxRow();
+                        var row = new TInfluxRow();
 
                         // if we implement IHaveMeasurementName, set the measurement name on the IInfluxRow as well
                         var seriesDataPoint = dataPoints as IHaveMeasurementName;
@@ -112,19 +114,23 @@ namespace Vibrant.InfluxDB.Client.Parsers
                            {
                               if ( value != null )
                               {
-                                 if ( property.Type.IsEnum )
+                                 if ( property.IsDateTime )
                                  {
-                                    property.SetValue( dataPoint, property.GetEnumValue( value ) );
+                                    property.SetValue( row, DateTime.Parse( (string)value, CultureInfo.InvariantCulture, DateTimeStyles ) );
+                                 }
+                                 else if ( property.Type.IsEnum )
+                                 {
+                                    property.SetValue( row, property.GetEnumValue( value ) );
                                  }
                                  else
                                  {
-                                    property.SetValue( dataPoint, Convert.ChangeType( value, property.Type ) );
+                                    property.SetValue( row, Convert.ChangeType( value, property.Type, CultureInfo.InvariantCulture ) );
                                  }
                               }
                            }
                         }
 
-                        dataPoints.Add( dataPoint );
+                        dataPoints.Add( row );
                      }
                   }
 
@@ -261,7 +267,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                               {
                                  if ( columnName == InfluxConstants.TimeColumn )
                                  {
-                                    dataPoint.SetTimestamp( (DateTime)value );
+                                    dataPoint.SetTimestamp( DateTime.Parse( (string)value, CultureInfo.InvariantCulture, DateTimeStyles ) );
                                  }
                                  else if ( meta.Tags.Contains( columnName ) )
                                  {

@@ -19,6 +19,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
       internal readonly Dictionary<string, Enum> StringToEnum;
       internal readonly PropertyInfo Property;
       internal readonly string EscapedKey;
+      internal readonly bool IsDateTime;
 
       internal PropertyExpressionInfo( string key, PropertyInfo property )
       {
@@ -78,6 +79,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
             }
          }
 
+         IsDateTime = Type == typeof( DateTime );
          EscapedKey = LineProtocolEscape.EscapeKey( key );
       }
 

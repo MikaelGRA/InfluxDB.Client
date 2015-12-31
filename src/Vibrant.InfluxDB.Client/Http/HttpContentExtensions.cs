@@ -19,6 +19,8 @@ namespace Vibrant.InfluxDB.Client.Http
       {
          var settings = new JsonSerializerSettings();
          settings.Converters.Add( new StringEnumConverter() );
+         settings.DateParseHandling = DateParseHandling.None;
+
 
          Serializer = JsonSerializer.CreateDefault( settings );
       }
