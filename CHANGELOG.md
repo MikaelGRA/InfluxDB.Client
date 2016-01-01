@@ -5,7 +5,7 @@
  * Fixes a bug that could cause an unexpected exception when using IInfluxRow, if no fields/tags were present for a type of measurement
  * Now allows use of internal classes/properties for POCO classes used for queries
  * Fixes a lot of issues with the XML documentation
- * Portable class library that adds support for the platforms: Windows 8, Windows 8.1, ASP.NET Core 5.0, Xamarin.Android, Xamarin.iOS, Xamarin.iOS (Classic)
+ * Portable class library that adds support for the platforms: Windows 8, Windows 8.1, Universal, ASP.NET Core 5.0, Xamarin.Android, Xamarin.iOS, Xamarin.iOS (Classic)
 
 ## 1.0.1
  * Much improved error messages
