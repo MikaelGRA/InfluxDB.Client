@@ -36,7 +36,7 @@ namespace Vibrant.InfluxDB.Client
       internal InfluxResult( List<InfluxSeries<TInfluxRow>> series, string error )
          : base( error )
       {
-         Series = series.AsReadOnly();
+         Series = series;
       }
 
       /// <summary>

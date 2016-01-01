@@ -23,9 +23,9 @@ namespace Vibrant.InfluxDB.Client.Metadata
 
             if ( !_typeCache.TryGetValue( type, out cache ) )
             {
-               var tags = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>( StringComparer.InvariantCulture );
-               var fields = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>( StringComparer.InvariantCulture );
-               var all = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>( StringComparer.InvariantCulture );
+               var tags = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>();
+               var fields = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>();
+               var all = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>();
                PropertyExpressionInfo<TInfluxRow> timestamp = null;
                foreach ( var propertyInfo in type.GetProperties( BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public ) )
                {
@@ -56,7 +56,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
                   else if ( fieldAttribute != null )
                   {
                      var expression = new PropertyExpressionInfo<TInfluxRow>( fieldAttribute.Name, propertyInfo );
-                     if ( !_validFieldTypes.Contains( expression.Type ) && !expression.Type.IsEnum )
+                     if ( !_validFieldTypes.Contains( expression.Type ) && !expression.Type.GetTypeInfo().IsEnum )
                      {
                         throw new InfluxException( string.Format( Errors.InvalidFieldType, propertyInfo.Name, type.Name ) );
                      }
@@ -72,7 +72,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
                   else if ( tagAttribute != null )
                   {
                      var expression = new PropertyExpressionInfo<TInfluxRow>( tagAttribute.Name, propertyInfo );
-                     if ( expression.Type != typeof( string ) && !expression.Type.IsEnum )
+                     if ( expression.Type != typeof( string ) && !expression.Type.GetTypeInfo().IsEnum )
                      {
                         throw new InfluxException( string.Format( Errors.InvalidTagType, propertyInfo.Name, type.Name ) );
                      }

@@ -13,7 +13,7 @@ namespace Vibrant.InfluxDB.Client
    {
       internal InfluxResultSet( List<InfluxResult<TInfluxRow>> results )
       {
-         Results = results.AsReadOnly();
+         Results = results;
       }
 
       /// <summary>
@@ -29,7 +29,7 @@ namespace Vibrant.InfluxDB.Client
    {
       internal InfluxResultSet( List<InfluxResult> results )
       {
-         Results = results.AsReadOnly();
+         Results = results;
       }
 
       /// <summary>

@@ -118,7 +118,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                                  {
                                     property.SetValue( row, DateTime.Parse( (string)value, CultureInfo.InvariantCulture, DateTimeStyles ) );
                                  }
-                                 else if ( property.Type.IsEnum )
+                                 else if ( property.IsEnum )
                                  {
                                     property.SetValue( row, property.GetEnumValue( value ) );
                                  }
@@ -148,7 +148,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                            if ( propertyMap.TryGetValue( kvp.Key, out property ) )
                            {
                               // we know this is either an enum or a string
-                              if ( property.Type.IsEnum )
+                              if ( property.IsEnum )
                               {
                                  Enum valueAsEnum;
                                  if ( property.StringToEnum.TryGetValue( kvp.Value, out valueAsEnum ) )

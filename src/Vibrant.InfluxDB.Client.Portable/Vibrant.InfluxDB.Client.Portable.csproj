@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{EF5D795E-80D3-4FCE-AC7D-596734BB5DF6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Vibrant.InfluxDB.Client</RootNamespace>
+    <AssemblyName>Vibrant.InfluxDB.Client</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>Profile7</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;PORTABLE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Consistency.cs">
+      <Link>Consistency.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\ConsistencyExtensions.cs">
+      <Link>ConsistencyExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\DatabasePriviledge.cs">
+      <Link>DatabasePriviledge.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\DateTimeExtensions.cs">
+      <Link>DateTimeExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Dto\ErrorResult.cs">
+      <Link>Dto\ErrorResult.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Dto\QueryResult.cs">
+      <Link>Dto\QueryResult.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Dto\SeriesResult.cs">
+      <Link>Dto\SeriesResult.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Dto\SeriesResultWrapper.cs">
+      <Link>Dto\SeriesResultWrapper.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Http\HttpContentExtensions.cs">
+      <Link>Http\HttpContentExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Http\InfluxRowContent.cs">
+      <Link>Http\InfluxRowContent.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\InfluxAttribute.cs">
+      <Link>InfluxAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\InfluxClient.cs">
+      <Link>InfluxClient.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\InfluxConstants.cs">
+      <Link>InfluxConstants.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\InfluxException.cs">
+      <Link>InfluxException.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\InfluxFieldAttribute.cs">
+      <Link>InfluxFieldAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\InfluxPingResult.cs">
+      <Link>InfluxPingResult.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\InfluxQuery.cs">
+      <Link>InfluxQuery.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\InfluxQueryOptions.cs">
+      <Link>InfluxQueryOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\InfluxQueryProvider.cs">
+      <Link>InfluxQueryProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\InfluxResult.cs">
+      <Link>InfluxResult.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\InfluxResultSet.cs">
+      <Link>InfluxResultSet.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\InfluxSeries.cs">
+      <Link>InfluxSeries.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\InfluxTagAttribute.cs">
+      <Link>InfluxTagAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\InfluxTimestampAttribute.cs">
+      <Link>InfluxTimestampAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\InfluxWriteOptions.cs">
+      <Link>InfluxWriteOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Metadata\DatabaseMeasurementInfo.cs">
+      <Link>Metadata\DatabaseMeasurementInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Metadata\InfluxRowTypeInfo.cs">
+      <Link>Metadata\InfluxRowTypeInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Metadata\MetadataCache.cs">
+      <Link>Metadata\MetadataCache.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Metadata\PropertyExpressionInfo.cs">
+      <Link>Metadata\PropertyExpressionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Parsers\LineProtocolEscape.cs">
+      <Link>Parsers\LineProtocolEscape.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Parsers\ResultSetFactory.cs">
+      <Link>Parsers\ResultSetFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Resources\Errors.cs">
+      <Link>Resources\Errors.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Rows\ContinuousQueryRow.cs">
+      <Link>Rows\ContinuousQueryRow.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Rows\DatabaseRow.cs">
+      <Link>Rows\DatabaseRow.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Rows\DynamicInfluxRow.cs">
+      <Link>Rows\DynamicInfluxRow.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Rows\FieldKeyRow.cs">
+      <Link>Rows\FieldKeyRow.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Rows\GrantsRow.cs">
+      <Link>Rows\GrantsRow.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Rows\IHaveMeasurementName.cs">
+      <Link>Rows\IHaveMeasurementName.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Rows\IInfluxRow.cs">
+      <Link>Rows\IInfluxRow.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Rows\MeasurementRow.cs">
+      <Link>Rows\MeasurementRow.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Rows\RetentionPolicyRow.cs">
+      <Link>Rows\RetentionPolicyRow.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Rows\ShardRow.cs">
+      <Link>Rows\ShardRow.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Rows\TagKeyRow.cs">
+      <Link>Rows\TagKeyRow.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\Rows\UserRow.cs">
+      <Link>Rows\UserRow.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\TimestampPrecision.cs">
+      <Link>TimestampPrecision.cs</Link>
+    </Compile>
+    <Compile Include="..\Vibrant.InfluxDB.Client\TimestampPrecisionExtensions.cs">
+      <Link>TimestampPrecisionExtensions.cs</Link>
+    </Compile>
+    <Compile Include="BindingFlags.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReflectionExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Bcl.Async.1.0.168\lib\portable-net45+win8+wpa81\Microsoft.Threading.Tasks.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Bcl.Async.1.0.168\lib\portable-net45+win8+wpa81\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\portable-net45+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
+    <Error Condition="!Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
+    <Error Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -10,6 +10,13 @@ namespace Vibrant.InfluxDB.Client.Metadata
 {
    internal class InfluxRowTypeInfo<TInfluxRow>
    {
+      internal readonly Func<TInfluxRow> New;
+      internal readonly PropertyExpressionInfo<TInfluxRow> Timestamp;
+      internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> Tags;
+      internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> Fields;
+      internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> All;
+      internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> PropertiesByClrName;
+
       internal InfluxRowTypeInfo(
          PropertyExpressionInfo<TInfluxRow> timestamp,
          IDictionary<string, PropertyExpressionInfo<TInfluxRow>> tags, 
@@ -27,17 +34,5 @@ namespace Vibrant.InfluxDB.Client.Metadata
          var newLambda = Expression.Lambda<Func<TInfluxRow>>( Expression.New( typeof( TInfluxRow ) ), true );
          New = newLambda.Compile();
       }
-
-      internal readonly Func<TInfluxRow> New;
-
-      internal readonly PropertyExpressionInfo<TInfluxRow> Timestamp;
-
-      internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> Tags;
-
-      internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> Fields;
-
-      internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> All;
-
-      internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> PropertiesByClrName;
    }
 }

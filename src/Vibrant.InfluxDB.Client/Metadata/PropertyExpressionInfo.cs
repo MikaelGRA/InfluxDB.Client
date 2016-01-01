@@ -20,6 +20,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
       internal readonly PropertyInfo Property;
       internal readonly string EscapedKey;
       internal readonly bool IsDateTime;
+      internal readonly bool IsEnum;
 
       internal PropertyExpressionInfo( string key, PropertyInfo property )
       {
@@ -44,7 +45,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
          SetValue = setterLambda.Compile();
 
          var type = property.PropertyType;
-         if ( type.IsGenericType && type.GetGenericTypeDefinition() == typeof( Nullable<> ) )
+         if ( type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof( Nullable<> ) )
          {
             // unwrap the nullable type
             Type = type.GetGenericArguments()[ 0 ];
@@ -54,8 +55,12 @@ namespace Vibrant.InfluxDB.Client.Metadata
             Type = type;
          }
 
+         IsEnum = Type.GetTypeInfo().IsEnum;
+         IsDateTime = Type == typeof( DateTime );
+         EscapedKey = LineProtocolEscape.EscapeKey( key );
+
          // ensure we can convert between string/enum
-         if ( Type.IsEnum )
+         if( IsEnum )
          {
             EnumToString = new Dictionary<Enum, string>();
             StringToEnum = new Dictionary<string, Enum>();
@@ -64,10 +69,10 @@ namespace Vibrant.InfluxDB.Client.Metadata
             foreach ( Enum value in values )
             {
                string stringValue = value.ToString();
-               var memberInfo = Type.GetMember( stringValue );
-               if ( memberInfo != null && memberInfo.Length > 0 )
+               var memberInfo = Type.GetField( stringValue );
+               if ( memberInfo != null  )
                {
-                  var attribute = memberInfo[ 0 ].GetCustomAttribute<EnumMemberAttribute>();
+                  var attribute = memberInfo.GetCustomAttribute<EnumMemberAttribute>();
                   if ( attribute != null )
                   {
                      stringValue = attribute.Value;
@@ -79,8 +84,6 @@ namespace Vibrant.InfluxDB.Client.Metadata
             }
          }
 
-         IsDateTime = Type == typeof( DateTime );
-         EscapedKey = LineProtocolEscape.EscapeKey( key );
       }
 
       internal Enum GetEnumValue( object value )

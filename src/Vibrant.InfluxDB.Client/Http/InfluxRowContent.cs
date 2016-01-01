@@ -171,7 +171,7 @@ namespace Vibrant.InfluxDB.Client.Http
                   {
                      writer.Write( property.EscapedKey );
                      writer.Write( '=' );
-                     if ( property.Type.IsEnum )
+                     if ( property.IsEnum )
                      {
                         writer.Write( LineProtocolEscape.EscapeFieldValue( property.GetStringValue( value ) ) );
                      }

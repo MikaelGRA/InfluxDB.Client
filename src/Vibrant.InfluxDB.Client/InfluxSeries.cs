@@ -16,7 +16,7 @@ namespace Vibrant.InfluxDB.Client
       internal InfluxSeries( string name, List<TInfluxRow> dataPoints, IDictionary<string, object> tags )
       {
          Name = name;
-         Rows = dataPoints.AsReadOnly();
+         Rows = dataPoints;
          if ( tags != null )
          {
             GroupedTags = new ReadOnlyDictionary<string, object>( tags );

@@ -8,7 +8,6 @@ namespace Vibrant.InfluxDB.Client
    /// <summary>
    /// Class representing an error occurring in the InfluxClient.
    /// </summary>
-   [Serializable]
    public class InfluxException : Exception
    {
       internal InfluxException() { }

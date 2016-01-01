@@ -8,21 +8,19 @@ namespace Vibrant.InfluxDB.Client.Metadata
 {
    internal struct DatabaseMeasurementInfoKey
    {
+      internal readonly string Database;
+      internal readonly string MeasurementName;
+
       public DatabaseMeasurementInfoKey( string db, string measurementName )
       {
          Database = db;
          MeasurementName = measurementName;
       }
-
-      internal readonly string Database;
-
-      internal readonly string MeasurementName;
    }
 
    internal class DatabaseMeasurementInfo
    {
       internal readonly HashSet<string> Tags;
-
       internal readonly HashSet<string> Fields;
 
       public DatabaseMeasurementInfo()
