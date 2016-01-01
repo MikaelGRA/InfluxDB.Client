@@ -1,11 +1,10 @@
 # Changelog
 
-## 1.0.2 - Upcoming release
+## 1.0.2
  * Fixes to DateTime handling. It could occur that strings formatted as DateTimes, when read from InfluxDB, would be treated as DateTimes
  * Fixes a bug that could cause an unexpected exception when using IInfluxRow, if no fields/tags were present for a type of measurement
  * Now allows use of internal classes/properties for POCO classes used for queries
  * Fixes a lot of issues with the XML documentation
- * Portable class library that adds support for the platforms: Windows 8, Windows 8.1, UAP, ASP.NET Core 5.0, Xamarin.Android, Xamarin.iOS, Xamarin.iOS (Classic)
 
 ## 1.0.1
  * Much improved error messages
