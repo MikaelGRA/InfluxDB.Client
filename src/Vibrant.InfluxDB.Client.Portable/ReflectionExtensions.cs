@@ -5,44 +5,44 @@ using System.Reflection;
 
 namespace Vibrant.InfluxDB.Client
 {
-   public static class ReflectionExtensions
+   internal static class ReflectionExtensions
    {
-      public static IEnumerable<Type> GetTypes( this Assembly assembly )
+      internal static IEnumerable<Type> GetTypes( this Assembly assembly )
       {
          return assembly.DefinedTypes.Select( t => t.AsType() );
       }
 
-      public static EventInfo GetEvent( this Type type, string name )
+      internal static EventInfo GetEvent( this Type type, string name )
       {
          return type.GetRuntimeEvent( name );
       }
 
-      public static IEnumerable<Type> GetInterfaces( this Type type )
+      internal static IEnumerable<Type> GetInterfaces( this Type type )
       {
          return type.GetTypeInfo().ImplementedInterfaces;
       }
 
-      public static bool IsAssignableFrom( this Type type, Type otherType )
+      internal static bool IsAssignableFrom( this Type type, Type otherType )
       {
          return type.GetTypeInfo().IsAssignableFrom( otherType.GetTypeInfo() );
       }
 
-      public static Attribute[] GetCustomAttributes( this Type type, Type attributeType, bool inherit )
+      internal static Attribute[] GetCustomAttributes( this Type type, Type attributeType, bool inherit )
       {
          return type.GetTypeInfo().GetCustomAttributes( attributeType, inherit ).ToArray();
       }
 
-      public static IEnumerable<ConstructorInfo> GetConstructors( this Type type )
+      internal static IEnumerable<ConstructorInfo> GetConstructors( this Type type )
       {
          return type.GetTypeInfo().DeclaredConstructors.Where( c => c.IsPublic );
       }
 
-      public static bool IsInstanceOfType( this Type type, object obj )
+      internal static bool IsInstanceOfType( this Type type, object obj )
       {
          return type.IsAssignableFrom( obj.GetType() );
       }
 
-      public static MethodInfo GetAddMethod( this EventInfo eventInfo, bool nonPublic = false )
+      internal static MethodInfo GetAddMethod( this EventInfo eventInfo, bool nonPublic = false )
       {
          if ( eventInfo.AddMethod == null || ( !nonPublic && !eventInfo.AddMethod.IsPublic ) )
          {
@@ -52,7 +52,7 @@ namespace Vibrant.InfluxDB.Client
          return eventInfo.AddMethod;
       }
 
-      public static MethodInfo GetRemoveMethod( this EventInfo eventInfo, bool nonPublic = false )
+      internal static MethodInfo GetRemoveMethod( this EventInfo eventInfo, bool nonPublic = false )
       {
          if ( eventInfo.RemoveMethod == null || ( !nonPublic && !eventInfo.RemoveMethod.IsPublic ) )
          {
@@ -62,7 +62,7 @@ namespace Vibrant.InfluxDB.Client
          return eventInfo.RemoveMethod;
       }
 
-      public static MethodInfo GetGetMethod( this PropertyInfo property, bool nonPublic = false )
+      internal static MethodInfo GetGetMethod( this PropertyInfo property, bool nonPublic = false )
       {
          if ( property.GetMethod == null || ( !nonPublic && !property.GetMethod.IsPublic ) )
          {
@@ -72,7 +72,7 @@ namespace Vibrant.InfluxDB.Client
          return property.GetMethod;
       }
 
-      public static MethodInfo GetSetMethod( this PropertyInfo property, bool nonPublic = false )
+      internal static MethodInfo GetSetMethod( this PropertyInfo property, bool nonPublic = false )
       {
          if ( property.SetMethod == null || ( !nonPublic && !property.SetMethod.IsPublic ) )
          {
@@ -82,12 +82,12 @@ namespace Vibrant.InfluxDB.Client
          return property.SetMethod;
       }
 
-      public static IEnumerable<PropertyInfo> GetProperties( this Type type )
+      internal static IEnumerable<PropertyInfo> GetProperties( this Type type )
       {
          return GetProperties( type, BindingFlags.FlattenHierarchy | BindingFlags.Public );
       }
 
-      public static IEnumerable<PropertyInfo> GetProperties( this Type type, BindingFlags flags )
+      internal static IEnumerable<PropertyInfo> GetProperties( this Type type, BindingFlags flags )
       {
          var properties = type.GetTypeInfo().DeclaredProperties;
          if ( ( flags & BindingFlags.FlattenHierarchy ) == BindingFlags.FlattenHierarchy )
@@ -105,22 +105,22 @@ namespace Vibrant.InfluxDB.Client
                 select property;
       }
 
-      public static PropertyInfo GetProperty( this Type type, string name, BindingFlags flags )
+      internal static PropertyInfo GetProperty( this Type type, string name, BindingFlags flags )
       {
          return GetProperties( type, flags ).FirstOrDefault( p => p.Name == name );
       }
 
-      public static PropertyInfo GetProperty( this Type type, string name )
+      internal static PropertyInfo GetProperty( this Type type, string name )
       {
          return GetProperties( type, BindingFlags.Public | BindingFlags.FlattenHierarchy ).FirstOrDefault( p => p.Name == name );
       }
 
-      public static IEnumerable<MethodInfo> GetMethods( this Type type )
+      internal static IEnumerable<MethodInfo> GetMethods( this Type type )
       {
          return GetMethods( type, BindingFlags.FlattenHierarchy | BindingFlags.Public );
       }
 
-      public static IEnumerable<MethodInfo> GetMethods( this Type type, BindingFlags flags )
+      internal static IEnumerable<MethodInfo> GetMethods( this Type type, BindingFlags flags )
       {
          var properties = type.GetTypeInfo().DeclaredMethods;
          if ( ( flags & BindingFlags.FlattenHierarchy ) == BindingFlags.FlattenHierarchy )
@@ -135,18 +135,18 @@ namespace Vibrant.InfluxDB.Client
              .Where( m => ( flags & BindingFlags.Static ) != BindingFlags.Static || m.IsStatic );
       }
 
-      public static MethodInfo GetMethod( this Type type, string name, BindingFlags flags )
+      internal static MethodInfo GetMethod( this Type type, string name, BindingFlags flags )
       {
          return GetMethods( type, flags ).FirstOrDefault( m => m.Name == name );
       }
 
-      public static MethodInfo GetMethod( this Type type, string name )
+      internal static MethodInfo GetMethod( this Type type, string name )
       {
          return GetMethods( type, BindingFlags.Public | BindingFlags.FlattenHierarchy )
                 .FirstOrDefault( m => m.Name == name );
       }
 
-      public static IEnumerable<ConstructorInfo> GetConstructors( this Type type, BindingFlags flags )
+      internal static IEnumerable<ConstructorInfo> GetConstructors( this Type type, BindingFlags flags )
       {
          return type.GetConstructors()
              .Where( f => ( flags & BindingFlags.NonPublic ) != BindingFlags.NonPublic || !f.IsPublic )
@@ -155,12 +155,12 @@ namespace Vibrant.InfluxDB.Client
              .Where( m => ( flags & BindingFlags.Static ) != BindingFlags.Static || m.IsStatic );
       }
 
-      public static IEnumerable<FieldInfo> GetFields( this Type type )
+      internal static IEnumerable<FieldInfo> GetFields( this Type type )
       {
          return GetFields( type, BindingFlags.Public | BindingFlags.FlattenHierarchy );
       }
 
-      public static IEnumerable<FieldInfo> GetFields( this Type type, BindingFlags flags )
+      internal static IEnumerable<FieldInfo> GetFields( this Type type, BindingFlags flags )
       {
          var fields = type.GetTypeInfo().DeclaredFields;
          if ( ( flags & BindingFlags.FlattenHierarchy ) == BindingFlags.FlattenHierarchy )
@@ -175,17 +175,17 @@ namespace Vibrant.InfluxDB.Client
              .Where( f => ( flags & BindingFlags.Static ) != BindingFlags.Static || f.IsStatic );
       }
 
-      public static FieldInfo GetField( this Type type, string name, BindingFlags flags )
+      internal static FieldInfo GetField( this Type type, string name, BindingFlags flags )
       {
          return GetFields( type, flags ).FirstOrDefault( p => p.Name == name );
       }
 
-      public static FieldInfo GetField( this Type type, string name )
+      internal static FieldInfo GetField( this Type type, string name )
       {
          return GetFields( type, BindingFlags.Public | BindingFlags.FlattenHierarchy ).FirstOrDefault( p => p.Name == name );
       }
 
-      public static Type[] GetGenericArguments( this Type type )
+      internal static Type[] GetGenericArguments( this Type type )
       {
          return type.GenericTypeArguments;
       }

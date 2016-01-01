@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Vibrant.InfluxDB.Client
 {
    [Flags]
-   public enum BindingFlags
+   internal enum BindingFlags
    {
       None = 0,
       Instance = 1,
