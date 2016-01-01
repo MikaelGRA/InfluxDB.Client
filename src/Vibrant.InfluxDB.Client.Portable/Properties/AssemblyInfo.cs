@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Vibrant A/S")]
 [assembly: AssemblyProduct("Vibrant.InfluxDB.Client")]
-[assembly: AssemblyCopyright("Copyright © Vibrant A/S 2015")]
+[assembly: AssemblyCopyright( "Copyright © MikaelGRA 2015" )]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en")]
