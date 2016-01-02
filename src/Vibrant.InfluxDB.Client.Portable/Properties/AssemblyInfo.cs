@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Vibrant.InfluxDB.Client")]
 [assembly: AssemblyDescription( "An easy-to-use client for InfluxDB." )]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Vibrant A/S")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Vibrant.InfluxDB.Client")]
 [assembly: AssemblyCopyright( "Copyright © MikaelGRA 2015" )]
 [assembly: AssemblyTrademark("")]
@@ -26,5 +26,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.2.0")]
-[assembly: AssemblyFileVersion("1.0.2.0")]
+[assembly: AssemblyVersion("1.0.4.0")]
+[assembly: AssemblyFileVersion("1.0.4.0")]
