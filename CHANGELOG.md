@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.5
+ * Added new overloads of ShowMeasurements by splitting them into two different methods
+
 ## 1.0.4
  * Nuget package metadata update
  * AssemblyInfo fixes
