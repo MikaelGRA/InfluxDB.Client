@@ -1,0 +1,1075 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Vibrant.InfluxDB.Client</name>
+    </assembly>
+    <members>
+        <member name="T:Vibrant.InfluxDB.Client.Consistency">
+            <summary>
+            Set the number of nodes that must confirm the write. If the requirement is not met the return value will be partial write if some points in the batch fail, or write failure if all points in the batch fail.
+            </summary>
+        </member>
+        <member name="F:Vibrant.InfluxDB.Client.Consistency.One">
+            <summary>
+            The data must be written to disk by at least 1 valid node
+            </summary>
+        </member>
+        <member name="F:Vibrant.InfluxDB.Client.Consistency.Quorum">
+            <summary>
+            The data must be written to disk by (N/2 + 1) valid nodes (N is the replication factor for the target retention policy)
+            </summary>
+        </member>
+        <member name="F:Vibrant.InfluxDB.Client.Consistency.All">
+            <summary>
+            The data must be written to disk by all valid nodes
+            </summary>
+        </member>
+        <member name="F:Vibrant.InfluxDB.Client.Consistency.Any">
+            <summary>
+            a write is confirmed if hinted-handoff is successful, even if all target nodes report a write failure In this context, “valid node” means a node that hosts a copy of the shard containing the series being written to. In a clustered system, the replication factor should equal the number of valid nodes.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.DatabasePriviledge">
+            <summary>
+            Enum representing the database privileges of InfluxDB.
+            </summary>
+        </member>
+        <member name="F:Vibrant.InfluxDB.Client.DatabasePriviledge.None">
+            <summary>
+            No access to the database.
+            </summary>
+        </member>
+        <member name="F:Vibrant.InfluxDB.Client.DatabasePriviledge.Read">
+            <summary>
+            Read access to the database.
+            </summary>
+        </member>
+        <member name="F:Vibrant.InfluxDB.Client.DatabasePriviledge.Write">
+            <summary>
+            Write access to the database.
+            </summary>
+        </member>
+        <member name="F:Vibrant.InfluxDB.Client.DatabasePriviledge.All">
+            <summary>
+            Full access to the database.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.DateTimeExtensions">
+            <summary>
+            Some simple DateTimeExxtensions that makes it easier to work with InfluxDB.
+            </summary>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.DateTimeExtensions.ToPrecision(System.TimeSpan,Vibrant.InfluxDB.Client.TimestampPrecision)">
+            <summary>
+            Returns a long representing the number of ticks (in the given precision) the TimeSpan represents.
+            </summary>
+            <param name="that"></param>
+            <param name="precision"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.DateTimeExtensions.ToPrecision(System.DateTime,Vibrant.InfluxDB.Client.TimestampPrecision)">
+            <summary>
+            Returns a long representing the number of ticks (in the given precision) the DateTime is from 1. Jan 1970.
+            </summary>
+            <param name="that"></param>
+            <param name="precision"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.DateTimeExtensions.ToIso8601(System.DateTime)">
+            <summary>
+            Gets a string that can be used as part of a query to InfluxDB.
+            </summary>
+            <param name="that"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.InfluxAttribute">
+            <summary>
+            Base-class for various InfluxAttributes.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.InfluxPingResult">
+            <summary>
+            Class representing the result of a ping to InfluxDB.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxPingResult.Version">
+            <summary>
+            Gets the version of InfluxDB.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.InfluxQueryOptions">
+            <summary>
+            InfluxQueryOptions are applied to queries made to InfluxDB.
+            </summary>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxQueryOptions.#ctor">
+            <summary>
+            Constructs an InfluxQueryOptions with default values.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxQueryOptions.Precision">
+            <summary>
+            Gets or sets the Precision. Default is nanoseconds.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxQueryOptions.ChunkSize">
+            <summary>
+            Gets or sets the ChunkSize. Default is null. Which means
+            it uses the InfluxDB default of 10000.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.InfluxWriteOptions">
+            <summary>
+            The write options that are being used when write operations are performed against influxDB.
+            </summary>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxWriteOptions.#ctor">
+            <summary>
+            Constructs a new InfluxWriteOptions with default values.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxWriteOptions.Consistency">
+            <summary>
+            Gets or sets the consistency. Default is All.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxWriteOptions.Precision">
+            <summary>
+            Gets or sets the precision. Default is nanosecond.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.Rows.ContinuousQueryRow">
+            <summary>
+            Class representing a row returned by the SHOW CONTINUOUS QUERIES.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.ContinuousQueryRow.Name">
+            <summary>
+            Gets the name.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.ContinuousQueryRow.Query">
+            <summary>
+            Gets the query.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.Rows.GrantsRow">
+            <summary>
+            Class representing a row returned by the SHOW GRANTS.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.GrantsRow.Database">
+            <summary>
+            Gets the database of the grant.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.GrantsRow.Privilege">
+            <summary>
+            Gets the privilege of the grant.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.Rows.IInfluxRow">
+            <summary>
+            IInfluxRow is an interface that allows using custom types as rows in InfluxDB.
+            
+            When implementing this interface, InfluxAttributes are ignored and the interface 
+            is used instead.
+            </summary>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.IInfluxRow.SetTimestamp(System.Nullable{System.DateTime})">
+            <summary>
+            Sets the timestamp.
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.IInfluxRow.GetTimestamp">
+            <summary>
+            Gets the timestamp.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.IInfluxRow.SetField(System.String,System.Object)">
+            <summary>
+            Sets a field.
+            </summary>
+            <param name="name"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.IInfluxRow.GetField(System.String)">
+            <summary>
+            Gets a field.
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.IInfluxRow.SetTag(System.String,System.String)">
+            <summary>
+            Sets a tag.
+            </summary>
+            <param name="name"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.IInfluxRow.GetTag(System.String)">
+            <summary>
+            Gets a tag.
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.IInfluxRow.GetAllTags">
+            <summary>
+            Gets all tags contained in the IInfluxRow.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.IInfluxRow.GetAllFields">
+            <summary>
+            Gets all fields cotnained in the IInfluxRow.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.Rows.IHaveMeasurementName">
+            <summary>
+            Interface that can be used to specify a per-row measurement name.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.IHaveMeasurementName.MeasurementName">
+            <summary>
+            Gets or sets the measurement name.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.Rows.DatabaseRow">
+            <summary>
+            Class representing a row returned by the SHOW DATABASES query.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.DatabaseRow.Name">
+            <summary>
+            Gets or sets the name of the database.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.Rows.DynamicInfluxRow">
+            <summary>
+            A class implementing the IInfluxRow interface that can be used with the DLR. This
+            allows you to query data that you do not know the structure of.
+            </summary>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.DynamicInfluxRow.#ctor">
+            <summary>
+            Constructs a new empty DynamicInfluxRow.
+            </summary>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.DynamicInfluxRow.GetTimestamp">
+            <summary>
+            Gets the timestamp.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.DynamicInfluxRow.SetTimestamp(System.Nullable{System.DateTime})">
+            <summary>
+            Sets the timestamp.
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.DynamicInfluxRow.GetField(System.String)">
+            <summary>
+            Gets a field.
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.DynamicInfluxRow.SetField(System.String,System.Object)">
+            <summary>
+            Sets a field.
+            </summary>
+            <param name="name"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.DynamicInfluxRow.GetTag(System.String)">
+            <summary>
+            Gets a tag.
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.DynamicInfluxRow.SetTag(System.String,System.String)">
+            <summary>
+            Sets a tag.
+            </summary>
+            <param name="name"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.DynamicInfluxRow.GetAllTags">
+            <summary>
+            Gets all tags contained in the IInfluxRow.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.DynamicInfluxRow.GetAllFields">
+            <summary>
+            Gets all fields cotnained in the IInfluxRow.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.DynamicInfluxRow.Timestamp">
+            <summary>
+            Gets or sets the timestamp.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.DynamicInfluxRow.Tags">
+            <summary>
+            Gets a dictionary of all the Tags.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.DynamicInfluxRow.Fields">
+            <summary>
+            Gets a dictionary of all the Fields.
+            </summary>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.Rows.DynamicInfluxRow.TryGetMember(System.Dynamic.GetMemberBinder,System.Object@)">
+            <summary>
+            Gets the member identified by the binder so it can be used
+            with the DLR.
+            </summary>
+            <param name="binder"></param>
+            <param name="result"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.Rows.FieldKeyRow">
+            <summary>
+            Class representing a row returned by the SHOW FIELD KEYS query.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.FieldKeyRow.FieldKey">
+            <summary>
+            Gets the field key.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.Rows.MeasurementRow">
+            <summary>
+            Class representing a row returned by the SHOW MEASUREMENTS query.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.MeasurementRow.Name">
+            <summary>
+            Gets the name of the measurement.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.Rows.RetentionPolicyRow">
+            <summary>
+            Class representing a row returned by the SHOW RETENTION POLICIES query.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.RetentionPolicyRow.Name">
+            <summary>
+            Gets the name of the retention policy.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.RetentionPolicyRow.Duration">
+            <summary>
+            Gets the duration of rows using this retention policy.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.RetentionPolicyRow.Replication">
+            <summary>
+            Gets the number of replicas of rows using this retention policy.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.RetentionPolicyRow.Default">
+            <summary>
+            Gets an indication of whether or not this is the default retention policy
+            for the database.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.Rows.ShardRow">
+            <summary>
+            Class representing a row returned by the SHOW SHARDS query.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.ShardRow.Id">
+            <summary>
+            Gets the ID of the shard.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.ShardRow.Database">
+            <summary>
+            Gets the database.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.ShardRow.RetentionPolicy">
+            <summary>
+            Gets the retention policy.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.ShardRow.ShardGroup">
+            <summary>
+            Gets the shard group.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.ShardRow.StartTime">
+            <summary>
+            Gets the start time.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.ShardRow.EndTime">
+            <summary>
+            Gets the end time.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.ShardRow.ExpiryTime">
+            <summary>
+            Gets the expiry time.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.ShardRow.Owners">
+            <summary>
+            Gets the owners.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.Rows.TagKeyRow">
+            <summary>
+            Class representing a row returned by the SHOW TAG KEYS query.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.TagKeyRow.TagKey">
+            <summary>
+            Gets the tag key.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.Rows.UserRow">
+            <summary>
+            Class representing a row returned by the SHOW USERS query.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.UserRow.Username">
+            <summary>
+            Gets the username.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.Rows.UserRow.IsAdmin">
+            <summary>
+            Gets an indication of whether the user is an admin.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.InfluxClient">
+            <summary>
+            An InfluxClient exposes all HTTP operations on InfluxDB.
+            </summary>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.#ctor(System.Uri,System.String,System.String)">
+            <summary>
+            Constructs an InfluxClient that uses the specified credentials.
+            </summary>
+            <param name="endpoint"></param>
+            <param name="username"></param>
+            <param name="password"></param>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.#ctor(System.Uri)">
+            <summary>
+            Constructs an InfluxClient that does not use any credentials.
+            </summary>
+            <param name="endpoint"></param>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxClient.DefaultWriteOptions">
+            <summary>
+            Gets the default write options.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxClient.DefaultQueryOptions">
+            <summary>
+            Gets the default query optionns.
+            </summary>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ExecuteOperationAsync``1(System.String,System.String)">
+            <summary>
+            Executes an arbitrary command that returns a table as a result.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+            <param name="commandOrQuery"></param>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ExecuteOperationAsync``1(System.String)">
+            <summary>
+            Executes an arbitrary command or query that returns a table as a result.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+            <param name="commandOrQuery"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ExecuteOperationAsync(System.String,System.String)">
+            <summary>
+            Executes an arbitrary command that does not return a table.
+            </summary>
+            <param name="commandOrQuery"></param>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ExecuteOperationAsync(System.String)">
+            <summary>
+            Executes an arbitrary command that does not return a table.
+            </summary>
+            <param name="commandOrQuery"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.PingAsync">
+            <summary>
+            Executes a ping.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.PingAsync(System.Int32)">
+            <summary>
+            Executes a ping and waits for the leader to respond.
+            </summary>
+            <param name="secondsToWaitForLeader"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowStatsAsync``1">
+            <summary>
+            Shows InfluxDB stats.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowDiagnosticsAsync``1">
+            <summary>
+            Shows InfluxDB diagnostics.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowShards">
+            <summary>
+            Shows Shards.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.CreateAdminUserAsync(System.String,System.String)">
+            <summary>
+            CREATE a new admin user.
+            </summary>
+            <param name="username"></param>
+            <param name="password"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.CreateUserAsync(System.String,System.String)">
+            <summary>
+            CREATE a new non-admin user.
+            </summary>
+            <param name="username"></param>
+            <param name="password"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.GrantAdminPrivilegesAsync(System.String)">
+            <summary>
+            GRANT administrative privileges to an existing user.
+            </summary>
+            <param name="username"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.GrantPrivilegeAsync(System.String,Vibrant.InfluxDB.Client.DatabasePriviledge,System.String)">
+            <summary>
+            GRANT READ, WRITE or ALL database privileges to an existing user.
+            </summary>
+            <param name="privilege"></param>
+            <param name="db"></param>
+            <param name="username"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.RevokeAdminPrivilegesAsync(System.String)">
+            <summary>
+            REVOKE administrative privileges from an admin user
+            </summary>
+            <param name="username"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.RevokePrivilegeAsync(System.String,Vibrant.InfluxDB.Client.DatabasePriviledge,System.String)">
+            <summary>
+            REVOKE READ, WRITE, or ALL database privileges from an existing user.
+            </summary>
+            <param name="privilege"></param>
+            <param name="db"></param>
+            <param name="username"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.SetPasswordAsync(System.String,System.String)">
+            <summary>
+            SET a user’s password.
+            </summary>
+            <param name="username"></param>
+            <param name="password"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.DropUserAsync(System.String)">
+            <summary>
+            DROP a user.
+            </summary>
+            <param name="username"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowUsersAsync">
+            <summary>
+            SHOW all existing users and their admin status.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowGrantsAsync(System.String)">
+            <summary>
+            SHOW a user’s database privileges.
+            </summary>
+            <param name="username"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.CreateDatabaseIfNotExistsAsync(System.String)">
+            <summary>
+            Create a database with CREATE DATABASE IF NOT EXISTS.
+            </summary>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.CreateDatabaseAsync(System.String)">
+            <summary>
+            Create a database with CREATE DATABASE.
+            </summary>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.DropDatabaseIfExistsAsync(System.String)">
+            <summary>
+            Delete a database with DROP DATABASE IF EXUSTS,
+            </summary>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.DropDatabaseAsync(System.String)">
+            <summary>
+            Delete a database with DROP DATABASE
+            </summary>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.DropSeries(System.String,System.String)">
+            <summary>
+            Delete series with DROP SERIES
+            </summary>
+            <param name="db"></param>
+            <param name="measurementName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.DropSeries(System.String,System.String,System.String)">
+            <summary>
+            Delete series with DROP SERIES
+            </summary>
+            <param name="db"></param>
+            <param name="measurementName"></param>
+            <param name="where"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.DropMeasurementAsync(System.String,System.String)">
+            <summary>
+            Delete measurements with DROP MEASUREMENT
+            </summary>
+            <param name="measurementName"></param>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.CreateRetentionPolicyAsync(System.String,System.String,System.String,System.Int32,System.Boolean)">
+            <summary>
+            Create retention policies with CREATE RETENTION POLICY
+            </summary>
+            <param name="policyName"></param>
+            <param name="db"></param>
+            <param name="duration"></param>
+            <param name="replicationLevel"></param>
+            <param name="isDefault"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.AlterRetentionPolicyAsync(System.String,System.String,System.String,System.Int32,System.Boolean)">
+            <summary>
+            Modify retention policies with ALTER RETENTION POLICY
+            </summary>
+            <param name="policyName"></param>
+            <param name="db"></param>
+            <param name="duration"></param>
+            <param name="replicationLevel"></param>
+            <param name="isDefault"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.DropRetentionPolicyAsync(System.String,System.String)">
+            <summary>
+            Delete retention policies with DROP RETENTION POLICY
+            </summary>
+            <param name="policyName"></param>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowContinuousQueries(System.String)">
+            <summary>
+            To see the continuous queries you have defined, query SHOW CONTINUOUS QUERIES and InfluxDB will return the name and query for each continuous query in the database.
+            </summary>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.CreateContinuousQuery(System.String,System.String,System.String)">
+            <summary>
+            Creates a continuous query.
+            </summary>
+            <param name="name"></param>
+            <param name="db"></param>
+            <param name="continuousQuery"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.DropContinuousQuery(System.String,System.String)">
+            <summary>
+            Drops a continuous query.
+            </summary>
+            <param name="name"></param>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowDatabasesAsync">
+            <summary>
+            Get a list of all the databases in your system.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowRetentionPoliciesAsync(System.String)">
+            <summary>
+            The SHOW RETENTION POLICIES query lists the existing retention policies on a given database.
+            </summary>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowSeriesAsync``1(System.String)">
+            <summary>
+            The SHOW SERIES query returns the distinct series in your database.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowSeriesAsync``1(System.String,System.String)">
+            <summary>
+            The SHOW SERIES query returns the distinct series in your database.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+            <param name="db"></param>
+            <param name="measurementName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowSeriesAsync``1(System.String,System.String,System.String)">
+            <summary>
+            The SHOW SERIES query returns the distinct series in your database.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+            <param name="db"></param>
+            <param name="measurementName"></param>
+            <param name="where"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowMeasurementsAsync(System.String)">
+            <summary>
+            The SHOW MEASUREMENTS query returns the measurements in your database.
+            </summary>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowMeasurementsAsync(System.String,System.String)">
+            <summary>
+            The SHOW MEASUREMENTS query returns the measurements in your database.
+            </summary>
+            <param name="db"></param>
+            <param name="where"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowMeasurementsWithMeasurementAsync(System.String,System.String)">
+            <summary>
+            The SHOW MEASUREMENTS query returns the measurements in your database.
+            </summary>
+            <param name="db"></param>
+            <param name="measurementRegex"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowMeasurementsWithMeasurementAsync(System.String,System.String,System.String)">
+            <summary>
+            The SHOW MEASUREMENTS query returns the measurements in your database.
+            </summary>
+            <param name="db"></param>
+            <param name="measurementRegex"></param>
+            <param name="where"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowTagKeysAsync(System.String)">
+            <summary>
+            SHOW TAG KEYS returns the tag keys associated with each measurement.
+            </summary>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowTagKeysAsync(System.String,System.String)">
+            <summary>
+            SHOW TAG KEYS returns the tag keys associated with each measurement.
+            </summary>
+            <param name="db"></param>
+            <param name="measurementName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowTagValuesAsync``1(System.String,System.String)">
+            <summary>
+            The SHOW TAG VALUES query returns the set of tag values for a specific tag key across all measurements in the database.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+            <param name="db"></param>
+            <param name="tagKey"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowTagValuesAsync``1(System.String,System.String,System.String)">
+            <summary>
+            The SHOW TAG VALUES query returns the set of tag values for a specific tag key across all measurements in the database.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+            <param name="db"></param>
+            <param name="tagKey"></param>
+            <param name="measurementName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowFieldKeysAsync(System.String)">
+            <summary>
+            The SHOW FIELD KEYS query returns the field keys across each measurement in the database.
+            </summary>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ShowFieldKeysAsync(System.String,System.String)">
+            <summary>
+            The SHOW FIELD KEYS query returns the field keys across each measurement in the database.
+            </summary>
+            <param name="db"></param>
+            <param name="measurementName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.WriteAsync``1(System.String,System.String,System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Writes the rows with default write options.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+            <param name="db"></param>
+            <param name="measurementName"></param>
+            <param name="rows"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.WriteAsync``1(System.String,System.String,System.Collections.Generic.IEnumerable{``0},Vibrant.InfluxDB.Client.InfluxWriteOptions)">
+            <summary>
+            Writes the rows with the specified write options.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+            <param name="db"></param>
+            <param name="measurementName"></param>
+            <param name="rows"></param>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.WriteAsync``1(System.String,System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Writes the rows with default write options.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+            <param name="db"></param>
+            <param name="rows"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.WriteAsync``1(System.String,System.Collections.Generic.IEnumerable{``0},Vibrant.InfluxDB.Client.InfluxWriteOptions)">
+            <summary>
+            Writes the rows with the specified write options.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+            <param name="db"></param>
+            <param name="rows"></param>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ReadAsync``1(System.String,System.String)">
+            <summary>
+            Executes the query and returns the result with the default query options.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+            <param name="query"></param>
+            <param name="db"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.ReadAsync``1(System.String,System.String,Vibrant.InfluxDB.Client.InfluxQueryOptions)">
+            <summary>
+            Executes the query and returns the result with the specified query options.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+            <param name="query"></param>
+            <param name="db"></param>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.Finalize">
+            <summary>
+            Destructor.
+            </summary>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxClient.Dispose">
+            <summary>
+            Disposes the InfluxClient and the internal HttpClient that it uses.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.InfluxException">
+            <summary>
+            Class representing an error occurring in the InfluxClient.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.InfluxFieldAttribute">
+            <summary>
+            Attribute to be placed on properties that are considered fields by InfluxDB.
+            </summary>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxFieldAttribute.#ctor(System.String)">
+            <summary>
+            Constructs an InfluxFieldAttribute with the given name.
+            </summary>
+            <param name="name"></param>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxFieldAttribute.Name">
+            <summary>
+            Gets the name of the field used by InfluxDB.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.InfluxResult">
+            <summary>
+            Result of a query to influxdb that does not return a table.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxResult.ErrorMessage">
+            <summary>
+            Gets the error message, if the operation did not succeed.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxResult.Succeeded">
+            <summary>
+            Gets an indication of whether the operation succeeded.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.InfluxResult`1">
+            <summary>
+            Result of a query to influxdb that returns one or more tables.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxResult`1.Series">
+            <summary>
+            Gets the series.
+            </summary>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxResult`1.FindGroup(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,System.Object}})">
+            <summary>
+            Finds the serie that can be identified by the specified tags.
+            </summary>
+            <param name="tags"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.InfluxResultSet`1">
+            <summary>
+            Result of multiple queries against influxDB that does not return a table.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxResultSet`1.Results">
+            <summary>
+            Gets the results.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.InfluxResultSet">
+            <summary>
+            Result of multiple queries against influxDB that returns a table.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxResultSet.Results">
+            <summary>
+            Gets the results.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.InfluxSeries`1">
+            <summary>
+            An InfluxSeries is a single series returned by InfluxDB. A single query may
+            return multiple series due to GROUP BY.
+            </summary>
+            <typeparam name="TInfluxRow"></typeparam>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxSeries`1.Name">
+            <summary>
+            Gets the name of the measurement or series.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxSeries`1.GroupedTags">
+            <summary>
+            Gets the tags that this InfluxSeries has been grouped on.
+            </summary>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxSeries`1.Rows">
+            <summary>
+            Gets the rows of the InfluxSeries.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.InfluxTagAttribute">
+            <summary>
+            Attribute to be placed on properties that are considered tags by InfluxDB.
+            </summary>
+        </member>
+        <member name="M:Vibrant.InfluxDB.Client.InfluxTagAttribute.#ctor(System.String)">
+            <summary>
+            Constructs an InfluxTagAttribute with the given name.
+            </summary>
+            <param name="name"></param>
+        </member>
+        <member name="P:Vibrant.InfluxDB.Client.InfluxTagAttribute.Name">
+            <summary>
+            Gets the name of the tag used by InfluxDB.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.InfluxTimestampAttribute">
+            <summary>
+            Attribute placed on the property that should be considered the InfluxDB timestamp.
+            </summary>
+        </member>
+        <member name="T:Vibrant.InfluxDB.Client.TimestampPrecision">
+            <summary>
+            Precision of DateTimes that are read or written to InfluxDB.
+            </summary>
+        </member>
+        <member name="F:Vibrant.InfluxDB.Client.TimestampPrecision.Nanosecond">
+            <summary>
+            Nanosecond precision.
+            </summary>
+        </member>
+        <member name="F:Vibrant.InfluxDB.Client.TimestampPrecision.Microsecond">
+            <summary>
+            Microsecond precision.
+            </summary>
+        </member>
+        <member name="F:Vibrant.InfluxDB.Client.TimestampPrecision.Millisecond">
+            <summary>
+            Millisecond precision.
+            </summary>
+        </member>
+        <member name="F:Vibrant.InfluxDB.Client.TimestampPrecision.Second">
+            <summary>
+            Second precision.
+            </summary>
+        </member>
+        <member name="F:Vibrant.InfluxDB.Client.TimestampPrecision.Minute">
+            <summary>
+            Minute precision.
+            </summary>
+        </member>
+        <member name="F:Vibrant.InfluxDB.Client.TimestampPrecision.Hours">
+            <summary>
+            Hour precision.
+            </summary>
+        </member>
+    </members>
+</doc>
