@@ -478,29 +478,34 @@ public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string 
 /// <summary>
 /// The SHOW MEASUREMENTS query returns the measurements in your database.
 /// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
 /// <param name="db"></param>
 /// <returns></returns>
-public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db )
+public Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db )
 
 /// <summary>
 /// The SHOW MEASUREMENTS query returns the measurements in your database.
 /// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
 /// <param name="db"></param>
-/// <param name="withMeasurement"></param>
-/// <returns></returns>
-public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db, string withMeasurement )
-
-/// <summary>
-/// The SHOW MEASUREMENTS query returns the measurements in your database.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <param name="withMeasurement"></param>
 /// <param name="where"></param>
 /// <returns></returns>
-public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db, string withMeasurement, string where )
+public Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db, string where )
+
+/// <summary>
+/// The SHOW MEASUREMENTS query returns the measurements in your database.
+/// </summary>
+/// <param name="db"></param>
+/// <param name="measurementRegex"></param>
+/// <returns></returns>
+public Task<InfluxResult<MeasurementRow>> ShowMeasurementsWithMeasurementAsync( string db, string measurementRegex )
+
+/// <summary>
+/// The SHOW MEASUREMENTS query returns the measurements in your database.
+/// </summary>
+/// <param name="db"></param>
+/// <param name="measurementRegex"></param>
+/// <param name="where"></param>
+/// <returns></returns>
+public Task<InfluxResult<MeasurementRow>> ShowMeasurementsWithMeasurementAsync( string db, string measurementRegex, string where )
 
 /// <summary>
 /// SHOW TAG KEYS returns the tag keys associated with each measurement.
