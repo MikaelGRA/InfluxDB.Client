@@ -556,11 +556,11 @@ namespace Vibrant.InfluxDB.Client
       /// The SHOW MEASUREMENTS query returns the measurements in your database.
       /// </summary>
       /// <param name="db"></param>
-      /// <param name="withMeasurement"></param>
+      /// <param name="where"></param>
       /// <returns></returns>
-      public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db, string withMeasurement )
+      public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db, string where )
       {
-         var parserResult = await ExecuteQueryInternalAsync<MeasurementRow>( $"SHOW MEASUREMENTS WITH MEASUREMENT {withMeasurement}", db ).ConfigureAwait( false );
+         var parserResult = await ExecuteQueryInternalAsync<MeasurementRow>( $"SHOW MEASUREMENTS WHERE {where}", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -568,12 +568,24 @@ namespace Vibrant.InfluxDB.Client
       /// The SHOW MEASUREMENTS query returns the measurements in your database.
       /// </summary>
       /// <param name="db"></param>
-      /// <param name="withMeasurement"></param>
+      /// <param name="measurementRegex"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsWithMeasurementAsync( string db, string measurementRegex )
+      {
+         var parserResult = await ExecuteQueryInternalAsync<MeasurementRow>( $"SHOW MEASUREMENTS WITH MEASUREMENT =~ {measurementRegex}", db ).ConfigureAwait( false );
+         return parserResult.Results.First();
+      }
+
+      /// <summary>
+      /// The SHOW MEASUREMENTS query returns the measurements in your database.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="measurementRegex"></param>
       /// <param name="where"></param>
       /// <returns></returns>
-      public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db, string withMeasurement, string where )
+      public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsWithMeasurementAsync( string db, string measurementRegex, string where )
       {
-         var parserResult = await ExecuteQueryInternalAsync<MeasurementRow>( $"SHOW MEASUREMENTS WITH MEASUREMENT {withMeasurement} WHERE {where}", db ).ConfigureAwait( false );
+         var parserResult = await ExecuteQueryInternalAsync<MeasurementRow>( $"SHOW MEASUREMENTS WITH MEASUREMENT =~ {measurementRegex} WHERE {where}", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 

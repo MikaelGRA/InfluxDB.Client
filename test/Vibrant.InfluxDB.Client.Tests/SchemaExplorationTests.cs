@@ -87,5 +87,18 @@ namespace Vibrant.InfluxDB.Client.Tests
             Assert.Contains( series.Rows, x => x.Region == region );
          }
       }
+
+      [Fact]
+      public async Task Should_Show_Measurements_With_Measurement()
+      {
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( 2015, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 200, false );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "set6Measurement", infos );
+
+         var result = await _client.ShowMeasurementsWithMeasurementAsync( InfluxClientFixture.DatabaseName, "/set6.*/" );
+         Assert.Equal( 1, result.Series.Count );
+
+         var series = result.Series[ 0 ];
+         Assert.Contains( series.Rows, x => x.Name == "set6Measurement" );
+      }
    }
 }
