@@ -1,0 +1,75 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+         DefaultTargets="All"
+         ToolsVersion="4.5">
+
+   <!--
+      [Standard Build (Debug Mode)]
+      msbuild Build.proj /p:BuildConfiguration=debug
+
+      [Production / Release Build]
+      msbuild Build.proj 
+
+      [Production / Release Build with NuGet Packaging]
+      msbuild Build.proj /p:Production=true /p:Package=true
+   -->
+
+
+   <PropertyGroup Condition="'$(NugetOutputDirectory)' == ''">
+      <!-- NugetOutputDirectory is the root of where the nuget package output goes. -->
+      <NugetOutputDirectory>$(MSBuildProjectDirectory)\nugetpackages</NugetOutputDirectory>
+   </PropertyGroup>
+
+   <PropertyGroup>
+      <!-- PackageInstallDirectory is where NuGet installs the set of dependencies. -->
+      <PackageInstallDirectory>$(MSBuildProjectDirectory)\..\packages</PackageInstallDirectory>
+      <!-- Path to the nuget binary -->
+      <NuGetCommandLinePath>$(MSBuildProjectDirectory)\..\tools\nuget\nuget.exe</NuGetCommandLinePath>
+   </PropertyGroup>
+
+   <PropertyGroup Condition="'$(BuildConfiguration)' == ''">
+      <!-- Unless otherwise specified, build is Release. -->
+      <BuildConfiguration>Release</BuildConfiguration>
+   </PropertyGroup>
+
+   <ItemGroup>
+      <!-- SolutionFile is the solution to build. Technically we could add more if needed. -->
+      <SolutionFile Include="$(MSBuildProjectDirectory)\..\Vibrant.InfluxDB.Client.sln" />
+   </ItemGroup>
+
+   <Target Name="All">
+      <CallTarget Targets="Clean;Compile" />
+      <CallTarget Targets="PackageNuget" Condition="'$(Package)' == 'true'" />
+   </Target>
+
+   <Target Name="Clean">
+      <ItemGroup>
+         <AllProject Include="$(MSBuildProjectDirectory)\..\src\**\*.csproj" />
+      </ItemGroup>
+      <Message Text="Removing bin and obj directories for a clean build." />
+      <RemoveDir Directories="$(NugetOutputDirectory)" ContinueOnError="true" />
+      <RemoveDir
+         Directories="%(AllProject.RootDir)%(AllProject.Directory)bin"
+         Condition="Exists('%(AllProject.RootDir)%(AllProject.Directory)bin')" />
+      <RemoveDir
+         Directories="%(AllProject.RootDir)%(AllProject.Directory)obj"
+         Condition="Exists('%(AllProject.RootDir)%(AllProject.Directory)obj')" />
+   </Target>
+
+   <Target Name="Compile"
+           Inputs="@(SolutionFile.Identity)"
+           Outputs="@(SolutionFile.Identity)\ignore_this">
+      <!-- Restore solution-level packages before build. -->
+      <Exec Command="&quot;$(NuGetCommandLinePath)&quot; restore &quot;%(SolutionFile.Identity)&quot;" />
+
+      <MSBuild Projects="%(SolutionFile.FullPath)"
+               Properties="Configuration=$(BuildConfiguration)"
+               StopOnFirstFailure="True"
+               Targets="Build" />
+   </Target>
+
+   <Target Name="PackageNuget">
+      <MakeDir Directories="$(NugetOutputDirectory)"/>
+      <Exec Command="&quot;$(NuGetCommandLinePath)&quot; pack ..\src\Vibrant.InfluxDB.Client\Vibrant.InfluxDB.Client.csproj -symbols -Properties Configuration=Release -OutputDirectory $(NugetOutputDirectory)\" />
+   </Target>
+
+</Project>

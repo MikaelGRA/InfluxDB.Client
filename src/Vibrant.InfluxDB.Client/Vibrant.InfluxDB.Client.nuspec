@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>Vibrant.InfluxDB.Client</id>
+        <version>$version$</version>
+        <title>InfluxDB Client for .NET</title>
+        <authors>MikaelGRA</authors>
+        <owners>MikaelGRA</owners>
+        <licenseUrl>https://github.com/MikaelGRA/InfluxDB.Client/blob/master/LICENSE</licenseUrl>
+        <projectUrl>https://github.com/MikaelGRA/InfluxDB.Client</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>An easy-to-use client for InfluxDB that supports simple query to object mapping.</description>
+        <summary />
+        <releaseNotes>https://github.com/MikaelGRA/InfluxDB.Client/blob/master/CHANGELOG.md</releaseNotes>
+        <copyright>Copyright (c) 2015-2016 MikaelGRA</copyright>
+        <language>en-US</language>
+        <tags>influxdb nosql timeseries data</tags>
+        <dependencies>
+            <dependency id="Newtonsoft.Json" version="6.0.4" />
+        </dependencies>
+    </metadata>
+</package>

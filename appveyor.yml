@@ -1,0 +1,12 @@
+version: '{build}'
+
+build:
+  verbosity: minimal
+  
+build_script:
+  - Msbuild.exe build/build.proj /verbosity:minimal /p:Package=true 
+
+after_build:
+  - ps: Get-ChildItem build\nugetpackages\*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+  
+test: off
