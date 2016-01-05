@@ -1,5 +1,5 @@
 # InfluxDB Client for .NET
-[![Build status](https://ci.appveyor.com/api/projects/status/kwrcbppcnst522pl?svg=true)](https://ci.appveyor.com/project/madsmg/influxdb-client)
+[![Build status](https://ci.appveyor.com/api/projects/status/0rkna8pevwiv9acy/branch/master?svg=true)](https://ci.appveyor.com/project/MikaelGRA/influxdb-client/branch/master)
 
 This library makes it easy to be a client for InfluxDB on .NET!
 
