@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,12 +13,13 @@ namespace Vibrant.InfluxDB.Client.Tests
       private bool _disposed;
 
       public const string DatabaseName = "unittestdb";
+      public static readonly string InfluxHost = ConfigurationManager.AppSettings[ "Influx.Host" ];
 
       public InfluxClient Client { get; set; }
 
       public InfluxClientFixture()
       {
-         Client = new InfluxClient( new Uri( "http://localhost:8086" ), "root", "root" );
+         Client = new InfluxClient( new Uri( InfluxHost ), "root", "root" );
          Client.CreateDatabaseIfNotExistsAsync( DatabaseName ).Wait();
       }
 

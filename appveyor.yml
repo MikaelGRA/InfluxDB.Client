@@ -9,4 +9,3 @@ build_script:
 after_build:
   - ps: Get-ChildItem build\nugetpackages\*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
   
-test: off
