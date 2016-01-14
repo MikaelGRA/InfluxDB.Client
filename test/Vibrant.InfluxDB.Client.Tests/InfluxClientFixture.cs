@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +12,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       private bool _disposed;
 
       public const string DatabaseName = "unittestdb";
-      public static readonly string InfluxHost = ConfigurationManager.AppSettings[ "Influx.Host" ];
+      public static readonly string InfluxHost = "http://winflux.westeurope.cloudapp.azure.com:8086";
 
       public InfluxClient Client { get; set; }
 
