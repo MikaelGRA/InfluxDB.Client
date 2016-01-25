@@ -1,0 +1,38 @@
+﻿{
+  "version": "1.0.6-*",
+  "title": "InfluxDB Client for .NET",
+  "description": "An easy-to-use client for InfluxDB that supports simple query to object mapping.",
+  "authors": [ "MikaelGRA" ],
+  "owners": [ "MikaelGRA" ],
+  "tags": [ "influxdb", "nosql", "timeseries", "data" ],
+  "projectUrl": "https://github.com/MikaelGRA/InfluxDB.Client",
+  "licenseUrl": "https://github.com/MikaelGRA/InfluxDB.Client/blob/master/LICENSE",
+  "releaseNotes": "https://github.com/MikaelGRA/InfluxDB.Client/blob/master/CHANGELOG.md",
+  "copyright": "Copyright (c) 2015-2016 MikaelGRA",
+  "language": "en-US",
+  "dependencies": {
+    "Newtonsoft.Json": "6.0.4"
+  },
+
+  "frameworks": {
+    "net45": {
+      "frameworkAssemblies": {
+        "System.Net": "4.0.0.0",
+        "System.Net.Http": "4.0.0.0",
+        "System.Runtime.Serialization": "4.0.0.0"
+      }
+    },
+    "dotnet": {
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.0",
+        "System.Collections": "4.0.10",
+        "System.Collections.Concurrent": "4.0.10",
+        "System.Net.Http": "4.0.0",
+        "System.Runtime": "4.0.20",
+        "System.Runtime.Serialization.Primitives": "4.0.0",
+        "System.Text.Encoding": "4.0.10",
+        "System.Text.Encoding.Extensions": "4.0.10"
+      }
+    }
+  }
+}

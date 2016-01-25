@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Reflection;
 using Vibrant.InfluxDB.Client.Dto;
 using Vibrant.InfluxDB.Client.Metadata;
 using Vibrant.InfluxDB.Client.Resources;

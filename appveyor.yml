@@ -1,11 +1,18 @@
 version: '{build}'
 
+os: Visual Studio 2015
+
+install:
+ - dnvm upgrade -r clr
+ - dnu restore
+
 build:
   verbosity: minimal
   
-build_script:
-  - Msbuild.exe build/build.proj /verbosity:minimal /p:Package=true 
-
-after_build:
-  - ps: Get-ChildItem build\nugetpackages\*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+#build_script:
+#  - Msbuild.exe build/build.proj /verbosity:minimal /p:Package=true 
+#
+#after_build:
+#  - ps: Get-ChildItem build\nugetpackages\*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
   
+test: off

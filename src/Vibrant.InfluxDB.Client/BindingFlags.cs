@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if PORTABLE
 namespace Vibrant.InfluxDB.Client
 {
    [Flags]
@@ -18,3 +19,4 @@ namespace Vibrant.InfluxDB.Client
       SetProperty = 8192
    }
 }
+#endif
