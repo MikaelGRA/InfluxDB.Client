@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.6
+ * Additional target frameworks
+
 ## 1.0.5
  * Added new overloads of ShowMeasurements by splitting them into two different methods
 
