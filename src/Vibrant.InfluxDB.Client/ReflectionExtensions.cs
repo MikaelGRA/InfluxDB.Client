@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+#if PORTABLE
 namespace Vibrant.InfluxDB.Client
 {
    internal static class ReflectionExtensions
@@ -191,3 +192,4 @@ namespace Vibrant.InfluxDB.Client
       }
    }
 }
+#endif
