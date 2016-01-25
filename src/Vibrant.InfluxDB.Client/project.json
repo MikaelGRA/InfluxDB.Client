@@ -27,13 +27,11 @@
         "Microsoft.CSharp": "4.0.0",
         "System.Collections": "4.0.10",
         "System.Collections.Concurrent": "4.0.10",
-        "System.Linq": "4.0.0",
         "System.Net.Http": "4.0.0",
         "System.Runtime": "4.0.20",
         "System.Runtime.Serialization.Primitives": "4.0.0",
         "System.Text.Encoding": "4.0.10",
-        "System.Text.Encoding.Extensions": "4.0.10",
-        "System.Threading": "4.0.10"
+        "System.Text.Encoding.Extensions": "4.0.10"
       }
     }
   }
