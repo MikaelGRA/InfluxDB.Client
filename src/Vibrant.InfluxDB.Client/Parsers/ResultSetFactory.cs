@@ -256,9 +256,13 @@ namespace Vibrant.InfluxDB.Client.Parsers
                         {
                            setters[ i ] = ( row, tagName, value ) => row.SetTag( tagName, (string)value );
                         }
-                        else
+                        else if ( meta.Fields.Contains( columnName ) )
                         {
                            setters[ i ] = ( row, fieldName, value ) => row.SetField( fieldName, value );
+                        }
+                        else
+                        {
+                           throw new InfluxException( string.Format( Errors.InvalidColumn, columnName ) );
                         }
                      }
 
@@ -280,8 +284,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                            var value = values[ i ]; // TODO: What about NULL values? Are they treated as empty strings or actual nulls?
                            if ( value != null )
                            {
-                              var columnName = columns[ i ];
-                              setters[ i ]( dataPoint, columnName, value );
+                              setters[ i ]( dataPoint, columns[ i ], value );
                            }
                         }
 
