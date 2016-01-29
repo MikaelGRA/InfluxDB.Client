@@ -211,6 +211,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                   var name = series.Name;
                   var columns = series.Columns;
                   var dataPoints = new List<TInfluxRow>();
+                  var setters = new Action<IInfluxRow, string, object>[ columns.Count ];
 
                   // Values will be null, if there are no entries in the result set
                   if ( series.Values != null )
@@ -239,6 +240,28 @@ namespace Vibrant.InfluxDB.Client.Parsers
                         }
                      }
 
+                     for ( int i = 0 ; i < columns.Count ; i++ )
+                     {
+                        var columnName = columns[ i ];
+
+                        if ( isExclusivelyFields )
+                        {
+                           setters[ i ] = ( row, fieldName, value ) => row.SetField( fieldName, value );
+                        }
+                        else if ( columnName == InfluxConstants.TimeColumn )
+                        {
+                           setters[ i ] = ( row, timeName, value ) => row.SetTimestamp( DateTime.Parse( (string)value, CultureInfo.InvariantCulture, DateTimeStyles ) );
+                        }
+                        else if ( meta.Tags.Contains( columnName ) )
+                        {
+                           setters[ i ] = ( row, tagName, value ) => row.SetTag( tagName, (string)value );
+                        }
+                        else
+                        {
+                           setters[ i ] = ( row, fieldName, value ) => row.SetField( fieldName, value );
+                        }
+                     }
+
                      // constructs the IInfluxRows using the IInfluxRow interface
                      foreach ( var values in series.Values )
                      {
@@ -254,31 +277,11 @@ namespace Vibrant.InfluxDB.Client.Parsers
                         // go through all values that are stored as a List<List<object>>
                         for ( int i = 0 ; i < values.Count ; i++ )
                         {
-                           if ( isExclusivelyFields )
-                           {
-                              dataPoint.SetField( columns[ i ], values[ i ] );
-                           }
-                           else
+                           var value = values[ i ]; // TODO: What about NULL values? Are they treated as empty strings or actual nulls?
+                           if ( value != null )
                            {
                               var columnName = columns[ i ];
-                              var value = values[ i ]; // TODO: What about NULL values? Are they treated as empty strings or actual nulls?
-
-                              // determine which method to call, if the value exists, otherwise, we wont call any method
-                              if ( value != null )
-                              {
-                                 if ( columnName == InfluxConstants.TimeColumn )
-                                 {
-                                    dataPoint.SetTimestamp( DateTime.Parse( (string)value, CultureInfo.InvariantCulture, DateTimeStyles ) );
-                                 }
-                                 else if ( meta.Tags.Contains( columnName ) )
-                                 {
-                                    dataPoint.SetTag( columnName, (string)value );
-                                 }
-                                 else
-                                 {
-                                    dataPoint.SetField( columnName, value );
-                                 }
-                              }
+                              setters[ i ]( dataPoint, columnName, value );
                            }
                         }
 
