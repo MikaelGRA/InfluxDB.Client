@@ -137,7 +137,7 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
-          "Newtonsoft.Json": "6.0.4"
+          "Newtonsoft.Json": "7.0.1"
         },
         "frameworkAssemblies": [
           "System.Net",
@@ -1032,7 +1032,7 @@
         "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
           "Microsoft.CSharp": "4.0.0",
-          "Newtonsoft.Json": "6.0.4",
+          "Newtonsoft.Json": "7.0.1",
           "System.Collections": "4.0.10",
           "System.Collections.Concurrent": "4.0.10",
           "System.Net.Http": "4.0.0",
@@ -1340,7 +1340,7 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
-          "Newtonsoft.Json": "6.0.4"
+          "Newtonsoft.Json": "7.0.1"
         },
         "frameworkAssemblies": [
           "System.Net",
@@ -1593,7 +1593,7 @@
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
-          "Newtonsoft.Json": "6.0.4"
+          "Newtonsoft.Json": "7.0.1"
         },
         "frameworkAssemblies": [
           "System.Net",
@@ -2846,7 +2846,7 @@
         "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
           "Microsoft.CSharp": "4.0.0",
-          "Newtonsoft.Json": "6.0.4",
+          "Newtonsoft.Json": "7.0.1",
           "System.Collections": "4.0.10",
           "System.Collections.Concurrent": "4.0.10",
           "System.Net.Http": "4.0.0",
@@ -4154,7 +4154,7 @@
         "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
           "Microsoft.CSharp": "4.0.0",
-          "Newtonsoft.Json": "6.0.4",
+          "Newtonsoft.Json": "7.0.1",
           "System.Collections": "4.0.10",
           "System.Collections.Concurrent": "4.0.10",
           "System.Net.Http": "4.0.0",

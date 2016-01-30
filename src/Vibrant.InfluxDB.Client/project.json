@@ -11,7 +11,7 @@
   "copyright": "Copyright (c) 2015-2016 MikaelGRA",
   "language": "en-US",
   "dependencies": {
-    "Newtonsoft.Json": "6.0.4"
+    "Newtonsoft.Json": "7.0.1"
   },
 
   "frameworks": {
