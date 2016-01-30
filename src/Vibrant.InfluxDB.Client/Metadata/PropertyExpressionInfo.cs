@@ -19,6 +19,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
       internal readonly Dictionary<string, Enum> StringToEnum;
       internal readonly PropertyInfo Property;
       internal readonly string EscapedKey;
+      internal readonly string Key;
       internal readonly bool IsDateTime;
       internal readonly bool IsEnum;
 
@@ -58,6 +59,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
          IsEnum = Type.GetTypeInfo().IsEnum;
          IsDateTime = Type == typeof( DateTime );
          EscapedKey = LineProtocolEscape.EscapeKey( key );
+         Key = key;
 
          // ensure we can convert between string/enum
          if( IsEnum )

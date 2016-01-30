@@ -23,9 +23,9 @@ namespace Vibrant.InfluxDB.Client.Metadata
 
             if ( !_typeCache.TryGetValue( type, out cache ) )
             {
-               var tags = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>();
-               var fields = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>();
-               var all = new Dictionary<string, PropertyExpressionInfo<TInfluxRow>>();
+               var tags = new List<PropertyExpressionInfo<TInfluxRow>>();
+               var fields = new List<PropertyExpressionInfo<TInfluxRow>>();
+               var all = new List<PropertyExpressionInfo<TInfluxRow>>();
                PropertyExpressionInfo<TInfluxRow> timestamp = null;
                foreach ( var propertyInfo in type.GetProperties( BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public ) )
                {
@@ -51,7 +51,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
                         throw new InfluxException( string.Format( Errors.InvalidTimestampType, propertyInfo.Name, type.Name ) );
                      }
 
-                     all.Add( "time", timestamp );
+                     all.Add( timestamp );
                   }
                   else if ( fieldAttribute != null )
                   {
@@ -66,8 +66,8 @@ namespace Vibrant.InfluxDB.Client.Metadata
                         throw new InfluxException( string.Format( Errors.InvalidNameProperty, propertyInfo.Name, type.Name ) );
                      }
 
-                     fields.Add( fieldAttribute.Name, expression );
-                     all.Add( fieldAttribute.Name, expression );
+                     fields.Add( expression );
+                     all.Add( expression );
                   }
                   else if ( tagAttribute != null )
                   {
@@ -82,8 +82,8 @@ namespace Vibrant.InfluxDB.Client.Metadata
                         throw new InfluxException( string.Format( Errors.InvalidNameProperty, propertyInfo.Name, type.Name ) );
                      }
 
-                     tags.Add( tagAttribute.Name, expression );
-                     all.Add( tagAttribute.Name, expression );
+                     tags.Add( expression );
+                     all.Add( expression );
                   }
                }
 

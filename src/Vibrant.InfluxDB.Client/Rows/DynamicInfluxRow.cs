@@ -17,8 +17,8 @@ namespace Vibrant.InfluxDB.Client.Rows
       /// </summary>
       public DynamicInfluxRow()
       {
-         Tags = new Dictionary<string, string>();
-         Fields = new Dictionary<string, object>();
+         Tags = new SortedDictionary<string, string>( StringComparer.Ordinal );
+         Fields = new SortedDictionary<string, object>( StringComparer.Ordinal );
       }
 
       /// <summary>

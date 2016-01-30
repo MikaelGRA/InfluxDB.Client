@@ -12,24 +12,24 @@ namespace Vibrant.InfluxDB.Client.Metadata
    {
       internal readonly Func<TInfluxRow> New;
       internal readonly PropertyExpressionInfo<TInfluxRow> Timestamp;
-      internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> Tags;
-      internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> Fields;
+      internal readonly IReadOnlyList<PropertyExpressionInfo<TInfluxRow>> Tags;
+      internal readonly IReadOnlyList<PropertyExpressionInfo<TInfluxRow>> Fields;
       internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> All;
-      internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> PropertiesByClrName;
+      //internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> PropertiesByClrName;
 
       internal InfluxRowTypeInfo(
          PropertyExpressionInfo<TInfluxRow> timestamp,
-         IDictionary<string, PropertyExpressionInfo<TInfluxRow>> tags, 
-         IDictionary<string, PropertyExpressionInfo<TInfluxRow>> fields,
-         IDictionary<string, PropertyExpressionInfo<TInfluxRow>> all )
+         List<PropertyExpressionInfo<TInfluxRow>> tags,
+         List<PropertyExpressionInfo<TInfluxRow>> fields,
+         List<PropertyExpressionInfo<TInfluxRow>> all )
       {
          Timestamp = timestamp;
-         Tags = new ReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>>( tags );
-         Fields = new ReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>>( fields );
-         All = new ReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>>( all );
+         Tags = new List<PropertyExpressionInfo<TInfluxRow>>( tags.OrderBy( x => x.Key, StringComparer.Ordinal ) );
+         Fields = new List<PropertyExpressionInfo<TInfluxRow>>( fields.OrderBy( x => x.Key, StringComparer.Ordinal ) );
+         All = new ReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>>( all.ToDictionary( x => x.Key, x => x ) );
 
 
-         PropertiesByClrName = All.ToDictionary( x => x.Value.Property.Name, x => x.Value );
+         //PropertiesByClrName = All.ToDictionary( x => x.Value.Property.Name, x => x.Value );
 
          var newLambda = Expression.Lambda<Func<TInfluxRow>>( Expression.New( typeof( TInfluxRow ) ), true );
          New = newLambda.Compile();

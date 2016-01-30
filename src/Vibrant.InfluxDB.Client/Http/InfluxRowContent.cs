@@ -18,7 +18,7 @@ namespace Vibrant.InfluxDB.Client.Http
    internal class InfluxRowContent<TInfluxRow> : HttpContent
       where TInfluxRow : new()
    {
-      private static readonly MediaTypeHeaderValue _mediaType = new MediaTypeHeaderValue( "text/plain" ) { CharSet = "utf-8" };
+      private static readonly MediaTypeHeaderValue TextMediaType = new MediaTypeHeaderValue( "text/plain" ) { CharSet = "utf-8" };
       private static readonly Encoding UTF8 = new UTF8Encoding( false );
 
       private readonly IEnumerable<TInfluxRow> _dataPoints;
@@ -31,7 +31,7 @@ namespace Vibrant.InfluxDB.Client.Http
          _getMeasurementName = getMeasurementName;
          _precision = precision;
 
-         Headers.ContentType = _mediaType;
+         Headers.ContentType = TextMediaType;
       }
 
       protected override Task SerializeToStreamAsync( Stream stream, TransportContext context )
@@ -49,7 +49,7 @@ namespace Vibrant.InfluxDB.Client.Http
                writer.Write( getMeasurementName( (TInfluxRow)dp ) );
 
                // write all tags
-               foreach ( var kvp in dp.GetAllTags() )
+               foreach ( var kvp in dp.GetAllTags() ) // Ensure tags are in correct order?
                {
                   var value = kvp.Value;
                   if ( value != null )
@@ -132,16 +132,15 @@ namespace Vibrant.InfluxDB.Client.Http
                // write all tags
                if ( tags.Count > 0 )
                {
-                  foreach ( var kvp in tags )
+                  foreach ( var tagProperty in tags )
                   {
-                     var property = kvp.Value;
-                     var value = property.GetValue( dp );
+                     var value = tagProperty.GetValue( dp );
                      if ( value != null )
                      {
                         writer.Write( ',' );
-                        writer.Write( property.EscapedKey );
+                        writer.Write( tagProperty.EscapedKey );
                         writer.Write( '=' );
-                        writer.Write( LineProtocolEscape.EscapeTagValue( property.GetStringValue( value ) ) );
+                        writer.Write( LineProtocolEscape.EscapeTagValue( tagProperty.GetStringValue( value ) ) );
                      }
                   }
                }
@@ -156,12 +155,10 @@ namespace Vibrant.InfluxDB.Client.Http
                   bool hasValue = false;
                   object value = null;
                   PropertyExpressionInfo<TInfluxRow> property = null;
-                  KeyValuePair<string, PropertyExpressionInfo<TInfluxRow>> current = default( KeyValuePair<string, PropertyExpressionInfo<TInfluxRow>> );
                   while ( hasMore && !hasValue )
                   {
-                     current = enumerator.Current;
-                     property = current.Value;
-                     value = current.Value.GetValue( dp );
+                     property = enumerator.Current;
+                     value = property.GetValue( dp );
                      hasValue = value != null;
 
                      hasMore = enumerator.MoveNext();
@@ -184,9 +181,8 @@ namespace Vibrant.InfluxDB.Client.Http
                      hasValue = false;
                      while ( hasMore && !hasValue )
                      {
-                        current = enumerator.Current;
-                        property = current.Value;
-                        value = current.Value.GetValue( dp );
+                        property = enumerator.Current;
+                        value = property.GetValue( dp );
                         hasValue = value != null;
 
                         hasMore = enumerator.MoveNext();

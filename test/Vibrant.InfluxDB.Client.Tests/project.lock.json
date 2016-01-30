@@ -133,7 +133,7 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "Vibrant.InfluxDB.Client/1.0.6": {
+      "Vibrant.InfluxDB.Client/1.0.7": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
@@ -1027,7 +1027,7 @@
           "lib/dotnet5.4/System.Xml.XDocument.dll": {}
         }
       },
-      "Vibrant.InfluxDB.Client/1.0.6": {
+      "Vibrant.InfluxDB.Client/1.0.7": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
@@ -1336,7 +1336,7 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "Vibrant.InfluxDB.Client/1.0.6": {
+      "Vibrant.InfluxDB.Client/1.0.7": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
@@ -1589,7 +1589,7 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "Vibrant.InfluxDB.Client/1.0.6": {
+      "Vibrant.InfluxDB.Client/1.0.7": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5",
         "dependencies": {
@@ -2841,7 +2841,7 @@
           "lib/dotnet5.4/System.Xml.XDocument.dll": {}
         }
       },
-      "Vibrant.InfluxDB.Client/1.0.6": {
+      "Vibrant.InfluxDB.Client/1.0.7": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
@@ -4149,7 +4149,7 @@
           "lib/dotnet5.4/System.Xml.XDocument.dll": {}
         }
       },
-      "Vibrant.InfluxDB.Client/1.0.6": {
+      "Vibrant.InfluxDB.Client/1.0.7": {
         "type": "project",
         "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
@@ -4329,7 +4329,7 @@
     }
   },
   "libraries": {
-    "Vibrant.InfluxDB.Client/1.0.6": {
+    "Vibrant.InfluxDB.Client/1.0.7": {
       "type": "project",
       "path": "../../src/Vibrant.InfluxDB.Client/project.json"
     },
@@ -7067,7 +7067,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "Vibrant.InfluxDB.Client >= 1.0.6-*",
+      "Vibrant.InfluxDB.Client >= 1.0.7-*",
       "xunit >= 2.1.0",
       "xunit.runner.dnx >= 2.1.0-rc1-build204"
     ],
