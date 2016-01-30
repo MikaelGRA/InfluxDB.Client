@@ -2,6 +2,7 @@
 
 ## 1.0.7 - Upcoming
  * Improved performance for reading IInfluxRows from the database.
+ * Improved perfomance by following guidelines for ordering of tags/fields when sending to data to influxdb
 
 ## 1.0.6
  * Additional target frameworks
