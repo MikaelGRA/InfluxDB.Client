@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.7 - Upcoming
+ * Improved performance for reading IInfluxRows from the database.
+
 ## 1.0.6
  * Additional target frameworks
 
