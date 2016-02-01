@@ -95,7 +95,7 @@ Here's how to query from the database:
 ```c#
 public async Task Should_Query_Typed_Data()
 {
-   var resultSet = await _client.ReadAsync<ComputerInfo>( "mydb", $"SELECT * FROM myMeasurementName" );
+   var resultSet = await _client.ReadAsync<ComputerInfo>( "mydb", "SELECT * FROM myMeasurementName" );
    
    // resultSet will contain 1 result in the Results collection (or multiple if you execute multiple queries at once)
    var result = resultSet.Results[ 0 ];
@@ -167,7 +167,7 @@ Here's how to query from the database:
 ```c#
 public async Task Should_Query_Dynamic_Data()
 {
-   var resultSet = await _client.ReadAsync<DynamicInfluxRow>( "mydb", $"SELECT * FROM myMeasurementName" );
+   var resultSet = await _client.ReadAsync<DynamicInfluxRow>( "mydb", "SELECT * FROM myMeasurementName" );
    
    // resultSet will contain 1 result in the Results collection (or multiple if you execute multiple queries at once)
    var result = resultSet.Results[ 0 ];
