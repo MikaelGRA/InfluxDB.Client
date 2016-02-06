@@ -651,4 +651,4 @@ public Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery )
 In case an error occurrs, an InfluxException will be thrown. Catch this and inspect the Message to get an indication of what went wrong. However, if you execute multiple operations at once, and an error occurrs, you will have to inspect the ErrorMessage on the InfluxResult that is returned instead. This is because the other operation may have succeeded.
 
 **0.10.0+:** Since this version, pretty much the only queries that causes errors are malformed ones.
- * Queries such as CREATE DATABASE or CREATE RETENTION POLICY that specifies an item that already exists, will always return a successful response. This is because there is no way to differentiate between an error response and a success response.
+ * Queries such as CREATE DATABASE or CREATE RETENTION POLICY that specifies an item that already exists, will always return a successful response. This is because there is no way to differentiate between an error response and a success response. See https://github.com/influxdata/influxdb/issues/5563
