@@ -5,18 +5,17 @@
 //using System.Linq.Expressions;
 //using System.Threading.Tasks;
 //using Vibrant.InfluxDB.Client.IQToolkit;
-//using Vibrant.InfluxDB.Client.Linq;
 
 //namespace Vibrant.InfluxDB.Client
 //{
 //   public class InfluxQuery<TData> : Query<TData>
 //   {
 //      public InfluxQuery( InfluxClient client, Type type, string db, string seriesId )
-//         : base( new InfluxQueryProvider( client, type, db, seriesId ) )
+//         : base( new InfluxQueryProvider<TData>( client, db, seriesId ) )
 //      {
 //      }
 
-//      public InfluxQuery( InfluxQueryProvider provider, Expression expression )
+//      public InfluxQuery( InfluxQueryProvider<TData> provider, Expression expression )
 //         : base( provider, expression )
 //      {
 
