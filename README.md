@@ -21,7 +21,7 @@ Or you can simply grab it in one of the github releases.
 
 ## Reading/Writing
 
-The library exposes all HTTP operations on InfluxDB (0.9.6) and can be used for reading/writing data to/from in two primary ways:
+The library exposes all HTTP operations on InfluxDB (0.9.6+) and can be used for reading/writing data to/from in two primary ways:
  * Using your own POCO classes.
  * Using dynamic classes.
 
@@ -649,3 +649,6 @@ public Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery )
 ## Error handling
 
 In case an error occurrs, an InfluxException will be thrown. Catch this and inspect the Message to get an indication of what went wrong. However, if you execute multiple operations at once, and an error occurrs, you will have to inspect the ErrorMessage on the InfluxResult that is returned instead. This is because the other operation may have succeeded.
+
+*0.10.0+:* Since this version, pretty much the only queries that causes errors are malformed ones.
+ * Queries such as CREATE DATABASE or CREATE RETENTION POLICY that specifies an item that already exists, will always return a successful response. This is because there is no way to differentiate between an error response and a success response.
