@@ -170,7 +170,7 @@ namespace Vibrant.InfluxDB.Client.Tests
          Assert.Contains( series.Rows, x => x.Name == "dmt4RetentionPolicy" );
 
          await _client.AlterRetentionPolicyAsync( InfluxClientFixture.DatabaseName, "dmt4RetentionPolicy", "4d", 1, false );
-         
+
          await _client.DropRetentionPolicyAsync( InfluxClientFixture.DatabaseName, "dmt4RetentionPolicy" );
       }
 
