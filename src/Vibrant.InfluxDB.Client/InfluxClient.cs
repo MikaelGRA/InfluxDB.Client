@@ -27,6 +27,7 @@ namespace Vibrant.InfluxDB.Client
       private readonly Dictionary<DatabaseMeasurementInfoKey, DatabaseMeasurementInfo> _seriesMetaCache;
       private readonly HttpClient _client;
       private readonly HttpClientHandler _handler;
+      private readonly InfluxQueryProvider _queryProvider;
       private bool _disposed;
 
       /// <summary>
@@ -729,6 +730,11 @@ namespace Vibrant.InfluxDB.Client
          where TInfluxRow : new()
       {
          return PostInternalIgnoreResultAsync( CreateWriteUrl( db, options ), new InfluxRowContent<TInfluxRow>( rows, getMeasurementName, options.Precision ) );
+      }
+
+      public IQueryable<TInfluxRow> Query<TInfluxRow>( string db, string measurementName )
+      {
+         return new InfluxQuery<TInfluxRow>( new InfluxQueryProvider( this, db, measurementName ) );
       }
 
       /// <summary>
