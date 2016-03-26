@@ -15,7 +15,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
       internal readonly IReadOnlyList<PropertyExpressionInfo<TInfluxRow>> Tags;
       internal readonly IReadOnlyList<PropertyExpressionInfo<TInfluxRow>> Fields;
       internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> All;
-      //internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> PropertiesByClrName;
+      internal readonly IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> PropertiesByClrName;
 
       internal InfluxRowTypeInfo(
          PropertyExpressionInfo<TInfluxRow> timestamp,
@@ -27,9 +27,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
          Tags = new List<PropertyExpressionInfo<TInfluxRow>>( tags.OrderBy( x => x.Key, StringComparer.Ordinal ) );
          Fields = new List<PropertyExpressionInfo<TInfluxRow>>( fields.OrderBy( x => x.Key, StringComparer.Ordinal ) );
          All = new ReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>>( all.ToDictionary( x => x.Key, x => x ) );
-
-
-         //PropertiesByClrName = All.ToDictionary( x => x.Value.Property.Name, x => x.Value );
+         PropertiesByClrName = All.ToDictionary( x => x.Value.Property.Name, x => x.Value );
 
          var newLambda = Expression.Lambda<Func<TInfluxRow>>( Expression.New( typeof( TInfluxRow ) ), true );
          New = newLambda.Compile();

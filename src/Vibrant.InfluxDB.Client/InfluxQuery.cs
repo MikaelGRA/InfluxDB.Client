@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client
@@ -14,12 +15,24 @@ namespace Vibrant.InfluxDB.Client
 
       public InfluxQuery( InfluxQueryProvider provider )
       {
+         if( provider == null )
+            throw new ArgumentNullException( "provider" );
+
          _provider = provider;
          _expression = Expression.Constant( this );
       }
 
       public InfluxQuery( InfluxQueryProvider provider, Expression expression )
       {
+         if( provider == null )
+            throw new ArgumentNullException( "provider" );
+
+         if( expression == null )
+            throw new ArgumentNullException( "expression" );
+
+         if( !typeof( IQueryable<TElement> ).GetTypeInfo().IsAssignableFrom( expression.Type.GetTypeInfo() ) )
+            throw new ArgumentOutOfRangeException( "expression" );
+
          _provider = provider;
          _expression = expression;
       }

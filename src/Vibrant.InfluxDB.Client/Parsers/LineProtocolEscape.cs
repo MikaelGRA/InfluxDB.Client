@@ -12,8 +12,6 @@ namespace Vibrant.InfluxDB.Client.Parsers
    internal static class LineProtocolEscape
    {
       private static readonly IDictionary<string, string> EscapedKeys = new ConcurrentDictionary<string, string>();
-      private const string True = "true";
-      private const string False = "false";
 
       internal static string EscapeFieldValue( object valueAsObject )
       {
@@ -27,7 +25,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
          }
          else if ( valueAsObject is bool )
          {
-            return ( (bool)valueAsObject ) ? True : False;
+            return ( (bool)valueAsObject ) ? InfluxConstants.True : InfluxConstants.False;
          }
          else if ( valueAsObject is DateTime )
          {
