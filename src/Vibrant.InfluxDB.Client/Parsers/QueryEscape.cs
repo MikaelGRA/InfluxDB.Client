@@ -11,11 +11,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
    {
       internal static string EscapeFieldOrTag( object valueAsObject )
       {
-         if( valueAsObject is long || valueAsObject is ulong || valueAsObject is int || valueAsObject is uint || valueAsObject is short || valueAsObject is ushort || valueAsObject is byte || valueAsObject is sbyte )
-         {
-            return valueAsObject.ToString() + 'i';
-         }
-         else if( valueAsObject is string )
+         if( valueAsObject is string )
          {
             string value = (string)valueAsObject;
             var builder = new StringBuilder( value.Length + 2 );
@@ -50,6 +46,27 @@ namespace Vibrant.InfluxDB.Client.Parsers
          {
             return Convert.ToString( valueAsObject, CultureInfo.InvariantCulture );
          }
+      }
+
+      public static string EscapeKey( string value )
+      {
+         var sb = new StringBuilder( value.Length + 2 );
+         sb.Append( '"' );
+         for( int i = 0 ; i < value.Length ; i++ )
+         {
+            var c = value[ i ];
+            switch( c )
+            {
+               case '"':
+                  sb.Append( "\\\"" );
+                  break;
+               default:
+                  sb.Append( c );
+                  break;
+            }
+         }
+         sb.Append( '"' );
+         return sb.ToString();
       }
    }
 }

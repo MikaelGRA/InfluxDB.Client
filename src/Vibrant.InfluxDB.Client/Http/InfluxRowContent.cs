@@ -138,7 +138,7 @@ namespace Vibrant.InfluxDB.Client.Http
                      if ( value != null )
                      {
                         writer.Write( ',' );
-                        writer.Write( tagProperty.EscapedKey );
+                        writer.Write( tagProperty.LineProtocolEscapedKey );
                         writer.Write( '=' );
                         writer.Write( LineProtocolEscape.EscapeTagValue( tagProperty.GetStringValue( value ) ) );
                      }
@@ -166,7 +166,7 @@ namespace Vibrant.InfluxDB.Client.Http
 
                   while ( hasValue )
                   {
-                     writer.Write( property.EscapedKey );
+                     writer.Write( property.LineProtocolEscapedKey );
                      writer.Write( '=' );
                      if ( property.IsEnum )
                      {

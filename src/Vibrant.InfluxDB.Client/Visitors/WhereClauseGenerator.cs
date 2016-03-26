@@ -14,12 +14,12 @@ namespace Vibrant.InfluxDB.Client.Visitors
    public class WhereClauseGenerator<TInfluxRow> : ExpressionVisitor
       where TInfluxRow : new()
    {
+      private static readonly InfluxRowTypeInfo<TInfluxRow> Metadata = MetadataCache.GetOrCreate<TInfluxRow>();
+
       private StringBuilder _sb;
-      private InfluxRowTypeInfo<TInfluxRow> _metadata;
 
       internal string GetWhereClause( Expression expression )
       {
-         _metadata = MetadataCache.GetOrCreate<TInfluxRow>();
          _sb = new StringBuilder();
          _sb.Append( "WHERE " );
          Visit( expression );
@@ -30,10 +30,10 @@ namespace Vibrant.InfluxDB.Client.Visitors
       {
          _sb.Append( "(" );
 
-         // TODO: Determine type based on left OR right!
+         // TODO: Support ~=, !~
 
          Visit( b.Left );
-
+         
          switch( b.NodeType )
          {
             case ExpressionType.AndAlso:
@@ -46,7 +46,7 @@ namespace Vibrant.InfluxDB.Client.Visitors
                _sb.Append( " = " );
                break;
             case ExpressionType.NotEqual:
-               _sb.Append( " != " );
+               _sb.Append( " <> " );
                break;
             case ExpressionType.LessThan:
                _sb.Append( " < " );
@@ -75,8 +75,8 @@ namespace Vibrant.InfluxDB.Client.Visitors
       {
          if( node.Expression.NodeType == ExpressionType.Parameter )
          {
-            var property = _metadata.PropertiesByClrName[ node.Member.Name ];
-            _sb.Append( property.Key ); // TODO: May not be the correct escaping for current context
+            var property = Metadata.PropertiesByClrName[ node.Member.Name ];
+            _sb.Append( property.QueryProtocolEscapedKey );
             return node;
          }
          throw new NotSupportedException( $"The member '{node.Member.Name}' is not supported." );

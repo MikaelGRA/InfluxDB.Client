@@ -76,10 +76,26 @@ namespace Vibrant.InfluxDB.Client
       }
 
       private object ExecuteByRowType<TInfluxRow>( Expression expression )
+         where TInfluxRow : new()
       {
+         var queryInfo = new InfluxQueryInfoGenerator<TInfluxRow>()
+            .GetInfo( expression, _db, _measurementName );
 
+         var iql = queryInfo.GenerateInfluxQL();
 
-         return null;
+         // Also need async version of this
+
+         // TODO: Handle projected situations
+         var result = _client.ReadAsync<TInfluxRow>( _db, iql ).Result;
+         var enumerable = result.Results.FirstOrDefault()?.Series.FirstOrDefault();
+         if( enumerable != null )
+         {
+            return enumerable;
+         }
+         else
+         {
+            return new TInfluxRow[ 0 ];
+         }
       }
    }
 }
