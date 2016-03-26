@@ -52,8 +52,15 @@ namespace Vibrant.InfluxDB.Client
 
       public object Execute( Expression expression )
       {
-         var elementType = TypeHelper.GetElementType( expression.Type );
-         return ExecuteByRowMethod.MakeGenericMethod( new[] { elementType } ).Invoke( this, new[] { expression } );
+         try
+         {
+            var elementType = TypeHelper.GetElementType( expression.Type );
+            return ExecuteByRowMethod.MakeGenericMethod( new[] { elementType } ).Invoke( this, new[] { expression } );
+         }
+         catch( TargetInvocationException tie )
+         {
+            throw tie.InnerException;
+         }
       }
 
       public TResult Execute<TResult>( Expression expression )
@@ -63,8 +70,15 @@ namespace Vibrant.InfluxDB.Client
 
       internal string GetQueryText( Expression expression )
       {
-         var elementType = TypeHelper.GetElementType( expression.Type );
-         return (string)GetQueryTextByRowTypeMethod.MakeGenericMethod( new[] { elementType } ).Invoke( this, new[] { expression } );
+         try
+         {
+            var elementType = TypeHelper.GetElementType( expression.Type );
+            return (string)GetQueryTextByRowTypeMethod.MakeGenericMethod( new[] { elementType } ).Invoke( this, new[] { expression } );
+         }
+         catch( TargetInvocationException tie )
+         {
+            throw tie.InnerException;
+         }
       }
 
       internal string GetQueryTextByRowType<TInfluxRow>( Expression expression )
@@ -86,7 +100,7 @@ namespace Vibrant.InfluxDB.Client
          // Also need async version of this
 
          // TODO: Handle projected situations
-         var result = _client.ReadAsync<TInfluxRow>( _db, iql ).Result;
+         var result = _client.ReadAsync<TInfluxRow>( _db, iql ).GetAwaiter().GetResult();
          var enumerable = result.Results.FirstOrDefault()?.Series.FirstOrDefault();
          if( enumerable != null )
          {
