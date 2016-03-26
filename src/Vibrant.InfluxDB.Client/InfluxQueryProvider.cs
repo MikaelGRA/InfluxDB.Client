@@ -12,11 +12,13 @@ namespace Vibrant.InfluxDB.Client
 {
    public class InfluxQueryProvider : IQueryProvider
    {
-      private static MethodInfo _executeByRow;
+      private static MethodInfo ExecuteByRowMethod;
+      private static MethodInfo GetQueryTextByRowTypeMethod;
 
       static InfluxQueryProvider()
       {
-         _executeByRow = typeof( InfluxQueryProvider ).GetTypeInfo().DeclaredMethods.First( x => x.Name == "ExecuteByRowType" );
+         ExecuteByRowMethod = typeof( InfluxQueryProvider ).GetTypeInfo().DeclaredMethods.First( x => x.Name == "ExecuteByRowType" );
+         GetQueryTextByRowTypeMethod = typeof( InfluxQueryProvider ).GetTypeInfo().DeclaredMethods.First( x => x.Name == "GetQueryTextByRowType" );
       }
 
       private readonly InfluxClient _client;
@@ -37,7 +39,7 @@ namespace Vibrant.InfluxDB.Client
          {
             return (IQueryable)Activator.CreateInstance( typeof( InfluxQuery<> ).MakeGenericType( elementType ), new object[] { this, expression, _db, _measurementName } );
          }
-         catch ( TargetInvocationException tie )
+         catch( TargetInvocationException tie )
          {
             throw tie.InnerException;
          }
@@ -51,7 +53,7 @@ namespace Vibrant.InfluxDB.Client
       public object Execute( Expression expression )
       {
          var elementType = TypeHelper.GetElementType( expression.Type );
-         return _executeByRow.MakeGenericMethod( new[] { elementType } ).Invoke( this, new[] { expression } );
+         return ExecuteByRowMethod.MakeGenericMethod( new[] { elementType } ).Invoke( this, new[] { expression } );
       }
 
       public TResult Execute<TResult>( Expression expression )
@@ -61,7 +63,16 @@ namespace Vibrant.InfluxDB.Client
 
       internal string GetQueryText( Expression expression )
       {
-         return new QueryBinder().Translate( expression );
+         var elementType = TypeHelper.GetElementType( expression.Type );
+         return (string)GetQueryTextByRowTypeMethod.MakeGenericMethod( new[] { elementType } ).Invoke( this, new[] { expression } );
+      }
+
+      internal string GetQueryTextByRowType<TInfluxRow>( Expression expression )
+         where TInfluxRow : new()
+      {
+         return new InfluxQueryInfoGenerator<TInfluxRow>()
+            .GetInfo( expression, _db, _measurementName )
+            .GenerateInfluxQL();
       }
 
       private object ExecuteByRowType<TInfluxRow>( Expression expression )

@@ -10,5 +10,9 @@ namespace Vibrant.InfluxDB.Client
       internal const string KeyColumn = "_key";
 
       internal const string TimeColumn = "time";
-    }
+
+      internal const string True = "true";
+
+      internal const string False = "false";
+   }
 }
