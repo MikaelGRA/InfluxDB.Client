@@ -13,14 +13,9 @@ namespace Vibrant.InfluxDB.Client
 {
    public class InfluxQueryProvider : IQueryProvider
    {
-      private static MethodInfo ExecuteByRowMethod;
-      private static MethodInfo GetQueryTextByRowTypeMethod;
-
-      static InfluxQueryProvider()
-      {
-         ExecuteByRowMethod = typeof( InfluxQueryProvider ).GetTypeInfo().DeclaredMethods.First( x => x.Name == "ExecuteByRowType" );
-         GetQueryTextByRowTypeMethod = typeof( InfluxQueryProvider ).GetTypeInfo().DeclaredMethods.First( x => x.Name == "GetQueryTextByRowType" );
-      }
+      private static readonly MethodInfo ExecuteByRowMethod = typeof( InfluxQueryProvider ).GetTypeInfo().DeclaredMethods.First( x => x.Name == "ExecuteByRowType" );
+      private static readonly MethodInfo GetQueryTextByRowTypeMethod = typeof( InfluxQueryProvider ).GetTypeInfo().DeclaredMethods.First( x => x.Name == "GetQueryTextByRowType" );
+      private static readonly MethodInfo PerformProjectionMethod = typeof( InfluxQueryProvider ).GetTypeInfo().DeclaredMethods.First( x => x.Name == "PerformProjection" );
 
       private readonly InfluxClient _client;
       private readonly Type _originalType;
@@ -103,18 +98,39 @@ namespace Vibrant.InfluxDB.Client
          var iql = queryInfo.GenerateInfluxQL();
 
          // Also need async version of this
-
-         // TODO: Handle projected situations
          var result = _client.ReadAsync<TInfluxRow>( _db, iql ).GetAwaiter().GetResult();
-         var enumerable = result.Results.FirstOrDefault()?.Series.FirstOrDefault();
-         if( enumerable != null )
+         var enumerable = result.Results.FirstOrDefault()?.Series.FirstOrDefault()?.Rows;
+
+         var projection = queryInfo.SelectClause?.Projection;
+         if( projection == null )
          {
-            return enumerable;
+            if( enumerable != null )
+            {
+               return enumerable;
+            }
+            else
+            {
+               return new List<TInfluxRow>();
+            }
          }
          else
          {
-            return new TInfluxRow[ 0 ];
+            var returnElementType = TypeHelper.GetElementType( expression.Type );
+            return PerformProjectionMethod.MakeGenericMethod( new[] { returnElementType } ).Invoke( this, new object[] { projection, enumerable } );
          }
+      }
+
+      private List<TProjectedInfluxRow> PerformProjection<TProjectedInfluxRow>( RowProjection projection, IEnumerable<object> rows )
+      {
+         var projectedRows = new List<TProjectedInfluxRow>();
+         if( rows != null )
+         {
+            foreach( var row in rows )
+            {
+               projectedRows.Add( (TProjectedInfluxRow)projection.PerformProjections( row ) );
+            }
+         }
+         return projectedRows;
       }
 
       private bool CanBeEvaluatedLocally( Expression expression )

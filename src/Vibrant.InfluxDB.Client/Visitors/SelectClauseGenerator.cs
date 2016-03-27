@@ -11,17 +11,25 @@ using Vibrant.InfluxDB.Client.Parsers;
 
 namespace Vibrant.InfluxDB.Client.Visitors
 {
-   public class WhereClauseGenerator<TInfluxRow> : ProjectingClauseGenerator<TInfluxRow>
+   public class SelectClauseGenerator<TInfluxRow> : ProjectingClauseGenerator<TInfluxRow>
       where TInfluxRow : new()
    {
-      private WhereClause _where;
-
-      internal string GetWhereClause( WhereClause where )
+      internal string GetSelectClause( SelectClause clause )
       {
-         InitialProjection = where.Projection;
-         _where = where;
+         InitialProjection = clause.Projection.InnerProjection;
 
-         Visit( _where.Expression );
+         var bindings = clause.Projection.Bindings;
+
+         for( int i = 0 ; i < bindings.Count ; i++ )
+         {
+            Visit( bindings[ i ].Source );
+
+            if( i != bindings.Count - 1 )
+            {
+               Clause.Append( ", " );
+            }
+         }
+
          return Clause.ToString();
       }
 
@@ -47,32 +55,8 @@ namespace Vibrant.InfluxDB.Client.Visitors
             case ExpressionType.Divide:
                Clause.Append( " / " );
                break;
-            case ExpressionType.AndAlso:
-               Clause.Append( " AND " );
-               break;
-            case ExpressionType.OrElse:
-               Clause.Append( " OR " );
-               break;
-            case ExpressionType.Equal:
-               Clause.Append( " = " );
-               break;
-            case ExpressionType.NotEqual:
-               Clause.Append( " <> " );
-               break;
-            case ExpressionType.LessThan:
-               Clause.Append( " < " );
-               break;
-            case ExpressionType.LessThanOrEqual:
-               Clause.Append( " <= " );
-               break;
-            case ExpressionType.GreaterThan:
-               Clause.Append( " > " );
-               break;
-            case ExpressionType.GreaterThanOrEqual:
-               Clause.Append( " >= " );
-               break;
             default:
-               throw new NotSupportedException( $"The binary operator '{b.NodeType}' is not supported" );
+               throw new NotSupportedException( $"The binary operator '{b.NodeType}' is not supported in a select clause." );
          }
 
          Visit( b.Right );
@@ -86,11 +70,7 @@ namespace Vibrant.InfluxDB.Client.Visitors
       {
          if( node.Method.DeclaringType == typeof( InfluxFunctions ) )
          {
-            if( node.Method.Name == "Now" )
-            {
-               Clause.Append( "now()" );
-            }
-            else if( node.Method.Name == "Count" )
+            if( node.Method.Name == "Count" )
             {
                Clause.Append( "COUNT(" );
                Visit( node.Arguments[ 0 ] );
@@ -101,7 +81,7 @@ namespace Vibrant.InfluxDB.Client.Visitors
          }
          else
          {
-            throw new NotSupportedException( $"The method '{node.Method.Name}' on '{node.Method.DeclaringType.FullName}' is not supported." );
+            throw new NotSupportedException( $"The method '{node.Method.Name}' on '{node.Method.DeclaringType.FullName}' is not supported in a select clause." );
          }
       }
 
