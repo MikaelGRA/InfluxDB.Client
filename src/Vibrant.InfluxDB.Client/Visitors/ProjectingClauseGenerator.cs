@@ -37,8 +37,7 @@ namespace Vibrant.InfluxDB.Client.Visitors
 
                if( _isFinalProjection )
                {
-                  var property = Metadata.PropertiesByClrName[ _currentProjectedTarget.Name ];
-                  Clause.Append( property.QueryProtocolEscapedKey );
+                  OnMemberFound( _currentProjectedTarget );
                }
             }
             else
@@ -68,14 +67,19 @@ namespace Vibrant.InfluxDB.Client.Visitors
                }
                else
                {
-                  var property = Metadata.PropertiesByClrName[ _currentProjectedTarget.Name ];
-                  Clause.Append( property.QueryProtocolEscapedKey );
+                  OnMemberFound( _currentProjectedTarget );
                }
             }
 
             return node;
          }
          throw new NotSupportedException( $"The member '{node.Member.Name}' is not supported." );
+      }
+
+      protected virtual void OnMemberFound( MemberInfo member )
+      {
+         var property = Metadata.PropertiesByClrName[ member.Name ];
+         Clause.Append( property.QueryProtocolEscapedKey );
       }
    }
 }

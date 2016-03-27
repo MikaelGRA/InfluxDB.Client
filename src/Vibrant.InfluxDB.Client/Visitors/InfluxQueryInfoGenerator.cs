@@ -72,9 +72,80 @@ namespace Vibrant.InfluxDB.Client.Visitors
                // update the select clause
                _info.SelectClause = new SelectClause( _currentProjection );
             }
+            else if( node.Method.Name == "OrderBy" )
+            {
+               Visit( node.Arguments[ 0 ] );
+
+               var lambda = (LambdaExpression)StripQuotes( node.Arguments[ 1 ] );
+
+               // store the Body of the lambda (representing part of the Where clause)
+               _info.OrderByClauses.Add( new OrderByClause( true, lambda.Body, _currentProjection ) );
+
+               // we do not visit the body itself, we will visit that later to perform query creation
+            }
+            else if( node.Method.Name == "ThenBy" )
+            {
+               Visit( node.Arguments[ 0 ] );
+
+               var lambda = (LambdaExpression)StripQuotes( node.Arguments[ 1 ] );
+
+               // store the Body of the lambda (representing part of the Where clause)
+               _info.OrderByClauses.Add( new OrderByClause( true, lambda.Body, _currentProjection ) );
+
+               // we do not visit the body itself, we will visit that later to perform query creation
+            }
+            else if( node.Method.Name == "OrderByDescending" )
+            {
+               Visit( node.Arguments[ 0 ] );
+
+               var lambda = (LambdaExpression)StripQuotes( node.Arguments[ 1 ] );
+
+               // store the Body of the lambda (representing part of the Where clause)
+               _info.OrderByClauses.Add( new OrderByClause( false, lambda.Body, _currentProjection ) );
+
+               // we do not visit the body itself, we will visit that later to perform query creation
+            }
+            else if( node.Method.Name == "ThenByDescending" )
+            {
+               Visit( node.Arguments[ 0 ] );
+
+               var lambda = (LambdaExpression)StripQuotes( node.Arguments[ 1 ] );
+
+               // store the Body of the lambda (representing part of the Where clause)
+               _info.OrderByClauses.Add( new OrderByClause( false, lambda.Body, _currentProjection ) );
+
+               // we do not visit the body itself, we will visit that later to perform query creation
+            }
+            else if( node.Method.Name == "Take" )
+            {
+               Visit( node.Arguments[ 0 ] );
+
+               var expression = (ConstantExpression)StripQuotes( node.Arguments[ 1 ] );
+
+               _info.Take = (int)expression.Value;
+            }
+            else if( node.Method.Name == "Skip" )
+            {
+               Visit( node.Arguments[ 0 ] );
+
+               var expression = (ConstantExpression)StripQuotes( node.Arguments[ 1 ] );
+
+               _info.Skip = (int)expression.Value;
+            }
             else
             {
                throw new NotSupportedException( $"The method '{node.Method.Name}' is not supported." );
+            }
+         }
+         else if( node.Method.DeclaringType == typeof( InfluxQueryableExtensions ) )
+         {
+            if( node.Method.Name == "GroupByTime" )
+            {
+               Visit( node.Arguments[ 0 ] );
+
+               var expression = (ConstantExpression)StripQuotes( node.Arguments[ 1 ] );
+
+               _info.GroupByTime = (TimeSpan)expression.Value;
             }
          }
 
