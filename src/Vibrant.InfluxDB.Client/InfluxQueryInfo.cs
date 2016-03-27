@@ -23,44 +23,56 @@ namespace Vibrant.InfluxDB.Client
       {
          Database = db;
          MeasurementName = measurementName;
+         WhereClauses = new List<WhereClause>();
       }
 
-      public Expression Where { get; private set; }
+      public List<WhereClause> WhereClauses { get; private set; }
 
-      public void IncludeWhere( Expression where )
-      {
-         if( Where == null )
-         {
-            Where = where;
-         }
-         else
-         {
-            Where = Expression.AndAlso( Where, where );
-         }
-      }
+      public SelectClause SelectClause { get; set; }
 
       public string GenerateInfluxQL()
       {
          var sb = new StringBuilder();
          // create selection
          sb.Append( "SELECT " );
-         var fields = Metadata.Fields.Union( Metadata.Tags ).ToList();
-         for( int i = 0 ; i < fields.Count ; i++ )
+
+         // items has not been projected
+         if( SelectClause == null )
          {
-            var field = fields[ i ];
-            sb.Append( field.QueryProtocolEscapedKey );
-            if( i != fields.Count - 1 )
+            var fields = Metadata.Fields.Union( Metadata.Tags ).ToList();
+            for( int i = 0 ; i < fields.Count ; i++ )
             {
-               sb.Append( ", " );
+               var field = fields[ i ];
+               sb.Append( field.QueryProtocolEscapedKey );
+               if( i != fields.Count - 1 )
+               {
+                  sb.Append( ", " );
+               }
             }
          }
+         else // items has been projected
+         {
+            sb.Append( new SelectClauseGenerator<TInfluxRow>().GetSelectClause( SelectClause ) );
+         }
+
+
          sb.Append( " FROM " );
          sb.Append( QueryEscape.EscapeKey( MeasurementName ) );
          sb.AppendLine();
 
-         if( Where != null )
+         if( WhereClauses.Count > 0 )
          {
-            sb.Append( new WhereClauseGenerator<TInfluxRow>().GetWhereClause( Where ) );
+            sb.Append( "WHERE " );
+            for( int i = 0 ; i < WhereClauses.Count ; i++ )
+            {
+               sb.Append( new WhereClauseGenerator<TInfluxRow>().GetWhereClause( WhereClauses[ i ] ) );
+
+               // if not last
+               if( i != WhereClauses.Count - 1 )
+               {
+                  sb.Append( " AND " );
+               }
+            }
          }
          return sb.ToString();
       }

@@ -51,7 +51,7 @@ namespace Vibrant.InfluxDB.Client.Visitors
                var lambda = (LambdaExpression)StripQuotes( node.Arguments[ 1 ] );
 
                // store the Body of the lambda (representing part of the Where clause)
-               _info.IncludeWhere( lambda.Body, _currentProjection );
+               _info.WhereClauses.Add( new WhereClause( lambda.Body, _currentProjection ) );
 
                // we do not visit the body itself, we will visit that later to perform query creation
             }
@@ -64,8 +64,13 @@ namespace Vibrant.InfluxDB.Client.Visitors
                // store information about the projection and which columns were selected
 
                // a chain of the lambdas that were selected represents the projection itself
-               _currentProjection = new RowProjection();
+               _currentProjection = new RowProjection( lambda, _currentProjection );
+
+               // populate the Bindings of the current projection by visiting the body
                Visit( lambda.Body );
+
+               // update the select clause
+               _info.SelectClause = new SelectClause( _currentProjection );
             }
             else
             {
@@ -88,8 +93,21 @@ namespace Vibrant.InfluxDB.Client.Visitors
          return node;
       }
 
-      //protected override Expression VisitNew( NewExpression node )
-      //{
-      //}
+      protected override Expression VisitNew( NewExpression node )
+      {
+         for( int i = 0 ; i < node.Arguments.Count ; i++ )
+         {
+            var target = node.Members[ i ];
+            var source = node.Arguments[ i ];
+            var cb = new ColumnBinding
+            {
+               Target = target,
+               Source = source,
+            };
+            _currentProjection.Bindings.Add( cb );
+         }
+
+         return node;
+      }
    }
 }
