@@ -12,6 +12,11 @@ namespace Vibrant.InfluxDB.Client
          throw new NotSupportedException( "This function is only supported during query creation." );
       }
 
+      public static long Count( object item )
+      {
+         throw new NotSupportedException( "This function is only supported during query creation." );
+      }
+
       public static bool Matches( object item, string matchAgainstRegex )
       {
          throw new NotSupportedException( "This function is only supported during query creation." );

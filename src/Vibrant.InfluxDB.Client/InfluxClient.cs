@@ -733,7 +733,7 @@ namespace Vibrant.InfluxDB.Client
 
       public InfluxQuery<TInfluxRow> Query<TInfluxRow>( string db, string measurementName )
       {
-         return new InfluxQuery<TInfluxRow>( new InfluxQueryProvider( this, db, measurementName ) );
+         return new InfluxQuery<TInfluxRow>( new InfluxQueryProvider( typeof( TInfluxRow ), this, db, measurementName ) );
       }
 
       /// <summary>
