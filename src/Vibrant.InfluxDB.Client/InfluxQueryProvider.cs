@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using Vibrant.InfluxDB.Client.Dto;
+using Vibrant.InfluxDB.Client.Helpers;
 using Vibrant.InfluxDB.Client.Linq;
 using Vibrant.InfluxDB.Client.Visitors;
 
@@ -22,11 +23,13 @@ namespace Vibrant.InfluxDB.Client
       }
 
       private readonly InfluxClient _client;
-      private string _measurementName;
-      private string _db;
+      private readonly Type _originalType;
+      private readonly string _measurementName;
+      private readonly string _db;
 
-      public InfluxQueryProvider( InfluxClient client, string db, string measurementName )
+      public InfluxQueryProvider( Type originalType, InfluxClient client, string db, string measurementName )
       {
+         _originalType = originalType;
          _client = client;
          _measurementName = measurementName;
          _db = db;
@@ -54,8 +57,7 @@ namespace Vibrant.InfluxDB.Client
       {
          try
          {
-            var elementType = TypeHelper.GetElementType( expression.Type );
-            return ExecuteByRowMethod.MakeGenericMethod( new[] { elementType } ).Invoke( this, new[] { expression } );
+            return ExecuteByRowMethod.MakeGenericMethod( new[] { _originalType } ).Invoke( this, new[] { expression } );
          }
          catch( TargetInvocationException tie )
          {
@@ -72,8 +74,7 @@ namespace Vibrant.InfluxDB.Client
       {
          try
          {
-            var elementType = TypeHelper.GetElementType( expression.Type );
-            return (string)GetQueryTextByRowTypeMethod.MakeGenericMethod( new[] { elementType } ).Invoke( this, new[] { expression } );
+            return (string)GetQueryTextByRowTypeMethod.MakeGenericMethod( new[] { _originalType } ).Invoke( this, new[] { expression } );
          }
          catch( TargetInvocationException tie )
          {
@@ -81,19 +82,23 @@ namespace Vibrant.InfluxDB.Client
          }
       }
 
-      internal string GetQueryTextByRowType<TInfluxRow>( Expression expression )
+      private InfluxQueryInfo<TInfluxRow> GetQueryInfo<TInfluxRow>( Expression expression )
          where TInfluxRow : new()
       {
-         return new InfluxQueryInfoGenerator<TInfluxRow>()
-            .GetInfo( expression, _db, _measurementName )
-            .GenerateInfluxQL();
+         expression = PartialEvaluator.Eval( expression, CanBeEvaluatedLocally );
+         return new InfluxQueryInfoGenerator<TInfluxRow>().GetInfo( expression, _db, _measurementName );
+      }
+
+      private string GetQueryTextByRowType<TInfluxRow>( Expression expression )
+         where TInfluxRow : new()
+      {
+         return GetQueryInfo<TInfluxRow>( expression ).GenerateInfluxQL();
       }
 
       private object ExecuteByRowType<TInfluxRow>( Expression expression )
          where TInfluxRow : new()
       {
-         var queryInfo = new InfluxQueryInfoGenerator<TInfluxRow>()
-            .GetInfo( expression, _db, _measurementName );
+         var queryInfo = GetQueryInfo<TInfluxRow>( expression );
 
          var iql = queryInfo.GenerateInfluxQL();
 
@@ -110,6 +115,20 @@ namespace Vibrant.InfluxDB.Client
          {
             return new TInfluxRow[ 0 ];
          }
+      }
+
+      private bool CanBeEvaluatedLocally( Expression expression )
+      {
+         if( expression is MethodCallExpression )
+         {
+            var mce = (MethodCallExpression)expression;
+            if( mce.Method.DeclaringType == typeof( InfluxFunctions ) )
+            {
+               return false;
+            }
+         }
+
+         return expression.NodeType != ExpressionType.Parameter;
       }
    }
 }

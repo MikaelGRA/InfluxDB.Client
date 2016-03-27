@@ -33,9 +33,21 @@ namespace Vibrant.InfluxDB.Client.Visitors
          // TODO: Support ~=, !~
 
          Visit( b.Left );
-         
+
          switch( b.NodeType )
          {
+            case ExpressionType.Add:
+               _sb.Append( " + " );
+               break;
+            case ExpressionType.Subtract:
+               _sb.Append( " - " );
+               break;
+            case ExpressionType.Multiply:
+               _sb.Append( " * " );
+               break;
+            case ExpressionType.Divide:
+               _sb.Append( " / " );
+               break;
             case ExpressionType.AndAlso:
                _sb.Append( " AND " );
                break;
@@ -69,6 +81,29 @@ namespace Vibrant.InfluxDB.Client.Visitors
          _sb.Append( ")" );
 
          return b;
+      }
+
+      protected override Expression VisitMethodCall( MethodCallExpression node )
+      {
+         if( node.Method.DeclaringType == typeof( InfluxFunctions ) )
+         {
+            if( node.Method.Name == "Now" )
+            {
+               _sb.Append( "now()" );
+            }
+            else if( node.Method.Name == "Count" )
+            {
+               _sb.Append( "COUNT(" );
+               Visit( node.Arguments[ 0 ] );
+               _sb.Append( ")" );
+            }
+
+            return node;
+         }
+         else
+         {
+            throw new NotSupportedException( $"The method '{node.Method.Name}' on '{node.Method.DeclaringType.FullName}' is not supported." );
+         }
       }
 
       protected override Expression VisitMember( MemberExpression node )

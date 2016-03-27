@@ -12,6 +12,7 @@ namespace Vibrant.InfluxDB.Client.Visitors
       where TInfluxRow : new()
    {
       private InfluxQueryInfo<TInfluxRow> _info;
+      private RowProjection _currentProjection;
 
       internal InfluxQueryInfoGenerator()
       {
@@ -38,27 +39,57 @@ namespace Vibrant.InfluxDB.Client.Visitors
       {
          if( node.Method.DeclaringType == typeof( Queryable ) )
          {
+            // Visit the SOURCE itself (the object the method was called on)
+            // source.MethodName( expression )
+            //  -> source is node.Arguments[ 0 ]
+            //  -> expression is node.Arguments[ 1 ]
+
             if( node.Method.Name == "Where" )
             {
-               // Visit the SOURCE itself (the object the method was called on)
-               // source.Where( expression )
-               //  -> source is node.Arguments[ 0 ]
-               //  -> expression is node.Arguments[ 1 ]
                Visit( node.Arguments[ 0 ] );
 
                var lambda = (LambdaExpression)StripQuotes( node.Arguments[ 1 ] );
 
                // store the Body of the lambda (representing part of the Where clause)
-               _info.IncludeWhere( lambda.Body );
+               _info.IncludeWhere( lambda.Body, _currentProjection );
 
                // we do not visit the body itself, we will visit that later to perform query creation
+            }
+            else if( node.Method.Name == "Select" )
+            {
+               Visit( node.Arguments[ 0 ] );
+
+               var lambda = (LambdaExpression)StripQuotes( node.Arguments[ 1 ] );
+
+               // store information about the projection and which columns were selected
+
+               // a chain of the lambdas that were selected represents the projection itself
+               _currentProjection = new RowProjection();
+               Visit( lambda.Body );
             }
             else
             {
                throw new NotSupportedException( $"The method '{node.Method.Name}' is not supported." );
             }
          }
+
          return node;
       }
+
+      protected override MemberAssignment VisitMemberAssignment( MemberAssignment node )
+      {
+         var cb = new ColumnBinding
+         {
+            Source = node.Expression,
+            Target = node.Member,
+         };
+         _currentProjection.Bindings.Add( cb );
+
+         return node;
+      }
+
+      //protected override Expression VisitNew( NewExpression node )
+      //{
+      //}
    }
 }

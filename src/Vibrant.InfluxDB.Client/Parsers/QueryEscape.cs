@@ -42,6 +42,11 @@ namespace Vibrant.InfluxDB.Client.Parsers
 
             return '\'' + valueAsDateTime.ToIso8601() + '\'';
          }
+         else if( valueAsObject is TimeSpan )
+         {
+            var valueAsTimeSpan = (TimeSpan)valueAsObject;
+            return valueAsTimeSpan.ToInfluxTimeSpan();
+         }
          else
          {
             return Convert.ToString( valueAsObject, CultureInfo.InvariantCulture );
