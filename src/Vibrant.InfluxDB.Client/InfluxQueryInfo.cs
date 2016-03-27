@@ -24,11 +24,20 @@ namespace Vibrant.InfluxDB.Client
          Database = db;
          MeasurementName = measurementName;
          WhereClauses = new List<WhereClause>();
+         OrderByClauses = new List<OrderByClause>();
       }
 
       public List<WhereClause> WhereClauses { get; private set; }
 
+      public List<OrderByClause> OrderByClauses { get; private set; }
+
       public SelectClause SelectClause { get; set; }
+
+      public int? Take { get; set; }
+
+      public int? Skip { get; set; }
+
+      public TimeSpan? GroupByTime { get; set; }
 
       public string GenerateInfluxQL()
       {
@@ -58,11 +67,12 @@ namespace Vibrant.InfluxDB.Client
 
          sb.Append( " FROM " );
          sb.Append( QueryEscape.EscapeKey( MeasurementName ) );
-         sb.AppendLine();
 
          if( WhereClauses.Count > 0 )
          {
+            sb.AppendLine();
             sb.Append( "WHERE " );
+
             for( int i = 0 ; i < WhereClauses.Count ; i++ )
             {
                sb.Append( new WhereClauseGenerator<TInfluxRow>().GetWhereClause( WhereClauses[ i ] ) );
@@ -74,6 +84,46 @@ namespace Vibrant.InfluxDB.Client
                }
             }
          }
+
+         if( GroupByTime.HasValue )
+         {
+            sb.AppendLine();
+            sb.Append( "GROUP BY time(" )
+               .Append( GroupByTime.Value.ToInfluxTimeSpan( true ) )
+               .Append( ")" );
+         }
+
+         if( OrderByClauses.Count > 0 )
+         {
+            sb.AppendLine();
+            sb.Append( "ORDER BY " );
+
+            for( int i = 0 ; i < OrderByClauses.Count ; i++ )
+            {
+               sb.Append( new OrderByClauseGenerator<TInfluxRow>().GetOrderByClause( OrderByClauses[ i ] ) );
+
+               // if not last
+               if( i != OrderByClauses.Count - 1 )
+               {
+                  sb.Append( ", " );
+               }
+            }
+         }
+
+         if( Take.HasValue || Skip.HasValue )
+         {
+            sb.AppendLine();
+            if( Take.HasValue )
+            {
+               sb.Append( "LIMIT " ).Append( Take.Value ).Append( ' ' );
+            }
+
+            if( Skip.HasValue )
+            {
+               sb.Append( "OFFSET " ).Append( Skip.Value );
+            }
+         }
+
          return sb.ToString();
       }
    }

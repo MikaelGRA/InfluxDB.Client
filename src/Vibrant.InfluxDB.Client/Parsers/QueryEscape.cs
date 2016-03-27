@@ -45,7 +45,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
          else if( valueAsObject is TimeSpan )
          {
             var valueAsTimeSpan = (TimeSpan)valueAsObject;
-            return valueAsTimeSpan.ToInfluxTimeSpan();
+            return valueAsTimeSpan.ToInfluxTimeSpan( false );
          }
          else
          {

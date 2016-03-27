@@ -11,9 +11,11 @@ using Vibrant.InfluxDB.Client.Parsers;
 
 namespace Vibrant.InfluxDB.Client.Visitors
 {
-   public class SelectClauseGenerator<TInfluxRow> : ProjectingClauseGenerator<TInfluxRow>
+   internal class SelectClauseGenerator<TInfluxRow> : ProjectingClauseGenerator<TInfluxRow>
       where TInfluxRow : new()
    {
+      private string _lastColumnName;
+
       internal string GetSelectClause( SelectClause clause )
       {
          InitialProjection = clause.Projection.InnerProjection;
@@ -24,13 +26,29 @@ namespace Vibrant.InfluxDB.Client.Visitors
          {
             Visit( bindings[ i ].Source );
 
-            if( i != bindings.Count - 1 )
+            if( Clause[ Clause.Length - 1 ] == ' ' )
             {
-               Clause.Append( ", " );
+               Clause.Remove( Clause.Length - 2, 2 );
             }
+            Clause.Append( ", " );
+         }
+
+         if( Clause[ Clause.Length - 1 ] == ' ' )
+         {
+            Clause.Remove( Clause.Length - 2, 2 );
          }
 
          return Clause.ToString();
+      }
+
+      protected override void OnMemberFound( MemberInfo member )
+      {
+         var property = Metadata.PropertiesByClrName[ member.Name ];
+         if( property.Key != InfluxConstants.TimeColumn )
+         {
+            Clause.Append( property.QueryProtocolEscapedKey );
+            _lastColumnName = property.QueryProtocolEscapedKey;
+         }
       }
 
       protected override Expression VisitBinary( BinaryExpression b )
@@ -74,7 +92,15 @@ namespace Vibrant.InfluxDB.Client.Visitors
             {
                Clause.Append( "COUNT(" );
                Visit( node.Arguments[ 0 ] );
-               Clause.Append( ")" );
+               Clause.Append( ") AS " )
+                  .Append( _lastColumnName );
+            }
+            else if( node.Method.Name == "Sum" )
+            {
+               Clause.Append( "SUM(" );
+               Visit( node.Arguments[ 0 ] );
+               Clause.Append( ") AS " )
+                  .Append( _lastColumnName );
             }
 
             return node;

@@ -11,10 +11,14 @@ namespace Vibrant.InfluxDB.Client.ConsoleApp
       {
          var client = new InfluxClient( new Uri( "http://13.95.159.186:8086" ), "root", "root" );
 
+         var from = new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc );
+         var to = new DateTime( 2010, 1, 1, 1, 11, 1, DateTimeKind.Utc );
+
          var query = client.Query<ComputerInfo>( "mydb", "myMeasurementName" )
-            //.Where( x => x.Timestamp < InfluxFunctions.Now() - TimeSpan.FromHours( 1 ) )
-            .Where( x => x.CPU >= 0.5 )
-            .Select( x => new { test = x.CPU } );
+            .Where( x => x.Timestamp >= from && x.Timestamp < to )
+            .Select( x => new { test = InfluxFunctions.Count( x.CPU ), time = x.Timestamp } )
+            .OrderByDescending( x => x.time )
+            .GroupByTime( TimeSpan.FromMinutes( 1 ) );
 
          var items = query.ToList();
 

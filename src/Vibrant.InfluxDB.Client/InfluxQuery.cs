@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client
 {
-   public class InfluxQuery<TElement> : IQueryable<TElement>
+   public class InfluxQuery<TElement> : IQueryable<TElement>, IOrderedQueryable<TElement>
    {
       private Expression _expression;
       private InfluxQueryProvider _provider;

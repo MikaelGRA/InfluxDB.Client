@@ -122,13 +122,14 @@ namespace Vibrant.InfluxDB.Client
 
       private List<TProjectedInfluxRow> PerformProjection<TProjectedInfluxRow>( RowProjection projection, IEnumerable<object> rows )
       {
-         var projectedRows = new List<TProjectedInfluxRow>();
+         List<TProjectedInfluxRow> projectedRows = null;
          if( rows != null )
          {
-            foreach( var row in rows )
-            {
-               projectedRows.Add( (TProjectedInfluxRow)projection.PerformProjections( row ) );
-            }
+            projectedRows = projection.PerformProjections<TProjectedInfluxRow>( rows ).ToList();
+         }
+         else
+         {
+            projectedRows = new List<TProjectedInfluxRow>();
          }
          return projectedRows;
       }

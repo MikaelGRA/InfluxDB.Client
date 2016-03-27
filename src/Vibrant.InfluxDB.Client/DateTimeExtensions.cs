@@ -69,7 +69,7 @@ namespace Vibrant.InfluxDB.Client
          }
       }
 
-      public static string ToInfluxTimeSpan( this TimeSpan that )
+      public static string ToInfluxTimeSpan( this TimeSpan that, bool requireSingleUnit )
       {
          if( that.Ticks > -10 && that.Ticks < 10 )
          {
@@ -84,6 +84,8 @@ namespace Vibrant.InfluxDB.Client
             sb.Append( "-" );
          }
 
+         bool hasDigits = false;
+
          var d = duration.Days;
          if( d != 0 )
          {
@@ -93,6 +95,11 @@ namespace Vibrant.InfluxDB.Client
                if( w != 0 )
                {
                   sb.Append( w ).Append( "w" );
+                  if( hasDigits && requireSingleUnit )
+                  {
+                     throw new NotSupportedException( "The specfied timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
+                  }
+                  hasDigits = true;
                }
 
                d %= 7;
@@ -101,6 +108,11 @@ namespace Vibrant.InfluxDB.Client
             if( d != 0 )
             {
                sb.Append( d ).Append( "d" );
+               if( hasDigits && requireSingleUnit )
+               {
+                  throw new NotSupportedException( "The specfied timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
+               }
+               hasDigits = true;
             }
          }
 
@@ -108,24 +120,44 @@ namespace Vibrant.InfluxDB.Client
          if( h != 0 )
          {
             sb.Append( h ).Append( "h" );
+            if( hasDigits && requireSingleUnit )
+            {
+               throw new NotSupportedException( "The specfied timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
+            }
+            hasDigits = true;
          }
 
          var m = duration.Minutes;
          if( m != 0 )
          {
             sb.Append( m ).Append( "m" );
+            if( hasDigits && requireSingleUnit )
+            {
+               throw new NotSupportedException( "The specfied timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
+            }
+            hasDigits = true;
          }
 
          var s = duration.Seconds;
          if( s != 0 )
          {
             sb.Append( s ).Append( "s" );
+            if( hasDigits && requireSingleUnit )
+            {
+               throw new NotSupportedException( "The specfied timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
+            }
+            hasDigits = true;
          }
 
          var u = ( duration.Ticks / 10 ) % 1000;
          if( u != 0 )
          {
             sb.Append( u ).Append( "u" );
+            if( hasDigits && requireSingleUnit )
+            {
+               throw new NotSupportedException( "The specfied timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
+            }
+            hasDigits = true;
          }
 
          return sb.ToString();

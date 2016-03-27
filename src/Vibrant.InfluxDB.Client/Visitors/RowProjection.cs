@@ -26,7 +26,7 @@ namespace Vibrant.InfluxDB.Client.Visitors
 
       public List<ColumnBinding> Bindings { get; private set; }
 
-      private Delegate GetProjector()
+      private Delegate GetProjectionMethod()
       {
          if( _compiledProjector == null )
          {
@@ -36,28 +36,40 @@ namespace Vibrant.InfluxDB.Client.Visitors
             var inputParameter = Expression.Parameter( current.Projector.Parameters[ 0 ].Type, "x" );
             while( current != null )
             {
-               //Expression.Call( null, SelectMethod,  )
-
                body = Expression.Invoke( current.Projector, body ?? inputParameter );
+
                current = current.InnerProjection;
             }
-
             var outputParameterType = body.Type;
+            var delegateType = typeof( Func<,> ).MakeGenericType( inputParameter.Type, outputParameterType );
+            
+            // replace all InfluxFunction calls
+            body = InfluxFunctionReplacer.Replace( body );
 
-            var delegateType = typeof( Func<,> ).MakeGenericType( new Type[] { inputParameter.Type, outputParameterType } );
+            var convertSingleItemLambda = Expression.Lambda( delegateType, body, inputParameter );
 
-            var lambda = Expression.Lambda( delegateType, body, inputParameter );
+            // this lambda can turn one item into another item, now we want one that does the same for an enumerable of the same
+            var inputParameterEnumerableType = typeof( IEnumerable<> ).MakeGenericType( inputParameter.Type );
+            var outputParameterEnumerableType = typeof( IEnumerable<> ).MakeGenericType( outputParameterType );
+
+            var inputParameterEnumable = Expression.Parameter( inputParameterEnumerableType, "y" );
+
+            var delegateEnumerableType = typeof( Func<,> ).MakeGenericType( inputParameterEnumerableType, outputParameterEnumerableType );
+
+            var gsm = SelectMethod.MakeGenericMethod( inputParameter.Type, outputParameterType );
+
+            var mce = Expression.Call( null, gsm, inputParameterEnumable, convertSingleItemLambda );
+
+            var lambda = Expression.Lambda( delegateEnumerableType, mce, inputParameterEnumable );
 
             _compiledProjector = lambda.Compile();
          }
          return _compiledProjector;
       }
 
-      public object PerformProjections( object item )
+      public IEnumerable<TProjectedInfluxRow> PerformProjections<TProjectedInfluxRow>( IEnumerable<object> item )
       {
-         // TODO: increase performance be compiling a single function which is a combination of all
-
-         return GetProjector().DynamicInvoke( new[] { item } );
+         return (IEnumerable<TProjectedInfluxRow>)GetProjectionMethod().DynamicInvoke( new[] { item } );
       }
    }
 }
