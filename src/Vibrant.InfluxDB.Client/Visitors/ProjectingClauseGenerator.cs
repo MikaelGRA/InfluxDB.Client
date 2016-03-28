@@ -14,11 +14,7 @@ namespace Vibrant.InfluxDB.Client.Visitors
    {
       internal static readonly InfluxRowTypeInfo<TInfluxRow> Metadata = MetadataCache.GetOrCreate<TInfluxRow>();
 
-      private bool _isProjecting;
-      private bool _isFinalProjection;
-      private MemberInfo _currentProjectedTarget;
-
-      public RowProjection InitialProjection { get; protected set; }
+      public RowProjection Projection { get; protected set; }
 
       public StringBuilder Clause { get; private set; }
 
@@ -31,44 +27,16 @@ namespace Vibrant.InfluxDB.Client.Visitors
       {
          if( node.Expression.NodeType == ExpressionType.Parameter )
          {
-            if( _isProjecting )
-            {
-               _currentProjectedTarget = node.Member;
+            var targetMember = node.Member;
 
-               if( _isFinalProjection )
-               {
-                  OnMemberFound( _currentProjectedTarget );
-               }
+            if( Projection != null )
+            {
+               var binding = Projection.Bindings.FirstOrDefault( x => x.TargetMember == node.Member );
+               OnMemberFound( binding.OriginalSourceMember );
             }
             else
             {
-
-               // we are already looking at the initial projections bindings, so start by looking at the inner
-               var currentProjection = InitialProjection;
-               _currentProjectedTarget = node.Member;
-
-               if( currentProjection != null )
-               {
-                  _isProjecting = true;
-                  while( currentProjection != null )
-                  {
-                     var binding = currentProjection.Bindings.FirstOrDefault( x => x.Target == node.Member );
-
-                     var nextProjection = currentProjection.InnerProjection;
-
-                     _isFinalProjection = nextProjection == null;
-
-                     Visit( binding.Source ); // updates the _currentProjectedTarget from the parameter being used in it
-
-                     currentProjection = nextProjection;
-                  }
-                  _isProjecting = false;
-                  _isFinalProjection = false;
-               }
-               else
-               {
-                  OnMemberFound( _currentProjectedTarget );
-               }
+               OnMemberFound( node.Member );
             }
 
             return node;

@@ -16,7 +16,7 @@ namespace Vibrant.InfluxDB.Client.ConsoleApp
 
          var query = client.Query<ComputerInfo>( "mydb", "myMeasurementName" )
             .Where( x => x.Timestamp >= from && x.Timestamp < to )
-            .Select( x => new { test = InfluxFunctions.Count( x.CPU ), time = x.Timestamp } )
+            .Select( x => new { test = InfluxFunctions.Sum( x.CPU ), time = x.Timestamp } )
             .OrderByDescending( x => x.time )
             .GroupByTime( TimeSpan.FromMinutes( 1 ) );
 

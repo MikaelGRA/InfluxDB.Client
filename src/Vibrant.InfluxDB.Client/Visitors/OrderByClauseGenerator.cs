@@ -18,7 +18,7 @@ namespace Vibrant.InfluxDB.Client.Visitors
 
       internal string GetOrderByClause( OrderByClause orderBy )
       {
-         InitialProjection = orderBy.Projection;
+         Projection = orderBy.Projection;
          _orderBy = orderBy;
 
          Visit( _orderBy.Expression );
