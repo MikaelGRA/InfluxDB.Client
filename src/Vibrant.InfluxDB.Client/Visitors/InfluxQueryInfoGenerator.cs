@@ -154,12 +154,24 @@ namespace Vibrant.InfluxDB.Client.Visitors
 
       protected override MemberAssignment VisitMemberAssignment( MemberAssignment node )
       {
-         var cb = new ColumnBinding
+         var targetMember = node.Member;
+         var sourceExpression = node.Expression;
+         var targetToLookForOrOriginalSource = ParameterMemberLocator.Locate( sourceExpression );
+
+         // determine in the inner column binding, if possible
+         ColumnBinding innerBinding = null;
+         ColumnBinding newBinding = null;
+         if( _currentProjection.InnerProjection != null )
          {
-            Source = node.Expression,
-            Target = node.Member,
-         };
-         _currentProjection.Bindings.Add( cb );
+            innerBinding = _currentProjection.InnerProjection.Bindings.First( x => x.TargetMember == targetToLookForOrOriginalSource );
+            newBinding = new ColumnBinding( sourceExpression, targetMember, innerBinding );
+         }
+         else
+         {
+            newBinding = new ColumnBinding( sourceExpression, targetMember, targetToLookForOrOriginalSource );
+         }
+
+         _currentProjection.Bindings.Add( newBinding );
 
          return node;
       }
@@ -168,14 +180,24 @@ namespace Vibrant.InfluxDB.Client.Visitors
       {
          for( int i = 0 ; i < node.Arguments.Count ; i++ )
          {
-            var target = node.Members[ i ];
-            var source = node.Arguments[ i ];
-            var cb = new ColumnBinding
+            var targetMember = node.Members[ i ];
+            var sourceExpression = node.Arguments[ i ];
+            var targetToLookForOrOriginalSource = ParameterMemberLocator.Locate( sourceExpression );
+
+            // determine in the inner column binding, if possible
+            ColumnBinding innerBinding = null;
+            ColumnBinding newBinding = null;
+            if( _currentProjection.InnerProjection != null )
             {
-               Target = target,
-               Source = source,
-            };
-            _currentProjection.Bindings.Add( cb );
+               innerBinding = _currentProjection.InnerProjection.Bindings.First( x => x.TargetMember == targetToLookForOrOriginalSource );
+               newBinding = new ColumnBinding( sourceExpression, targetMember, innerBinding );
+            }
+            else
+            {
+               newBinding = new ColumnBinding( sourceExpression, targetMember, targetToLookForOrOriginalSource );
+            }
+
+            _currentProjection.Bindings.Add( newBinding );
          }
 
          return node;

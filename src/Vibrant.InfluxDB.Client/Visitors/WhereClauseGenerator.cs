@@ -18,7 +18,7 @@ namespace Vibrant.InfluxDB.Client.Visitors
 
       internal string GetWhereClause( WhereClause where )
       {
-         InitialProjection = where.Projection;
+         Projection = where.Projection;
          _where = where;
 
          Visit( _where.Expression );

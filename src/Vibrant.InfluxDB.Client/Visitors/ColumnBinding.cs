@@ -9,8 +9,27 @@ namespace Vibrant.InfluxDB.Client.Visitors
 {
    public class ColumnBinding
    {
-      public Expression Source { get; set; }
+      public ColumnBinding( Expression sourceExpression, MemberInfo targetMember, ColumnBinding innerColumnBinding )
+      {
+         SourceExpression = sourceExpression;
+         TargetMember = targetMember;
+         InnerBinding = innerColumnBinding;
+         OriginalSourceMember = innerColumnBinding.OriginalSourceMember;
+      }
 
-      public MemberInfo Target { get; set; }
+      public ColumnBinding( Expression sourceExpression, MemberInfo targetMember, MemberInfo originalSourceMember )
+      {
+         SourceExpression = sourceExpression;
+         TargetMember = targetMember;
+         OriginalSourceMember = originalSourceMember;
+      }
+
+      public Expression SourceExpression { get; private set; }
+
+      public MemberInfo TargetMember { get; private set; }
+
+      public ColumnBinding InnerBinding { get; private set; }
+
+      public MemberInfo OriginalSourceMember { get; private set; }
    }
 }

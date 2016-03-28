@@ -115,6 +115,8 @@ namespace Vibrant.InfluxDB.Client
          }
          else
          {
+            // Use alternative Read method using the provided projection
+
             var returnElementType = TypeHelper.GetElementType( expression.Type );
             return PerformProjectionMethod.MakeGenericMethod( new[] { returnElementType } ).Invoke( this, new object[] { projection, enumerable } );
          }

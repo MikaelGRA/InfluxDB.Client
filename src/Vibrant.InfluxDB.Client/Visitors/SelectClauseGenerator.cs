@@ -15,30 +15,52 @@ namespace Vibrant.InfluxDB.Client.Visitors
       where TInfluxRow : new()
    {
       private string _lastColumnName;
+      private bool _requiresExplicitName;
+      private bool _foundMember;
 
       internal string GetSelectClause( SelectClause clause )
       {
-         InitialProjection = clause.Projection.InnerProjection;
+         Projection = clause.Projection.InnerProjection;
 
          var bindings = clause.Projection.Bindings;
 
          for( int i = 0 ; i < bindings.Count ; i++ )
          {
-            Visit( bindings[ i ].Source );
+            // Should build a single expression that I can traverse here instead???
 
-            if( Clause[ Clause.Length - 1 ] == ' ' )
-            {
-               Clause.Remove( Clause.Length - 2, 2 );
-            }
-            Clause.Append( ", " );
+            Visit( bindings[ i ].SourceExpression ); // TODO: Might miss projections, since we dont run through them recursively
+
+
+            AddPostColumnString();
          }
+         AddPostColumnString();
+
+         return Clause.ToString();
+      }
+
+      private void AddPostColumnString()
+      {
+         if( _foundMember )
+         {
+            if( _requiresExplicitName )
+            {
+               Clause.Append( " AS " )
+                  .Append( _lastColumnName );
+            }
+
+         }
+         _requiresExplicitName = false;
+         _foundMember = false;
 
          if( Clause[ Clause.Length - 1 ] == ' ' )
          {
             Clause.Remove( Clause.Length - 2, 2 );
          }
 
-         return Clause.ToString();
+         if( _foundMember )
+         {
+            Clause.Append( ", " );
+         }
       }
 
       protected override void OnMemberFound( MemberInfo member )
@@ -48,6 +70,7 @@ namespace Vibrant.InfluxDB.Client.Visitors
          {
             Clause.Append( property.QueryProtocolEscapedKey );
             _lastColumnName = property.QueryProtocolEscapedKey;
+            _foundMember = true;
          }
       }
 
@@ -92,16 +115,16 @@ namespace Vibrant.InfluxDB.Client.Visitors
             {
                Clause.Append( "COUNT(" );
                Visit( node.Arguments[ 0 ] );
-               Clause.Append( ") AS " )
-                  .Append( _lastColumnName );
+               Clause.Append( ")" );
             }
             else if( node.Method.Name == "Sum" )
             {
                Clause.Append( "SUM(" );
                Visit( node.Arguments[ 0 ] );
-               Clause.Append( ") AS " )
-                  .Append( _lastColumnName );
+               Clause.Append( ")" );
             }
+
+            _requiresExplicitName = true;
 
             return node;
          }
