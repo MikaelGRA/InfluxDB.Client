@@ -22,11 +22,14 @@ namespace Vibrant.InfluxDB.Client.Visitors
       {
          Projection = clause.Projection.InnerProjection;
 
-         var bindings = clause.Projection.Bindings;
+         var bindings = clause.Projection.Bindings; // go through a full selection expression instead of iterating bindings
 
          for( int i = 0 ; i < bindings.Count ; i++ )
          {
-            // Should build a single expression that I can traverse here instead???
+            // Should build a single expression that I can traverse here instead? Composed of all expressions... (already have that?)
+
+            // HOW TO???
+            var fullProjectionExpression = clause.Projection.GetFullProjectionExpression(); // use this instead!
 
             Visit( bindings[ i ].SourceExpression ); // TODO: Might miss projections, since we dont run through them recursively
 
