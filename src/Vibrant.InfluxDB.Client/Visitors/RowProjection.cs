@@ -12,6 +12,7 @@ namespace Vibrant.InfluxDB.Client.Visitors
       private static readonly MethodInfo SelectMethod = typeof( Enumerable ).GetTypeInfo().DeclaredMethods.First( x => x.Name == "Select" && x.GetGenericArguments().Length == 2 && x.GetParameters().Length == 2 );
 
       private Delegate _compiledProjector;
+      private Expression _fullProjectionExpression;
 
       public RowProjection( LambdaExpression projector, RowProjection innerProjection )
       {
@@ -25,6 +26,28 @@ namespace Vibrant.InfluxDB.Client.Visitors
       public LambdaExpression Projector { get; private set; }
 
       public List<ColumnBinding> Bindings { get; private set; }
+
+      public Expression GetFullProjectionExpression()
+      {
+         if( _fullProjectionExpression == null )
+         {
+            Expression body = null;
+
+            var current = this;
+            var inputParameter = Expression.Parameter( current.Projector.Parameters[ 0 ].Type, "x" );
+            while( current != null )
+            {
+               body = Expression.Invoke( current.Projector, body ?? inputParameter );
+
+               current = current.InnerProjection;
+            }
+            var outputParameterType = body.Type;
+            var delegateType = typeof( Func<,> ).MakeGenericType( inputParameter.Type, outputParameterType );
+
+            _fullProjectionExpression = body;
+         }
+         return _fullProjectionExpression;
+      }
 
       private Delegate GetProjectionMethod()
       {
@@ -42,7 +65,7 @@ namespace Vibrant.InfluxDB.Client.Visitors
             }
             var outputParameterType = body.Type;
             var delegateType = typeof( Func<,> ).MakeGenericType( inputParameter.Type, outputParameterType );
-            
+
             // replace all InfluxFunction calls
             body = InfluxFunctionReplacer.Replace( body );
 
