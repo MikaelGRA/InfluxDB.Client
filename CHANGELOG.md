@@ -3,7 +3,6 @@
 ## 1.0.7
  * Improved performance for reading IInfluxRows from the database.
  * Improved perfomance by following guidelines for ordering of tags/fields when sending to data to influxdb
- * Fixed a bug in the nuget nuspec specification
  * Changed Newtonsoft.Json requirement to 7.0.1
 
 ## 1.0.6
