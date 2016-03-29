@@ -25,7 +25,7 @@ The library exposes all HTTP operations on InfluxDB (0.9.6+) and can be used for
  * Using your own POCO classes.
  * Using dynamic classes.
 
-### Using your own POCO classes.
+### Using your own POCO classes
 
 Start by defining a class that represents a row in InfluxDB that you want to store.
 
