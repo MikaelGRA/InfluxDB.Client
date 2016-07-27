@@ -35,7 +35,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       [Fact]
       public async Task Should_Create_Show_And_Delete_Database()
       {
-         await _client.CreateDatabaseIfNotExistsAsync( Unused );
+         await _client.CreateDatabaseAsync( Unused );
 
          var result = await _client.ShowDatabasesAsync();
 
@@ -46,19 +46,6 @@ namespace Vibrant.InfluxDB.Client.Tests
          Assert.Contains( rows, x => x.Name == Unused );
 
          await _client.DropDatabaseIfExistsAsync( Unused );
-      }
-
-      [Fact]
-      public async Task Should_Throw_When_Creating_Duplicate_Database()
-      {
-         await _client.CreateDatabaseIfNotExistsAsync( Unused );
-
-         await Assert.ThrowsAsync( typeof( InfluxException ), async () =>
-         {
-            await _client.CreateDatabaseAsync( Unused );
-         } );
-
-         await _client.DropDatabaseAsync( Unused );
       }
 
       [Fact]
@@ -172,15 +159,6 @@ namespace Vibrant.InfluxDB.Client.Tests
          await _client.AlterRetentionPolicyAsync( InfluxClientFixture.DatabaseName, "dmt4RetentionPolicy", "4d", 1, false );
 
          await _client.DropRetentionPolicyAsync( InfluxClientFixture.DatabaseName, "dmt4RetentionPolicy" );
-      }
-
-      [Fact]
-      public async Task Should_Throw_When_Dropping_Nonexisting_Retention_Policy()
-      {
-         await Assert.ThrowsAsync( typeof( InfluxException ), async () =>
-          {
-             await _client.DropRetentionPolicyAsync( InfluxClientFixture.DatabaseName, "dmt5RetentionPolicy" );
-          } );
       }
    }
 }

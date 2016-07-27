@@ -48,7 +48,7 @@ namespace Vibrant.InfluxDB.Client
          DefaultWriteOptions = new InfluxWriteOptions();
          DefaultQueryOptions = new InfluxQueryOptions();
 
-         if ( !string.IsNullOrEmpty( username ) && !string.IsNullOrEmpty( password ) )
+         if( !string.IsNullOrEmpty( username ) && !string.IsNullOrEmpty( password ) )
          {
             var encoding = Encoding.GetEncoding( "ISO-8859-1" );
             var credentials = username + ":" + password;
@@ -301,7 +301,7 @@ namespace Vibrant.InfluxDB.Client
 
       private string GetPrivilege( DatabasePriviledge privilege )
       {
-         switch ( privilege )
+         switch( privilege )
          {
             case DatabasePriviledge.Read:
                return "READ";
@@ -317,16 +317,6 @@ namespace Vibrant.InfluxDB.Client
       #endregion
 
       #region Database Management
-
-      /// <summary>
-      /// Create a database with CREATE DATABASE IF NOT EXISTS.
-      /// </summary>
-      /// <param name="db"></param>
-      /// <returns></returns>
-      public Task CreateDatabaseIfNotExistsAsync( string db )
-      {
-         return ExecuteOperationWithNoResultAsync( $"CREATE DATABASE IF NOT EXISTS \"{db}\"" );
-      }
 
       /// <summary>
       /// Create a database with CREATE DATABASE.
@@ -792,11 +782,11 @@ namespace Vibrant.InfluxDB.Client
          var key = new DatabaseMeasurementInfoKey( db, measurementName );
          DatabaseMeasurementInfo info;
 
-         if ( !forceRefresh )
+         if( !forceRefresh )
          {
-            lock ( _seriesMetaCache )
+            lock( _seriesMetaCache )
             {
-               if ( _seriesMetaCache.TryGetValue( key, out info ) )
+               if( _seriesMetaCache.TryGetValue( key, out info ) )
                {
                   return info;
                }
@@ -812,22 +802,22 @@ namespace Vibrant.InfluxDB.Client
          var tags = tagTask.Result.Series.FirstOrDefault()?.Rows;
 
          info = new DatabaseMeasurementInfo();
-         if ( fields != null )
+         if( fields != null )
          {
-            foreach ( var row in fields )
+            foreach( var row in fields )
             {
                info.Fields.Add( row.FieldKey );
             }
          }
-         if ( tags != null )
+         if( tags != null )
          {
-            foreach ( var row in tags )
+            foreach( var row in tags )
             {
                info.Tags.Add( row.TagKey );
             }
          }
 
-         lock ( _seriesMetaCache )
+         lock( _seriesMetaCache )
          {
             _seriesMetaCache[ key ] = info;
          }
@@ -841,7 +831,7 @@ namespace Vibrant.InfluxDB.Client
 
       private string CreateQueryUrl( string commandOrQuery, string db, InfluxQueryOptions options )
       {
-         if ( options.ChunkSize.HasValue )
+         if( options.ChunkSize.HasValue )
          {
             return $"query?db={Uri.EscapeDataString( db )}&q={Uri.EscapeDataString( commandOrQuery )}&precision={options.Precision.GetQueryParameter()}&chunk_size={options.ChunkSize.Value}";
          }
@@ -863,7 +853,7 @@ namespace Vibrant.InfluxDB.Client
 
       private string CreatePingUrl( int? secondsToWaitForLeader )
       {
-         if ( secondsToWaitForLeader.HasValue )
+         if( secondsToWaitForLeader.HasValue )
          {
             return $"ping?wait_for_leader={secondsToWaitForLeader.Value}s";
          }
@@ -896,7 +886,7 @@ namespace Vibrant.InfluxDB.Client
 
       private async Task<InfluxResultSet> ExecuteQueryInternalAsync( string query, string db )
       {
-         var queryResult = await GetInternalAsync( CreateQueryUrl( query, db ), false ).ConfigureAwait( false );
+         var queryResult = await PostInternalAsync( CreateQueryUrl( query, db ), false ).ConfigureAwait( false );
          return ResultSetFactory.Create( queryResult );
       }
 
@@ -918,15 +908,15 @@ namespace Vibrant.InfluxDB.Client
 
       private async Task ExecuteOperationWithNoResultAsync( string query )
       {
-         await GetInternalIgnoreResultAsync( CreateQueryUrl( query ) ).ConfigureAwait( false );
+         await PostInternalIgnoreResultAsync( CreateQueryUrl( query ) ).ConfigureAwait( false );
       }
 
       private async Task<InfluxPingResult> HeadInternalAsync( string url )
       {
          try
          {
-            using ( var request = new HttpRequestMessage( HttpMethod.Head, url ) )
-            using ( var response = await _client.SendAsync( request ).ConfigureAwait( false ) )
+            using( var request = new HttpRequestMessage( HttpMethod.Head, url ) )
+            using( var response = await _client.SendAsync( request ).ConfigureAwait( false ) )
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
                IEnumerable<string> version = null;
@@ -934,7 +924,7 @@ namespace Vibrant.InfluxDB.Client
                return new InfluxPingResult { Version = version?.FirstOrDefault() ?? "unknown" };
             }
          }
-         catch ( HttpRequestException e )
+         catch( HttpRequestException e )
          {
             throw new InfluxException( Errors.UnknownError, e );
          }
@@ -944,8 +934,8 @@ namespace Vibrant.InfluxDB.Client
       {
          try
          {
-            using ( var request = new HttpRequestMessage( HttpMethod.Get, url ) )
-            using ( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
+            using( var request = new HttpRequestMessage( HttpMethod.Get, url ) )
+            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
                var queryResult = await response.Content.ReadAsJsonAsync<QueryResult>().ConfigureAwait( false );
@@ -953,7 +943,7 @@ namespace Vibrant.InfluxDB.Client
                return queryResult;
             }
          }
-         catch ( HttpRequestException e )
+         catch( HttpRequestException e )
          {
             throw new InfluxException( Errors.UnknownError, e );
          }
@@ -963,21 +953,40 @@ namespace Vibrant.InfluxDB.Client
       {
          try
          {
-            using ( var request = new HttpRequestMessage( HttpMethod.Get, url ) )
-            using ( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
+            using( var request = new HttpRequestMessage( HttpMethod.Get, url ) )
+            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
 
                // since we are ignoring the result, we dont return anything
                // but we still need to check what is being returned
-               if ( response.StatusCode == HttpStatusCode.OK )
+               if( response.StatusCode == HttpStatusCode.OK )
                {
                   var queryResult = await response.Content.ReadAsJsonAsync<QueryResult>().ConfigureAwait( false );
                   EnsureValidQueryResult( queryResult, false );
                }
             }
          }
-         catch ( HttpRequestException e )
+         catch( HttpRequestException e )
+         {
+            throw new InfluxException( Errors.UnknownError, e );
+         }
+      }
+
+      private async Task<QueryResult> PostInternalAsync( string url, bool isMeasurementsQuery )
+      {
+         try
+         {
+            using( var request = new HttpRequestMessage( HttpMethod.Post, url ) { Content = new StringContent( "" ) } )
+            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
+            {
+               await EnsureSuccessCode( response ).ConfigureAwait( false );
+               var queryResult = await response.Content.ReadAsJsonAsync<QueryResult>().ConfigureAwait( false );
+               EnsureValidQueryResult( queryResult, isMeasurementsQuery );
+               return queryResult;
+            }
+         }
+         catch( HttpRequestException e )
          {
             throw new InfluxException( Errors.UnknownError, e );
          }
@@ -987,13 +996,29 @@ namespace Vibrant.InfluxDB.Client
       {
          try
          {
-            using ( var request = new HttpRequestMessage( HttpMethod.Post, url ) { Content = content } )
-            using ( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
+            using( var request = new HttpRequestMessage( HttpMethod.Post, url ) { Content = content } )
+            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
             }
          }
-         catch ( HttpRequestException e )
+         catch( HttpRequestException e )
+         {
+            throw new InfluxException( Errors.UnknownError, e );
+         }
+      }
+
+      private async Task PostInternalIgnoreResultAsync( string url )
+      {
+         try
+         {
+            using( var request = new HttpRequestMessage( HttpMethod.Post, url ) { Content = new StringContent( "" ) } )
+            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
+            {
+               await EnsureSuccessCode( response ).ConfigureAwait( false );
+            }
+         }
+         catch( HttpRequestException e )
          {
             throw new InfluxException( Errors.UnknownError, e );
          }
@@ -1002,10 +1027,10 @@ namespace Vibrant.InfluxDB.Client
       private void EnsureValidQueryResult( QueryResult queryResult, bool isMeasurementsQuery )
       {
          // If there is only one result, we will throw an exception
-         if ( queryResult.Results.Count == 1 )
+         if( queryResult.Results.Count == 1 )
          {
             var resultWrapper = queryResult.Results[ 0 ];
-            if ( resultWrapper.Error != null )
+            if( resultWrapper.Error != null )
             {
                throw new InfluxException( resultWrapper.Error );
             }
@@ -1022,12 +1047,12 @@ namespace Vibrant.InfluxDB.Client
 
       private async Task EnsureSuccessCode( HttpResponseMessage response )
       {
-         if ( !response.IsSuccessStatusCode )
+         if( !response.IsSuccessStatusCode )
          {
             try
             {
                var errorResult = await response.Content.ReadAsJsonAsync<ErrorResult>().ConfigureAwait( false );
-               if ( errorResult?.Error != null )
+               if( errorResult?.Error != null )
                {
                   throw new InfluxException( errorResult.Error );
                }
@@ -1036,7 +1061,7 @@ namespace Vibrant.InfluxDB.Client
                   response.EnsureSuccessStatusCode();
                }
             }
-            catch ( JsonSerializationException e )
+            catch( JsonSerializationException e )
             {
                throw new InfluxException( Errors.ParsingError, e );
             }
@@ -1058,7 +1083,7 @@ namespace Vibrant.InfluxDB.Client
       /// </summary>
       public void Dispose()
       {
-         if ( !_disposed )
+         if( !_disposed )
          {
             Dispose( true );
             _disposed = true;
@@ -1068,7 +1093,7 @@ namespace Vibrant.InfluxDB.Client
 
       private void Dispose( bool disposing )
       {
-         if ( disposing )
+         if( disposing )
          {
             _client.Dispose();
             _handler.Dispose();

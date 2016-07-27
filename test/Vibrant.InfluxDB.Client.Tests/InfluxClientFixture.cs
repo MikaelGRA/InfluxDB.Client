@@ -14,14 +14,14 @@ namespace Vibrant.InfluxDB.Client.Tests
       public const string DatabaseName = "unittestdb";
       //public static readonly string InfluxHost = "http://winflux.westeurope.cloudapp.azure.com:8086";
       //public static readonly string InfluxHost = "http://localhost:8086";
-      public static readonly string InfluxHost = "http://13.95.159.186:8086";
+      public static readonly string InfluxHost = "http://52.174.159.230:8086";
 
       public InfluxClient Client { get; set; }
 
       public InfluxClientFixture()
       {
          Client = new InfluxClient( new Uri( InfluxHost ), "root", "root" );
-         Client.CreateDatabaseIfNotExistsAsync( DatabaseName ).Wait();
+         Client.CreateDatabaseAsync( DatabaseName ).Wait();
       }
 
       public static readonly string[] Regions = new[] { "west-eu", "north-eu", "west-us", "east-us", "asia" };

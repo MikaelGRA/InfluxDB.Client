@@ -19,7 +19,7 @@ namespace Vibrant.InfluxDB.Client.Rows
       /// <summary>
       /// Gets the tag value.
       /// </summary>
-      [InfluxField( "values" )]
+      [InfluxField( "value" )]
       public string Value { get; private set; }
    }
 }
