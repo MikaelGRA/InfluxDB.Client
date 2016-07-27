@@ -1,33 +1,20 @@
 {
-  "version": "1.0.0-*",
-  "description": "Vibrant.InfluxDB.Client.ConsoleApp Console Application",
-  "authors": [ "MikaelGRA" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
+   "version": "1.0.0-*",
+   "buildOptions": {
+      "emitEntryPoint": true
+   },
 
-  "compilationOptions": {
-    "emitEntryPoint": true
-  },
-
-  "dependencies": {
-    "Vibrant.InfluxDB.Client": "1.0.7-*"
-  },
-
-  "commands": {
-    "Vibrant.InfluxDB.Client.ConsoleApp": "Vibrant.InfluxDB.Client.ConsoleApp"
-  },
-
-  "frameworks": {
-    "dnx451": { },
-    "dnxcore50": {
-      "dependencies": {
-        "Microsoft.CSharp": "4.0.0",
-        "System.Collections": "4.0.10",
-        "System.Console": "4.0.0-beta-23516",
-        "System.Linq": "4.0.0",
-        "System.Threading": "4.0.10"
+   "dependencies": {
+      "Vibrant.InfluxDB.Client": "2.0.0-*",
+      "Microsoft.NETCore.App": {
+         "type": "platform",
+         "version": "1.0.0"
       }
-    }
-  }
+   },
+
+   "frameworks": {
+      "netcoreapp1.0": {
+         "imports": "dnxcore50"
+      }
+   }
 }

@@ -78,13 +78,13 @@ namespace Vibrant.InfluxDB.Client.Tests
          var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( 2014, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 5000, false );
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "set5Measurement", infos );
 
-         var result = await _client.ShowTagValuesAsync<RegionRow>( InfluxClientFixture.DatabaseName, "region", "set5Measurement" );
+         var result = await _client.ShowTagValuesAsync( InfluxClientFixture.DatabaseName, "region", "set5Measurement" );
          Assert.Equal( 1, result.Series.Count );
 
          var series = result.Series[ 0 ];
          foreach ( var region in InfluxClientFixture.Regions )
          {
-            Assert.Contains( series.Rows, x => x.Region == region );
+            Assert.Contains( series.Rows, x => x.Value == region );
          }
       }
 

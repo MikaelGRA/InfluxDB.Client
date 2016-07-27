@@ -1,19 +1,19 @@
 ﻿{
-   "version": "1.0.7-*",
+   "version": "2.0.0-*",
    "title": "InfluxDB Client for .NET",
    "description": "An easy-to-use client for InfluxDB that supports simple query to object mapping.",
    "authors": [ "MikaelGRA" ],
-   "owners": [ "MikaelGRA" ],
-   "tags": [ "influxdb", "nosql", "timeseries", "data" ],
-   "projectUrl": "https://github.com/MikaelGRA/InfluxDB.Client",
-   "licenseUrl": "https://github.com/MikaelGRA/InfluxDB.Client/blob/master/LICENSE",
-   "releaseNotes": "https://github.com/MikaelGRA/InfluxDB.Client/blob/master/CHANGELOG.md",
-   "copyright": "Copyright (c) 2015-2016 MikaelGRA",
-   "language": "en-US",
-   "dependencies": {
-      "Newtonsoft.Json": "7.0.1"
+   "packOptions": {
+      "owners": [ "MikaelGRA" ],
+      "tags": [ "influxdb", "nosql", "timeseries", "data" ],
+      "projectUrl": "https://github.com/MikaelGRA/InfluxDB.Client",
+      "licenseUrl": "https://github.com/MikaelGRA/InfluxDB.Client/blob/master/LICENSE",
+      "releaseNotes": "https://github.com/MikaelGRA/InfluxDB.Client/blob/master/CHANGELOG.md"
    },
-
+   "copyright": "Copyright (c) 2015-2016 MikaelGRA",
+   "dependencies": {
+      "Newtonsoft.Json": "9.0.0"
+   },
    "frameworks": {
       "net45": {
          "frameworkAssemblies": {
@@ -22,17 +22,32 @@
             "System.Runtime.Serialization": "4.0.0.0"
          }
       },
-      "dotnet": {
+      "netstandard1.3": {
          "dependencies": {
-            "Microsoft.CSharp": "4.0.0",
-            "System.Collections": "4.0.10",
-            "System.Collections.Concurrent": "4.0.10",
-            "System.Net.Http": "4.0.0",
-            "System.Runtime": "4.0.20",
-            "System.Runtime.Serialization.Primitives": "4.0.0",
-            "System.Text.Encoding": "4.0.10",
-            "System.Text.Encoding.Extensions": "4.0.10",
-            "System.Linq.Queryable": "4.0.0"
+            "Microsoft.CSharp": "4.0.1",
+            "System.Collections": "4.0.11",
+            "System.Collections.Concurrent": "4.0.12",
+            "System.Net.Http": "4.1.0",
+            "System.Runtime": "4.1.0",
+            "System.Runtime.InteropServices": "4.1.0",
+            "System.Runtime.Serialization.Primitives": "4.1.1",
+            "System.Text.Encoding": "4.0.11",
+            "System.Text.Encoding.Extensions": "4.0.11",
+            "System.Linq.Queryable": "4.0.1",
+            "System.Reflection.TypeExtensions": "4.1.0"
+         }
+      }
+   },
+   "scripts": {
+      "postcompile": [
+         "dotnet pack --no-build --configuration %compile:Configuration%"
+      ]
+   },
+   "configurations": {
+      "Release": {
+         "buildOptions": {
+            "optimize": true,
+            "xmlDoc": true
          }
       }
    }
