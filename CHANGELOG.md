@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.0
+ * Support for influxdb v 0.13
+
 ## 1.0.7
  * Improved performance for reading IInfluxRows from the database.
  * Improved perfomance by following guidelines for ordering of tags/fields when sending to data to influxdb
