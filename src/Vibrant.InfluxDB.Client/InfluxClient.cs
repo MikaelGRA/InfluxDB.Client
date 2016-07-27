@@ -619,8 +619,8 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <param name="tagKey"></param>
       /// <returns></returns>
-      public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsync<TInfluxRow>( string db, string tagKey )
-         where TInfluxRow : new()
+      public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsAsync<TInfluxRow, TValue>( string db, string tagKey )
+         where TInfluxRow : ITagValueRow<TValue>, new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW TAG VALUES WITH KEY = \"{tagKey}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
@@ -634,11 +634,34 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="tagKey"></param>
       /// <param name="measurementName"></param>
       /// <returns></returns>
-      public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsync<TInfluxRow>( string db, string tagKey, string measurementName )
-         where TInfluxRow : new()
+      public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsAsync<TInfluxRow, TValue>( string db, string tagKey, string measurementName )
+         where TInfluxRow : ITagValueRow<TValue>, new()
       {
          var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW TAG VALUES FROM \"{measurementName}\" WITH KEY = \"{tagKey}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
+      }
+
+      /// <summary>
+      /// The SHOW TAG VALUES query returns the set of tag values for a specific tag key across all measurements in the database.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="tagKey"></param>
+      /// <returns></returns>
+      public Task<InfluxResult<TagValueRow>> ShowTagValuesAsync( string db, string tagKey )
+      {
+         return ShowTagValuesAsAsync<TagValueRow, string>( db, tagKey );
+      }
+
+      /// <summary>
+      /// The SHOW TAG VALUES query returns the set of tag values for a specific tag key across all measurements in the database.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="tagKey"></param>
+      /// <param name="measurementName"></param>
+      /// <returns></returns>
+      public Task<InfluxResult<TagValueRow>> ShowTagValuesAsync( string db, string tagKey, string measurementName )
+      {
+         return ShowTagValuesAsAsync<TagValueRow, string>( db, tagKey, measurementName );
       }
 
 
