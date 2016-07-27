@@ -505,10 +505,9 @@ namespace Vibrant.InfluxDB.Client
       /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
       /// <returns></returns>
-      public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db )
-         where TInfluxRow : new()
+      public async Task<InfluxResult<ShowSeriesRow>> ShowSeriesAsync( string db )
       {
-         var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW SERIES", db ).ConfigureAwait( false );
+         var parserResult = await ExecuteQueryInternalAsync<ShowSeriesRow>( $"SHOW SERIES", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
