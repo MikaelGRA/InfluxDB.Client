@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.1.0
+ * Added support for DELETE queries
+
 ## 2.0.0
  * Support for influxdb v 0.13
 
