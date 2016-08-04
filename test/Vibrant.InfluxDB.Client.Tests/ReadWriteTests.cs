@@ -99,6 +99,16 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          var series = result.Series[ 0 ];
          Assert.Equal( 250, series.Rows.Count );
+
+         // attempt deletion
+         await _client.DeleteRangeAsync( InfluxClientFixture.DatabaseName, "computerInfo", from, to );
+         await _client.DeleteAsync( InfluxClientFixture.DatabaseName, "DELETE FROM computerInfo" );
+
+         resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM computerInfo WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'" );
+         Assert.Equal( 1, resultSet.Results.Count );
+
+         result = resultSet.Results[ 0 ];
+         Assert.Equal( 0, result.Series.Count );
       }
 
       [Fact]

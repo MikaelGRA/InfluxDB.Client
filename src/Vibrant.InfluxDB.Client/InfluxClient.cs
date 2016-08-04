@@ -743,11 +743,6 @@ namespace Vibrant.InfluxDB.Client
          return PostInternalIgnoreResultAsync( CreateWriteUrl( db, options ), new InfluxRowContent<TInfluxRow>( rows, getMeasurementName, options.Precision ) );
       }
 
-      public InfluxQuery<TInfluxRow> Query<TInfluxRow>( string db, string measurementName )
-      {
-         return new InfluxQuery<TInfluxRow>( new InfluxQueryProvider( typeof( TInfluxRow ), this, db, measurementName ) );
-      }
-
       /// <summary>
       /// Executes the query and returns the result with the default query options.
       /// </summary>
@@ -773,6 +768,42 @@ namespace Vibrant.InfluxDB.Client
          where TInfluxRow : new()
       {
          return ExecuteQueryInternalAsync<TInfluxRow>( query, db, options );
+      }
+
+      /// <summary>
+      /// Deletes data in accordance with the specified query
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="deleteQuery"></param>
+      /// <returns></returns>
+      public Task DeleteAsync( string db, string deleteQuery )
+      {
+         return ExecuteQueryInternalAsync( deleteQuery, db );
+      }
+
+      /// <summary>
+      /// Deletes all data older than the specified timestamp.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="measurementName"></param>
+      /// <param name="to"></param>
+      /// <returns></returns>
+      public Task DeleteOlderThanAsync( string db, string measurementName, DateTime to )
+      {
+         return DeleteAsync( db, $"DELETE FROM \"{measurementName}\" WHERE time < '{to.ToIso8601()}'" );
+      }
+
+      /// <summary>
+      /// Deletes all data in the specified range.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="measurementName"></param>
+      /// <param name="from"></param>
+      /// <param name="to"></param>
+      /// <returns></returns>
+      public Task DeleteRangeAsync( string  db, string measurementName, DateTime from, DateTime to )
+      {
+         return DeleteAsync( db, $"DELETE FROM \"{measurementName}\" WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'" );
       }
 
       #endregion

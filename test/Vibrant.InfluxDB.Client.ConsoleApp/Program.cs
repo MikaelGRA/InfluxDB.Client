@@ -13,16 +13,6 @@ namespace Vibrant.InfluxDB.Client.ConsoleApp
 
          var from = new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc );
          var to = new DateTime( 2010, 1, 1, 1, 11, 1, DateTimeKind.Utc );
-
-         var query = client.Query<ComputerInfo>( "mydb", "myMeasurementName" )
-            .Where( x => x.Timestamp >= from && x.Timestamp < to )
-            .Select( x => new { test = InfluxFunctions.Sum( x.CPU ), time = x.Timestamp } )
-            .OrderByDescending( x => x.time )
-            .GroupByTime( TimeSpan.FromMinutes( 1 ) );
-
-         var items = query.ToList();
-
-         Console.WriteLine( items.Count );
       }
 
       private static ComputerInfo[] CreateTypedRowsStartingAt( DateTime start, int rows )
