@@ -111,6 +111,38 @@ namespace Vibrant.InfluxDB.Client.Tests
       }
 
       [Fact]
+      public async Task Should_Write_Read_And_Delete_Typed_Data()
+      {
+         for( int i = 0 ; i < 2 ; i++ )
+         {
+            var start = new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc );
+            var infos = InfluxClientFixture.CreateTypedRowsStartingAt( start, 250, false );
+            await _client.WriteAsync( InfluxClientFixture.DatabaseName, "otherData", infos );
+
+            var from = start;
+            var to = from.AddSeconds( 250 );
+
+            var resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM otherData WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'" );
+            Assert.Equal( 1, resultSet.Results.Count );
+
+            var result = resultSet.Results[ 0 ];
+            Assert.Equal( 1, result.Series.Count );
+
+            var series = result.Series[ 0 ];
+            Assert.Equal( 250, series.Rows.Count );
+
+            // attempt deletion
+            await _client.DeleteRangeAsync( InfluxClientFixture.DatabaseName, "otherData", from, to );
+
+            resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM otherData WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'" );
+            Assert.Equal( 1, resultSet.Results.Count );
+
+            result = resultSet.Results[ 0 ];
+            Assert.Equal( 0, result.Series.Count );
+         }
+      }
+
+      [Fact]
       public async Task Should_Write_Type_With_Null_Timestamp()
       {
          var row = new SimpleRow
