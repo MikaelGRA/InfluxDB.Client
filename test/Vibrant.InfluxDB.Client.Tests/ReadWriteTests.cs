@@ -102,7 +102,6 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          // attempt deletion
          await _client.DeleteRangeAsync( InfluxClientFixture.DatabaseName, "computerInfo", from, to );
-         await _client.DeleteAsync( InfluxClientFixture.DatabaseName, "DELETE FROM computerInfo" );
 
          resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM computerInfo WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'" );
          Assert.Equal( 1, resultSet.Results.Count );
