@@ -14,7 +14,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       public const string DatabaseName = "unittestdb";
       //public static readonly string InfluxHost = "http://winflux.westeurope.cloudapp.azure.com:8086";
       //public static readonly string InfluxHost = "http://localhost:8086";
-      public static readonly string InfluxHost = "http://52.174.159.230:8086";
+      public static readonly string InfluxHost = "http://52.174.149.189:8086";
 
       public InfluxClient Client { get; set; }
 

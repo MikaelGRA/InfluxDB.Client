@@ -9,7 +9,7 @@ namespace Vibrant.InfluxDB.Client.ConsoleApp
    {
       public static void Main( string[] args )
       {
-         var client = new InfluxClient( new Uri( "http://13.95.159.186:8086" ), "root", "root" );
+         var client = new InfluxClient( new Uri( "http://52.174.149.189:8086" ), "root", "root" );
 
          var from = new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc );
          var to = new DateTime( 2010, 1, 1, 1, 11, 1, DateTimeKind.Utc );
