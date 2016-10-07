@@ -45,7 +45,7 @@ namespace Vibrant.InfluxDB.Client.Tests
          var rows = result.Series[ 0 ].Rows;
          Assert.Contains( rows, x => x.Name == Unused );
 
-         await _client.DropDatabaseIfExistsAsync( Unused );
+         await _client.DropDatabaseAsync( Unused );
       }
 
       [Fact]

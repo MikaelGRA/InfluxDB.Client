@@ -15,5 +15,11 @@ namespace Vibrant.InfluxDB.Client.Rows
       /// </summary>
       [InfluxField( "fieldKey" )]
       public string FieldKey { get; private set; }
+
+      /// <summary>
+      /// Gets the field type.
+      /// </summary>
+      [InfluxField( "fieldType" )]
+      public string FieldType { get; private set; }
    }
 }

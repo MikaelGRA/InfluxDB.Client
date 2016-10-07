@@ -13,8 +13,8 @@ namespace Vibrant.InfluxDB.Client.Tests
 
       public const string DatabaseName = "unittestdb";
       //public static readonly string InfluxHost = "http://winflux.westeurope.cloudapp.azure.com:8086";
-      //public static readonly string InfluxHost = "http://localhost:8086";
-      public static readonly string InfluxHost = "http://52.174.149.189:8086";
+      public static readonly string InfluxHost = "http://localhost:8086";
+      //public static readonly string InfluxHost = "http://52.174.58.40:8086";
 
       public InfluxClient Client { get; set; }
 
@@ -132,7 +132,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       {
          if ( disposing )
          {
-            Client.DropDatabaseIfExistsAsync( DatabaseName ).Wait();
+            Client.DropDatabaseAsync( DatabaseName ).Wait();
          }
       }
 

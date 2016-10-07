@@ -329,16 +329,6 @@ namespace Vibrant.InfluxDB.Client
       }
 
       /// <summary>
-      /// Delete a database with DROP DATABASE IF EXUSTS,
-      /// </summary>
-      /// <param name="db"></param>
-      /// <returns></returns>
-      public Task DropDatabaseIfExistsAsync( string db )
-      {
-         return ExecuteOperationWithNoResultAsync( $"DROP DATABASE IF EXISTS \"{db}\"" );
-      }
-
-      /// <summary>
       /// Delete a database with DROP DATABASE
       /// </summary>
       /// <param name="db"></param>
