@@ -319,25 +319,11 @@ public async Task<InfluxResult<GrantsRow>> ShowGrantsAsync( string username )
 #region Database Management
 
 /// <summary>
-/// Create a database with CREATE DATABASE IF NOT EXISTS.
-/// </summary>
-/// <param name="db"></param>
-/// <returns></returns>
-public Task CreateDatabaseIfNotExistsAsync( string db )
-
-/// <summary>
 /// Create a database with CREATE DATABASE.
 /// </summary>
 /// <param name="db"></param>
 /// <returns></returns>
 public Task CreateDatabaseAsync( string db )
-
-/// <summary>
-/// Delete a database with DROP DATABASE IF EXUSTS,
-/// </summary>
-/// <param name="db"></param>
-/// <returns></returns>
-public Task DropDatabaseIfExistsAsync( string db )
 
 /// <summary>
 /// Delete a database with DROP DATABASE
@@ -629,10 +615,10 @@ public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, strin
 ```
 
 To get an exact indication for what each of the parameters are refer to the documentation page provided by influxDB:
- * https://docs.influxdata.com/influxdb/v0.9/query_language/data_exploration/
- * https://docs.influxdata.com/influxdb/v0.9/query_language/schema_exploration/
- * https://docs.influxdata.com/influxdb/v0.9/query_language/database_management/
- * https://docs.influxdata.com/influxdb/v0.9/query_language/continuous_queries/
+ * https://docs.influxdata.com/influxdb/v1.0/query_language/data_exploration/
+ * https://docs.influxdata.com/influxdb/v1.0/query_language/schema_exploration/
+ * https://docs.influxdata.com/influxdb/v1.0/query_language/database_management/
+ * https://docs.influxdata.com/influxdb/v1.0/query_language/continuous_queries/
 
 Finally if you need to execute a custom operation or multiple management operations at once, you can use one of the following methods:
 
