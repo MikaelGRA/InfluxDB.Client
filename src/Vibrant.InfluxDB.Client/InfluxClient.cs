@@ -854,11 +854,11 @@ namespace Vibrant.InfluxDB.Client
       {
          if( options.ChunkSize.HasValue )
          {
-            return $"query?db={Uri.EscapeDataString( db )}&q={Uri.EscapeDataString( commandOrQuery )}&precision={options.Precision.GetQueryParameter()}&chunk_size={options.ChunkSize.Value}";
+            return $"query?db={Uri.EscapeDataString( db )}&q={Uri.EscapeDataString( commandOrQuery )}&epoch={options.Precision.GetQueryParameter()}&chunk_size={options.ChunkSize.Value}";
          }
          else
          {
-            return $"query?db={Uri.EscapeDataString( db )}&q={Uri.EscapeDataString( commandOrQuery )}&precision={options.Precision.GetQueryParameter()}";
+            return $"query?db={Uri.EscapeDataString( db )}&q={Uri.EscapeDataString( commandOrQuery )}&epoch={options.Precision.GetQueryParameter()}";
          }
       }
 
