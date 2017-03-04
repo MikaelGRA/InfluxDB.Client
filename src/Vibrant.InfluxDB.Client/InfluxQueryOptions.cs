@@ -16,14 +16,14 @@ namespace Vibrant.InfluxDB.Client
       /// </summary>
       public InfluxQueryOptions()
       {
-         Precision = TimestampPrecision.Nanosecond;
+         Precision = null;
          ChunkSize = null;
       }
 
       /// <summary>
       /// Gets or sets the Precision. Default is nanoseconds.
       /// </summary>
-      public TimestampPrecision Precision { get; set; }
+      public TimestampPrecision? Precision { get; set; }
 
       /// <summary>
       /// Gets or sets the ChunkSize. Default is null. Which means

@@ -15,6 +15,27 @@ namespace Vibrant.InfluxDB.Client
       private static readonly DateTime Epoch = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
       private static readonly long TicksPerMicrosecond = 10;
 
+      internal static DateTime FromEpochTime( long ticks, TimestampPrecision precision )
+      {
+         switch( precision )
+         {
+            case TimestampPrecision.Nanosecond:
+               return Epoch.AddTicks( ticks / 100 );
+            case TimestampPrecision.Microsecond:
+               return Epoch.AddTicks( ticks * TicksPerMicrosecond );
+            case TimestampPrecision.Millisecond:
+               return Epoch.AddMilliseconds( ticks );
+            case TimestampPrecision.Second:
+               return Epoch.AddSeconds( ticks );
+            case TimestampPrecision.Minute:
+               return Epoch.AddMinutes( ticks );
+            case TimestampPrecision.Hours:
+               return Epoch.AddHours( ticks );
+            default:
+               throw new ArgumentException( "Invalid parameter value.", nameof( precision ) );
+         }
+      }
+
       /// <summary>
       /// Returns a long representing the number of ticks (in the given precision) the TimeSpan represents.
       /// </summary>

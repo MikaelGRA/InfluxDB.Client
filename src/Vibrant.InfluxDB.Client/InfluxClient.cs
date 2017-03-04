@@ -852,14 +852,19 @@ namespace Vibrant.InfluxDB.Client
 
       private string CreateQueryUrl( string commandOrQuery, string db, InfluxQueryOptions options )
       {
+         var query = $"query?db={Uri.EscapeDataString( db )}&q={Uri.EscapeDataString( commandOrQuery )}";
+
+         if( options.Precision.HasValue )
+         {
+            query += $"&epoch={options.Precision.Value.GetQueryParameter()}";
+         }
+
          if( options.ChunkSize.HasValue )
          {
-            return $"query?db={Uri.EscapeDataString( db )}&q={Uri.EscapeDataString( commandOrQuery )}&epoch={options.Precision.GetQueryParameter()}&chunk_size={options.ChunkSize.Value}";
+            query += $"&chunk_size={options.ChunkSize.Value}";
          }
-         else
-         {
-            return $"query?db={Uri.EscapeDataString( db )}&q={Uri.EscapeDataString( commandOrQuery )}&epoch={options.Precision.GetQueryParameter()}";
-         }
+
+         return query;
       }
 
       private string CreateQueryUrl( string commandOrQuery, string db )
@@ -888,21 +893,21 @@ namespace Vibrant.InfluxDB.Client
          where TInfluxRow : new()
       {
          var queryResult = await GetInternalAsync( CreateQueryUrl( query, db, options ), true ).ConfigureAwait( false );
-         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, false ).ConfigureAwait( false );
+         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, options.Precision, false ).ConfigureAwait( false );
       }
 
       private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db, bool isMeasurementQuery = false )
          where TInfluxRow : new()
       {
          var queryResult = await GetInternalAsync( CreateQueryUrl( query, db ), isMeasurementQuery ).ConfigureAwait( false );
-         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, !isMeasurementQuery ).ConfigureAwait( false );
+         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, null, !isMeasurementQuery ).ConfigureAwait( false );
       }
 
       private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query )
          where TInfluxRow : new()
       {
          var queryResult = await GetInternalAsync( CreateQueryUrl( query ), false ).ConfigureAwait( false );
-         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, null, false ).ConfigureAwait( false );
+         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, null, null, false ).ConfigureAwait( false );
       }
 
       private async Task<InfluxResultSet> ExecuteQueryInternalAsync( string query, string db )
