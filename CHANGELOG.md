@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.0.1
+ * Fixed issue #7
+
 ## 3.0.0
  * Added support for influxdb 1.0
 
