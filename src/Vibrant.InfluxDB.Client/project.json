@@ -1,5 +1,5 @@
 ﻿{
-   "version": "3.0.1-*",
+   "version": "3.0.2-*",
    "title": "InfluxDB Client for .NET",
    "description": "An easy-to-use client for InfluxDB that supports simple query to object mapping.",
    "authors": [ "MikaelGRA" ],

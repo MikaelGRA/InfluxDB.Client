@@ -847,7 +847,9 @@ namespace Vibrant.InfluxDB.Client
       }
       private string CreateWriteUrl( string db, InfluxWriteOptions options )
       {
-         return $"write?db={Uri.EscapeDataString( db )}&precision={options.Precision.GetQueryParameter()}&consistency={options.Consistency.GetQueryParameter()}";
+         var url = $"write?db={Uri.EscapeDataString( db )}&precision={options.Precision.GetQueryParameter()}&consistency={options.Consistency.GetQueryParameter()}";
+         if (!string.IsNullOrEmpty(options.RetentionPolicy)) url += $"&rp={options.RetentionPolicy}";
+         return url;
       }
 
       private string CreateQueryUrl( string commandOrQuery, string db, InfluxQueryOptions options )

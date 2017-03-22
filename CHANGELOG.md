@@ -1,4 +1,6 @@
 # Changelog
+## 3.0.2 
+ * Added support for RP in write operations. Issue #9.
 
 ## 3.0.1
  * Fixed issue #7

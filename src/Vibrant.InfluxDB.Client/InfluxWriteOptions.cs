@@ -29,5 +29,10 @@ namespace Vibrant.InfluxDB.Client
       /// Gets or sets the precision. Default is nanosecond.
       /// </summary>
       public TimestampPrecision Precision { get; set; }
+
+      /// <summary>
+      /// Gets or sets the retention policy to write. If omitted (null, default), writes go to database's default RP.
+      /// </summary>
+      public string RetentionPolicy { get; set; } 
    }
 }
