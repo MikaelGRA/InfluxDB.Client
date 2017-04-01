@@ -1,4 +1,9 @@
 # Changelog
+## 3.0.3
+ * Fixed chunking support. #11 
+ * Changed newtonsoft json dependency to actually existing version.
+ * Change InfluxException throwing behaviour such that they are only throw in case of non-200 status code or other internal exception
+
 ## 3.0.2 
  * Added support for RP in write operations. Issue #9.
 
