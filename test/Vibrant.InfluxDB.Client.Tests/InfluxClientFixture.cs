@@ -14,7 +14,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       public const string DatabaseName = "unittestdb";
       //public static readonly string InfluxHost = "http://winflux.westeurope.cloudapp.azure.com:8086";
       //public static readonly string InfluxHost = "http://localhost:8086"; http://ipv4.fiddler
-      public static readonly string InfluxHost = "http://ipv4.fiddler:8086"; 
+      public static readonly string InfluxHost = "http://ipv4.fiddler:8086";
       //public static readonly string InfluxHost = "http://52.174.58.40:8086";
 
       public InfluxClient Client { get; set; }
@@ -35,14 +35,14 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          var timestamp = start;
          var infos = new ComputerInfo[ rows ];
-         for ( int i = 0 ; i < rows ; i++ )
+         for( int i = 0 ; i < rows ; i++ )
          {
             long ram = rng.Next( int.MaxValue );
             double cpu = rng.NextDouble();
             string region = Regions[ rng.Next( Regions.Length ) ];
             string host = Hosts[ rng.Next( Hosts.Length ) ];
 
-            if ( includeNulls )
+            if( includeNulls )
             {
                var info = new ComputerInfo { Timestamp = timestamp, RAM = ram, Region = region };
                infos[ i ] = info;
@@ -65,12 +65,12 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          var timestamp = start;
          var infos = new EnumeratedRow[ rows ];
-         for ( int i = 0 ; i < rows ; i++ )
+         for( int i = 0 ; i < rows ; i++ )
          {
             var value = rng.NextDouble();
             var type = TestEnums[ rng.Next( TestEnums.Length ) ];
 
-            var info = new EnumeratedRow { Timestamp = timestamp, Value = value,  Type = type };
+            var info = new EnumeratedRow { Timestamp = timestamp, Value = value, Type = type };
             infos[ i ] = info;
 
             timestamp = timestamp.AddSeconds( 1 );
@@ -85,7 +85,7 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          var timestamp = start;
          var infos = new DynamicInfluxRow[ rows ];
-         for ( int i = 0 ; i < rows ; i++ )
+         for( int i = 0 ; i < rows ; i++ )
          {
             long ram = rng.Next( int.MaxValue );
             double cpu = rng.NextDouble();
@@ -121,7 +121,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       /// </summary>
       public void Dispose()
       {
-         if ( !_disposed )
+         if( !_disposed )
          {
             Dispose( true );
             _disposed = true;
@@ -131,7 +131,7 @@ namespace Vibrant.InfluxDB.Client.Tests
 
       private void Dispose( bool disposing )
       {
-         if ( disposing )
+         if( disposing )
          {
             Client.DropDatabaseAsync( DatabaseName ).Wait();
          }

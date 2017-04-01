@@ -51,8 +51,15 @@ namespace Vibrant.InfluxDB.Client.Parsers
          {
             foreach( var result in queryResult.Results )
             {
-               // FIXME: May override stuff
-               results[ result.StatementId ] = new InfluxResult( result.StatementId, result.Error );
+               InfluxResult existingResult;
+               if( !results.TryGetValue( result.StatementId, out existingResult ) )
+               {
+                  results.Add( result.StatementId, new InfluxResult( result.StatementId, result.Error ) );
+               }
+               else
+               {
+                  existingResult.AppendErrorMessage( result.Error );
+               }
             }
          }
          return new InfluxResultSet( results.Values.ToList() );
@@ -95,8 +102,13 @@ namespace Vibrant.InfluxDB.Client.Parsers
                   existingResult = new InfluxResult<TInfluxRow>( result.StatementId, result.Error ?? ( result.Series == null ? Errors.UnexpectedQueryResult : null ) );
                   results.Add( result.StatementId, existingResult );
                }
-               
-               if( result.Series != null && result.Error == null )
+               else
+               {
+                  existingResult.AppendErrorMessage( result.Error );
+               }
+
+               // TODO: What if error message is given in following query?
+               if( existingResult.Succeeded )
                {
                   foreach( var series in result.Series )
                   {
@@ -150,7 +162,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                            tags.Add( kvp.Key, value );
                         }
                      }
-                     var influxSerie = existingResult.FindGroupInternal( name, tags );
+                     var influxSerie = existingResult.FindGroupInternal( name, tags, true );
                      if( influxSerie == null )
                      {
                         influxSerie = new InfluxSeries<TInfluxRow>( name, tags );
@@ -249,8 +261,12 @@ namespace Vibrant.InfluxDB.Client.Parsers
                   existingResult = new InfluxResult<TInfluxRow>( result.StatementId, result.Error ?? ( result.Series == null ? Errors.UnexpectedQueryResult : null ) );
                   results.Add( result.StatementId, existingResult );
                }
+               else
+               {
+                  existingResult.AppendErrorMessage( result.Error );
+               }
 
-               if( existingResult.ErrorMessage == null )
+               if( existingResult.Succeeded )
                {
                   foreach( var series in result.Series )
                   {
@@ -261,7 +277,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
 
                      // create influx series
                      var tags = series.Tags?.ToDictionary( x => x.Key, x => x.Value == string.Empty ? null : (object)x.Value ) ?? null;
-                     var influxSerie = existingResult.FindGroupInternal( name, tags );
+                     var influxSerie = existingResult.FindGroupInternal( name, tags, true );
                      if( influxSerie == null )
                      {
                         influxSerie = new InfluxSeries<TInfluxRow>( name, tags );

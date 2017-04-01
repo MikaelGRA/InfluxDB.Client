@@ -969,13 +969,11 @@ namespace Vibrant.InfluxDB.Client
                if( isMeasurementsQuery )
                {
                   var queryResult = await response.Content.ReadMultipleAsJsonAsync<QueryResult>().ConfigureAwait( false );
-                  EnsureValidQueryResult( queryResult, isMeasurementsQuery );
                   return queryResult;
                }
                else
                {
                   var queryResult = await response.Content.ReadAsJsonAsync<QueryResult>().ConfigureAwait( false );
-                  EnsureValidQueryResult( queryResult, isMeasurementsQuery );
                   return new[] { queryResult };
                }
             }
@@ -1000,7 +998,6 @@ namespace Vibrant.InfluxDB.Client
                if( response.StatusCode == HttpStatusCode.OK )
                {
                   var queryResult = await response.Content.ReadAsJsonAsync<QueryResult>().ConfigureAwait( false );
-                  EnsureValidQueryResult( queryResult, false );
                }
             }
          }
@@ -1019,7 +1016,6 @@ namespace Vibrant.InfluxDB.Client
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
                var queryResult = await response.Content.ReadAsJsonAsync<QueryResult>().ConfigureAwait( false );
-               EnsureValidQueryResult( queryResult, isMeasurementsQuery );
                return queryResult;
             }
          }
@@ -1058,52 +1054,6 @@ namespace Vibrant.InfluxDB.Client
          catch( HttpRequestException e )
          {
             throw new InfluxException( Errors.UnknownError, e );
-         }
-      }
-
-      private void EnsureValidQueryResult( List<QueryResult> queryResults, bool isMeasurementsQuery )
-      {
-         // If there is only one result, we will throw an exception
-         if( queryResults.Count == 1 )
-         {
-            var queryResult = queryResults[ 0 ];
-            if( queryResult.Results.Count == 1 )
-            {
-               var resultWrapper = queryResult.Results[ 0 ];
-               if( resultWrapper.Error != null )
-               {
-                  throw new InfluxException( resultWrapper.Error );
-               }
-
-               // COMMENT: We really should throw exception here, but we are unable to
-               // distinguish between "no data" and "error query"
-
-               //if ( isMeasurementsQuery && resultWrapper.Series == null )
-               //{
-               //   throw new InfluxException( Errors.UnexpectedQueryResult );
-               //}
-            }
-         }
-      }
-
-      private void EnsureValidQueryResult( QueryResult queryResult, bool isMeasurementsQuery )
-      {
-         // If there is only one result, we will throw an exception
-         if( queryResult.Results.Count == 1 )
-         {
-            var resultWrapper = queryResult.Results[ 0 ];
-            if( resultWrapper.Error != null )
-            {
-               throw new InfluxException( resultWrapper.Error );
-            }
-
-            // COMMENT: We really should throw exception here, but we are unable to
-            // distinguish between "no data" and "error query"
-
-            //if ( isMeasurementsQuery && resultWrapper.Series == null )
-            //{
-            //   throw new InfluxException( Errors.UnexpectedQueryResult );
-            //}
          }
       }
 

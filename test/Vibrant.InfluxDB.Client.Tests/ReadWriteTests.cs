@@ -26,9 +26,10 @@ namespace Vibrant.InfluxDB.Client.Tests
          var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 20000, false );
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos );
 
-         _client.DefaultQueryOptions.ChunkSize = 1000;
-
-         var resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, "select * from computerInfo" );
+         var resultSet = await _client.ReadAsync<ComputerInfo>( 
+            InfluxClientFixture.DatabaseName, 
+            "select * from computerInfo",
+            new InfluxQueryOptions { ChunkSize = 1000 } );
 
          var result = resultSet.Results[ 0 ];
          Assert.Equal( 1, result.Series.Count );
@@ -201,6 +202,29 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          var result = resultSet.Results[ 0 ];
          foreach ( var region in InfluxClientFixture.Regions )
+         {
+            var kvp = new KeyValuePair<string, object>( "region", region );
+            var group = result.FindGroup( "groupedComputerInfo", new[] { kvp } );
+            Assert.NotNull( group );
+         }
+      }
+
+      [Fact]
+      public async Task Should_Write_And_Query_Grouped_Data_With_Chunking()
+      {
+         var start = new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc );
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( start, 5000, false );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo", infos );
+
+         var resultSet = await _client.ReadAsync<ComputerInfo>( 
+            InfluxClientFixture.DatabaseName, 
+            $"SELECT * FROM groupedComputerInfo GROUP BY region",
+            new InfluxQueryOptions { ChunkSize = 100 } );
+
+         Assert.Equal( 1, resultSet.Results.Count );
+
+         var result = resultSet.Results[ 0 ];
+         foreach( var region in InfluxClientFixture.Regions )
          {
             var kvp = new KeyValuePair<string, object>( "region", region );
             var group = result.FindGroup( "groupedComputerInfo", new[] { kvp } );
