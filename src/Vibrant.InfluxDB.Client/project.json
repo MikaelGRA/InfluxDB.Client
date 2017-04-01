@@ -28,6 +28,7 @@
             "System.Collections": "4.0.11",
             "System.Collections.Concurrent": "4.0.12",
             "System.Net.Http": "4.1.0",
+            "System.Net.Sockets": "4.1.0",
             "System.Runtime": "4.1.0",
             "System.Runtime.InteropServices": "4.1.0",
             "System.Runtime.Serialization.Primitives": "4.1.1",

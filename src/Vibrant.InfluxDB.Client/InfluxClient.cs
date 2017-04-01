@@ -90,7 +90,7 @@ namespace Vibrant.InfluxDB.Client
       public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery, string db )
          where TInfluxRow : new()
       {
-         return ExecuteQueryInternalAsync<TInfluxRow>( commandOrQuery, db, false );
+         return ExecuteQueryInternalAsync<TInfluxRow>( commandOrQuery, db );
       }
 
       /// <summary>
@@ -427,7 +427,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<ContinuousQueryRow>> ShowContinuousQueries( string db )
       {
-         var parserResult = await ExecuteQueryInternalAsync<ContinuousQueryRow>( "SHOW CONTINUOUS QUERIES", db, false ).ConfigureAwait( false );
+         var parserResult = await ExecuteQueryInternalAsync<ContinuousQueryRow>( "SHOW CONTINUOUS QUERIES", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -791,7 +791,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="from"></param>
       /// <param name="to"></param>
       /// <returns></returns>
-      public Task DeleteRangeAsync( string  db, string measurementName, DateTime from, DateTime to )
+      public Task DeleteRangeAsync( string db, string measurementName, DateTime from, DateTime to )
       {
          return DeleteAsync( db, $"DELETE FROM \"{measurementName}\" WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'" );
       }
@@ -848,7 +848,7 @@ namespace Vibrant.InfluxDB.Client
       private string CreateWriteUrl( string db, InfluxWriteOptions options )
       {
          var url = $"write?db={Uri.EscapeDataString( db )}&precision={options.Precision.GetQueryParameter()}&consistency={options.Consistency.GetQueryParameter()}";
-         if (!string.IsNullOrEmpty(options.RetentionPolicy)) url += $"&rp={options.RetentionPolicy}";
+         if( !string.IsNullOrEmpty( options.RetentionPolicy ) ) url += $"&rp={options.RetentionPolicy}";
          return url;
       }
 
@@ -863,7 +863,7 @@ namespace Vibrant.InfluxDB.Client
 
          if( options.ChunkSize.HasValue )
          {
-            query += $"&chunk_size={options.ChunkSize.Value}";
+            query += $"&chunked=true&chunk_size={options.ChunkSize.Value}";
          }
 
          return query;
@@ -898,11 +898,11 @@ namespace Vibrant.InfluxDB.Client
          return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, options.Precision, false ).ConfigureAwait( false );
       }
 
-      private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db, bool isMeasurementQuery = false )
+      private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db )
          where TInfluxRow : new()
       {
-         var queryResult = await GetInternalAsync( CreateQueryUrl( query, db ), isMeasurementQuery ).ConfigureAwait( false );
-         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, null, !isMeasurementQuery ).ConfigureAwait( false );
+         var queryResult = await GetInternalAsync( CreateQueryUrl( query, db ), false ).ConfigureAwait( false );
+         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, null, true ).ConfigureAwait( false );
       }
 
       private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query )
@@ -920,8 +920,8 @@ namespace Vibrant.InfluxDB.Client
 
       private async Task<InfluxResultSet> ExecuteQueryInternalAsync( string query )
       {
-         var queryResult = await GetInternalAsync( CreateQueryUrl( query ), false ).ConfigureAwait( false );
-         return ResultSetFactory.Create( queryResult );
+         var queryResults = await GetInternalAsync( CreateQueryUrl( query ), false ).ConfigureAwait( false );
+         return ResultSetFactory.Create( queryResults );
       }
 
       private Task<InfluxPingResult> ExecutePingInternalAsync( int? secondsToWaitForLeader )
@@ -958,7 +958,7 @@ namespace Vibrant.InfluxDB.Client
          }
       }
 
-      private async Task<QueryResult> GetInternalAsync( string url, bool isMeasurementsQuery )
+      private async Task<IEnumerable<QueryResult>> GetInternalAsync( string url, bool isMeasurementsQuery )
       {
          try
          {
@@ -966,9 +966,18 @@ namespace Vibrant.InfluxDB.Client
             using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
-               var queryResult = await response.Content.ReadAsJsonAsync<QueryResult>().ConfigureAwait( false );
-               EnsureValidQueryResult( queryResult, isMeasurementsQuery );
-               return queryResult;
+               if( isMeasurementsQuery )
+               {
+                  var queryResult = await response.Content.ReadMultipleAsJsonAsync<QueryResult>().ConfigureAwait( false );
+                  EnsureValidQueryResult( queryResult, isMeasurementsQuery );
+                  return queryResult;
+               }
+               else
+               {
+                  var queryResult = await response.Content.ReadAsJsonAsync<QueryResult>().ConfigureAwait( false );
+                  EnsureValidQueryResult( queryResult, isMeasurementsQuery );
+                  return new[] { queryResult };
+               }
             }
          }
          catch( HttpRequestException e )
@@ -1049,6 +1058,31 @@ namespace Vibrant.InfluxDB.Client
          catch( HttpRequestException e )
          {
             throw new InfluxException( Errors.UnknownError, e );
+         }
+      }
+
+      private void EnsureValidQueryResult( List<QueryResult> queryResults, bool isMeasurementsQuery )
+      {
+         // If there is only one result, we will throw an exception
+         if( queryResults.Count == 1 )
+         {
+            var queryResult = queryResults[ 0 ];
+            if( queryResult.Results.Count == 1 )
+            {
+               var resultWrapper = queryResult.Results[ 0 ];
+               if( resultWrapper.Error != null )
+               {
+                  throw new InfluxException( resultWrapper.Error );
+               }
+
+               // COMMENT: We really should throw exception here, but we are unable to
+               // distinguish between "no data" and "error query"
+
+               //if ( isMeasurementsQuery && resultWrapper.Series == null )
+               //{
+               //   throw new InfluxException( Errors.UnexpectedQueryResult );
+               //}
+            }
          }
       }
 

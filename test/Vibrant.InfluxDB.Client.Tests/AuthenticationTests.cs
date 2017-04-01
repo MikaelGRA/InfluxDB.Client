@@ -101,6 +101,9 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          await _client.GrantPrivilegeAsync( InfluxClientFixture.DatabaseName, DatabasePriviledge.Read, "at4User" );
 
+         // REALLY don't know why this is needed
+         await Task.Delay( 200 );
+
          var result = await _client.ShowGrantsAsync( "at4User" );
          Assert.Equal( 1, result.Series.Count );
 

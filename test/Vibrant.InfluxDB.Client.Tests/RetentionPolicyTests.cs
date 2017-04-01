@@ -22,7 +22,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       [Fact]
       public async Task Should_Write_And_Read_Data_From_Non_Default_RP()
       {
-         _client.CreateRetentionPolicyAsync( InfluxClientFixture.DatabaseName, RpName, "1h", 1, false ).Wait();
+         _client.CreateRetentionPolicyAsync( InfluxClientFixture.DatabaseName, RpName, "2h2m", 1, false ).Wait();
          var rps = await _client.ShowRetentionPoliciesAsync( InfluxClientFixture.DatabaseName );
 
          Assert.True( rps.Succeeded );
@@ -33,8 +33,8 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          var policy = rpSeries.Rows.FirstOrDefault( row => row.Name == RpName );
          Assert.NotNull( policy );
-         Assert.Equal( "1h0m0s", policy.Duration );
-
+         Assert.Equal( "2h2m0s", policy.Duration );
+         
          var infos = InfluxClientFixture.CreateTypedRowsStartingAt( DateTime.UtcNow.AddHours( -2 ), 2 * 60 * 60, false );
 
          var options = new InfluxWriteOptions

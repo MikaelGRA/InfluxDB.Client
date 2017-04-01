@@ -13,10 +13,12 @@ namespace Vibrant.InfluxDB.Client
    /// <typeparam name="TInfluxRow"></typeparam>
    public class InfluxSeries<TInfluxRow>
    {
-      internal InfluxSeries( string name, List<TInfluxRow> dataPoints, IDictionary<string, object> tags )
+      private List<TInfluxRow> _rows;
+
+      internal InfluxSeries( string name, IDictionary<string, object> tags )
       {
          Name = name;
-         Rows = dataPoints;
+         _rows = new List<TInfluxRow>();
          if ( tags != null )
          {
             GroupedTags = new ReadOnlyDictionary<string, object>( tags );
@@ -36,6 +38,11 @@ namespace Vibrant.InfluxDB.Client
       /// <summary>
       /// Gets the rows of the InfluxSeries.
       /// </summary>
-      public IReadOnlyList<TInfluxRow> Rows { get; private set; }
+      public IReadOnlyList<TInfluxRow> Rows => _rows;
+
+      internal void AddRows( IEnumerable<TInfluxRow> rows )
+      {
+         _rows.AddRange( rows );
+      }
    }
 }

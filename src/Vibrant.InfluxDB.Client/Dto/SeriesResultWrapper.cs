@@ -13,5 +13,8 @@ namespace Vibrant.InfluxDB.Client.Dto
 
       [JsonProperty( "error" )]
       internal string Error { get; set; }
+
+      [JsonProperty( "statement_id" )]
+      internal int StatementId { get; set; }
    }
 }

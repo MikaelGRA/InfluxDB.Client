@@ -10,8 +10,9 @@ namespace Vibrant.InfluxDB.Client
    /// </summary>
    public class InfluxResult
    {
-      internal InfluxResult( string error )
+      internal InfluxResult( int statementId, string error )
       {
+         StatementId = statementId;
          ErrorMessage = error;
          Succeeded = error == null;
       }
@@ -25,6 +26,11 @@ namespace Vibrant.InfluxDB.Client
       /// Gets an indication of whether the operation succeeded.
       /// </summary>
       public bool Succeeded { get; private set; }
+
+      /// <summary>
+      /// Gets or sets the statement id.
+      /// </summary>
+      public int StatementId { get; set; }
    }
 
    /// <summary>
@@ -33,33 +39,45 @@ namespace Vibrant.InfluxDB.Client
    /// <typeparam name="TInfluxRow"></typeparam>
    public class InfluxResult<TInfluxRow> : InfluxResult
    {
-      internal InfluxResult( List<InfluxSeries<TInfluxRow>> series, string error )
-         : base( error )
+      private List<InfluxSeries<TInfluxRow>> _series;
+
+      internal InfluxResult( int statementId, string error )
+         : base( statementId, error )
       {
-         Series = series;
+         _series = new List<InfluxSeries<TInfluxRow>>();
       }
 
       /// <summary>
       /// Gets the series.
       /// </summary>
-      public IReadOnlyList<InfluxSeries<TInfluxRow>> Series { get; private set; }
+      public IReadOnlyList<InfluxSeries<TInfluxRow>> Series => _series;
 
       /// <summary>
       /// Finds the serie that can be identified by the specified tags.
       /// </summary>
       /// <param name="tags"></param>
       /// <returns></returns>
-      public InfluxSeries<TInfluxRow> FindGroup( IEnumerable<KeyValuePair<string, object>> tags )
+      public InfluxSeries<TInfluxRow> FindGroup( string seriesName, IEnumerable<KeyValuePair<string, object>> tags )
       {
-         if ( tags == null )
+         if( tags == null )
             throw new ArgumentNullException( nameof( tags ) );
 
-         if ( Series.Any( x => x.GroupedTags == null ) )
+         if( Series.Any( x => x.GroupedTags == null ) )
             throw new InvalidOperationException( "This query result set is not grouped." );
 
-         foreach ( var result in Series )
+         return FindGroupInternal( seriesName, tags );
+      }
+
+      internal void AddInfluxSeries( InfluxSeries<TInfluxRow> series )
+      {
+         _series.Add( series );
+      }
+
+      internal InfluxSeries<TInfluxRow> FindGroupInternal( string seriesName, IEnumerable<KeyValuePair<string, object>> tags )
+      {
+         foreach( var result in Series )
          {
-            if ( Matches( result, tags ) )
+            if( Matches( result, seriesName, tags ) )
             {
                return result;
             }
@@ -67,16 +85,27 @@ namespace Vibrant.InfluxDB.Client
          return null;
       }
 
-      private bool Matches( InfluxSeries<TInfluxRow> result, IEnumerable<KeyValuePair<string, object>> tags )
+
+      private bool Matches( InfluxSeries<TInfluxRow> result, string seriesName, IEnumerable<KeyValuePair<string, object>> tags )
       {
-         foreach ( var tag in tags )
+         if( result.Name != seriesName )
+         {
+            return false;
+         }
+
+         if( result.GroupedTags == null && ( tags == null || tags.Count() == 0 ) )
+         {
+            return true;
+         }
+
+         foreach( var tag in tags )
          {
             object tagValue;
-            if ( result.GroupedTags.TryGetValue( tag.Key, out tagValue ) )
+            if( result.GroupedTags.TryGetValue( tag.Key, out tagValue ) )
             {
-               if ( tagValue != null )
+               if( tagValue != null )
                {
-                  if ( !tagValue.Equals( tag.Value ) )
+                  if( !tagValue.Equals( tag.Value ) )
                   {
                      return false;
                   }

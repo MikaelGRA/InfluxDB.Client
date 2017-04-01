@@ -20,6 +20,23 @@ namespace Vibrant.InfluxDB.Client.Tests
          _client = fixture.Client;
       }
 
+      [Fact]
+      public async Task Should_Write_Typed_Rows_To_Database_With_Chunking()
+      {
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 20000, false );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos );
+
+         _client.DefaultQueryOptions.ChunkSize = 1000;
+
+         var resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, "select * from computerInfo" );
+
+         var result = resultSet.Results[ 0 ];
+         Assert.Equal( 1, result.Series.Count );
+
+         var series = result.Series[ 0 ];
+         Assert.Equal( 20000, series.Rows.Count );
+      }
+
       [Theory]
       [InlineData( 500 )]
       [InlineData( 1000 )]
@@ -28,6 +45,14 @@ namespace Vibrant.InfluxDB.Client.Tests
       {
          var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows, false );
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos );
+
+         var resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, "select * from computerInfo" );
+
+         var result = resultSet.Results[ 0 ];
+         Assert.Equal( 1, result.Series.Count );
+
+         var series = result.Series[ 0 ];
+         Assert.Equal( rows, series.Rows.Count );
       }
 
       [Theory]
@@ -178,7 +203,7 @@ namespace Vibrant.InfluxDB.Client.Tests
          foreach ( var region in InfluxClientFixture.Regions )
          {
             var kvp = new KeyValuePair<string, object>( "region", region );
-            var group = result.FindGroup( new[] { kvp } );
+            var group = result.FindGroup( "groupedComputerInfo", new[] { kvp } );
             Assert.NotNull( group );
          }
       }
@@ -197,7 +222,7 @@ namespace Vibrant.InfluxDB.Client.Tests
          foreach ( var type in InfluxClientFixture.TestEnums )
          {
             var kvp = new KeyValuePair<string, object>( "type", type );
-            var group = result.FindGroup( new[] { kvp } );
+            var group = result.FindGroup( "groupedEnumeratedRows", new[] { kvp } );
             Assert.NotNull( group );
          }
       }
