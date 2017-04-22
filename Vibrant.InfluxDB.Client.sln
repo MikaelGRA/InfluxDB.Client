@@ -1,22 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{026FE852-A7D4-4337-A135-9BFCD67F101B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{153A7EA8-EFED-48C7-8097-B95C903A0397}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.InfluxDB.Client", "src\Vibrant.InfluxDB.Client\Vibrant.InfluxDB.Client.xproj", "{85CA1A00-439F-4BA7-B024-6C8D62F2216D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{ADF0BC7C-6CC0-468F-B64D-0FFCCDA39C73}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.InfluxDB.Client.Tests", "test\Vibrant.InfluxDB.Client.Tests\Vibrant.InfluxDB.Client.Tests.xproj", "{E3BEA4A7-87D7-4E09-B2C0-04E7EA11FF43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vibrant.InfluxDB.Client", "src\Vibrant.InfluxDB.Client\Vibrant.InfluxDB.Client.csproj", "{85CA1A00-439F-4BA7-B024-6C8D62F2216D}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Vibrant.InfluxDB.Client.ConsoleApp", "test\Vibrant.InfluxDB.Client.ConsoleApp\Vibrant.InfluxDB.Client.ConsoleApp.xproj", "{6924A02F-A83D-4DA5-B800-FCBFC7A97C7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vibrant.InfluxDB.Client.Tests", "test\Vibrant.InfluxDB.Client.Tests\Vibrant.InfluxDB.Client.Tests.csproj", "{E3BEA4A7-87D7-4E09-B2C0-04E7EA11FF43}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vibrant.InfluxDB.Client.ConsoleApp", "test\Vibrant.InfluxDB.Client.ConsoleApp\Vibrant.InfluxDB.Client.ConsoleApp.csproj", "{6924A02F-A83D-4DA5-B800-FCBFC7A97C7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
