@@ -42,6 +42,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       public async Task Should_Create_Show_And_Delete_User()
       {
          await _client.CreateUserAsync( "at2User", "somePassword" );
+         await Task.Delay(200);
 
          var result = await _client.ShowUsersAsync();
          Assert.Equal( 1, result.Series.Count );
@@ -50,7 +51,7 @@ namespace Vibrant.InfluxDB.Client.Tests
          Assert.Contains( series.Rows, x => x.Username == "at2User" && !x.IsAdmin );
 
          await _client.DropUserAsync( "at2User" );
-
+         await Task.Delay(200);
          result = await _client.ShowUsersAsync();
          Assert.Equal( 1, result.Series.Count );
 
