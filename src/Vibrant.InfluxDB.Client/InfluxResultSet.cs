@@ -11,7 +11,7 @@ namespace Vibrant.InfluxDB.Client
    /// <typeparam name="TInfluxRow"></typeparam>
    public class InfluxResultSet<TInfluxRow>
    {
-      internal InfluxResultSet( List<InfluxResult<TInfluxRow>> results )
+      public InfluxResultSet( List<InfluxResult<TInfluxRow>> results )
       {
          Results = results;
       }
@@ -27,7 +27,7 @@ namespace Vibrant.InfluxDB.Client
    /// </summary>
    public class InfluxResultSet
    {
-      internal InfluxResultSet( List<InfluxResult> results )
+      public InfluxResultSet( List<InfluxResult> results )
       {
          Results = results;
       }

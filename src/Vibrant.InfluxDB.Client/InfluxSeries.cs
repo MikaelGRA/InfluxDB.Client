@@ -15,7 +15,7 @@ namespace Vibrant.InfluxDB.Client
    {
       private List<TInfluxRow> _rows;
 
-      internal InfluxSeries( string name, IDictionary<string, object> tags )
+      public InfluxSeries( string name, IDictionary<string, object> tags )
       {
          Name = name;
          _rows = new List<TInfluxRow>();
@@ -40,7 +40,7 @@ namespace Vibrant.InfluxDB.Client
       /// </summary>
       public IReadOnlyList<TInfluxRow> Rows => _rows;
 
-      internal void AddRows( IEnumerable<TInfluxRow> rows )
+      public void AddRows( IEnumerable<TInfluxRow> rows )
       {
          _rows.AddRange( rows );
       }

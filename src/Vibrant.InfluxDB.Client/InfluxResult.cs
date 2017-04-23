@@ -10,7 +10,7 @@ namespace Vibrant.InfluxDB.Client
    /// </summary>
    public class InfluxResult
    {
-      internal InfluxResult( int statementId, string error )
+      public InfluxResult( int statementId, string error )
       {
          StatementId = statementId;
          ErrorMessage = error;
@@ -32,7 +32,7 @@ namespace Vibrant.InfluxDB.Client
       /// </summary>
       public int StatementId { get; private set; }
 
-      internal void AppendErrorMessage( string message )
+      public void AppendErrorMessage( string message )
       {
          if( message != null )
          {
@@ -55,7 +55,7 @@ namespace Vibrant.InfluxDB.Client
    {
       private List<InfluxSeries<TInfluxRow>> _series;
 
-      internal InfluxResult( int statementId, string error )
+      public InfluxResult( int statementId, string error )
          : base( statementId, error )
       {
          _series = new List<InfluxSeries<TInfluxRow>>();
@@ -102,7 +102,7 @@ namespace Vibrant.InfluxDB.Client
          return FindGroupInternal( seriesName, tags, true );
       }
 
-      internal void AddInfluxSeries( InfluxSeries<TInfluxRow> series )
+      public void AddInfluxSeries( InfluxSeries<TInfluxRow> series )
       {
          _series.Add( series );
       }
