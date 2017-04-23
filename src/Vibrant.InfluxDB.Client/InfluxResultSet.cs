@@ -19,7 +19,7 @@ namespace Vibrant.InfluxDB.Client
       /// <summary>
       /// Gets the results.
       /// </summary>
-      public IReadOnlyList<InfluxResult<TInfluxRow>> Results { get; private set; }
+      public List<InfluxResult<TInfluxRow>> Results { get; set; }
    }
 
    /// <summary>
@@ -35,6 +35,6 @@ namespace Vibrant.InfluxDB.Client
       /// <summary>
       /// Gets the results.
       /// </summary>
-      public IReadOnlyList<InfluxResult> Results { get; private set; }
+      public List<InfluxResult> Results { get; set; }
    }
 }

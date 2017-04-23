@@ -53,18 +53,16 @@ namespace Vibrant.InfluxDB.Client
    /// <typeparam name="TInfluxRow"></typeparam>
    public class InfluxResult<TInfluxRow> : InfluxResult
    {
-      private List<InfluxSeries<TInfluxRow>> _series;
-
       public InfluxResult( int statementId, string error )
          : base( statementId, error )
       {
-         _series = new List<InfluxSeries<TInfluxRow>>();
+         Series = new List<InfluxSeries<TInfluxRow>>();
       }
 
       /// <summary>
       /// Gets the series.
       /// </summary>
-      public IReadOnlyList<InfluxSeries<TInfluxRow>> Series => _series;
+      public List<InfluxSeries<TInfluxRow>> Series { get; set; }
 
       /// <summary>
       /// Finds the serie that can be identified by the specified tags. 
@@ -104,7 +102,7 @@ namespace Vibrant.InfluxDB.Client
 
       public void AddInfluxSeries( InfluxSeries<TInfluxRow> series )
       {
-         _series.Add( series );
+         Series.Add( series );
       }
 
       internal InfluxSeries<TInfluxRow> FindGroupInternal( string seriesName, IEnumerable<KeyValuePair<string, object>> tags, bool requireNameComparison )
