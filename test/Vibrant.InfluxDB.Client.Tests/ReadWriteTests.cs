@@ -23,6 +23,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       [Fact]
       public async Task Should_Write_Typed_Rows_To_Database_With_Chunking()
       {
+         await _client.DropMeasurementAsync(InfluxClientFixture.DatabaseName, "computerInfo");
          var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 20000, false );
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos );
 
@@ -44,12 +45,13 @@ namespace Vibrant.InfluxDB.Client.Tests
       [InlineData( 20000 )]
       public async Task Should_Write_Typed_Rows_To_Database( int rows )
       {
+         await _client.DropMeasurementAsync(InfluxClientFixture.DatabaseName, "computerInfo");
          var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows, false );
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos );
 
-         var resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, "select * from computerInfo" );
+         var secondResultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, "select * from computerInfo" );
 
-         var result = resultSet.Results[ 0 ];
+         var result = secondResultSet.Results[ 0 ];
          Assert.Equal( 1, result.Series.Count );
 
          var series = result.Series[ 0 ];
