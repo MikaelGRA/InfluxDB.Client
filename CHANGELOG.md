@@ -1,4 +1,8 @@
 # Changelog
+## 3.0.4
+ * Fixed issue #12
+ * Fixed internal tests so they no longer collide
+
 ## 3.0.3
  * Fixed chunking support. #11 
  * Changed newtonsoft json dependency to actually existing version.
