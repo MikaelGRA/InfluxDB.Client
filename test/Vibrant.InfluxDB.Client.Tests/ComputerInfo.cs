@@ -23,6 +23,17 @@ namespace Vibrant.InfluxDB.Client.Tests
       [InfluxField( "ram" )]
       internal long RAM { get; set; }
    }
+   public class ComputedComputerInfo
+   {
+      [InfluxTimestamp]
+      internal DateTime Timestamp { get; set; }
+
+      [InfluxComputed( "cpu" )]
+      internal double? CPU { get; set; }
+
+      [InfluxComputed( "ram" )]
+      internal long RAM { get; set; }
+   }
 
    public class ComputerInfoMeta
    {

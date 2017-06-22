@@ -4,7 +4,6 @@
     <Description>An easy-to-use client for InfluxDB that supports simple query to object mapping.</Description>
     <Copyright>Copyright (c) 2015-2016 MikaelGRA</Copyright>
     <AssemblyTitle>InfluxDB Client for .NET</AssemblyTitle>
-    <VersionPrefix>3.0.3</VersionPrefix>
     <Authors>MikaelGRA</Authors>
     <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
     <AssemblyName>Vibrant.InfluxDB.Client</AssemblyName>
@@ -21,7 +20,7 @@
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>3.0.4</Version>
+    <Version>3.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

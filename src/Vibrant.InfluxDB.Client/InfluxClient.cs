@@ -84,25 +84,25 @@ namespace Vibrant.InfluxDB.Client
       /// Executes an arbitrary command that returns a table as a result.
       /// </summary>
       /// <typeparam name="TInfluxRow"></typeparam>
-      /// <param name="commandOrQuery"></param>
+      /// <param name="command"></param>
       /// <param name="db"></param>
       /// <returns></returns>
-      public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery, string db )
+      public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string command, string db )
          where TInfluxRow : new()
       {
-         return ExecuteQueryInternalAsync<TInfluxRow>( commandOrQuery, db );
+         return ExecuteQueryInternalAsync<TInfluxRow>( command, db );
       }
 
       /// <summary>
       /// Executes an arbitrary command or query that returns a table as a result.
       /// </summary>
       /// <typeparam name="TInfluxRow"></typeparam>
-      /// <param name="commandOrQuery"></param>
+      /// <param name="command"></param>
       /// <returns></returns>
-      public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery )
+      public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string command )
          where TInfluxRow : new()
       {
-         return ExecuteQueryInternalAsync<TInfluxRow>( commandOrQuery );
+         return ExecuteQueryInternalAsync<TInfluxRow>( command );
       }
 
       /// <summary>
@@ -798,38 +798,37 @@ namespace Vibrant.InfluxDB.Client
 
       #endregion
 
-      internal async Task<DatabaseMeasurementInfo> GetMetaInformationAsync( string db, string measurementName, bool forceRefresh )
+      internal async Task<DatabaseMeasurementInfo> GetMetaInformationAsync( string db, string measurementName, TimeSpan? expiration )
       {
          var key = new DatabaseMeasurementInfoKey( db, measurementName );
          DatabaseMeasurementInfo info;
 
-         if( !forceRefresh )
+         lock( _seriesMetaCache )
          {
-            lock( _seriesMetaCache )
+            _seriesMetaCache.TryGetValue( key, out info );
+         }
+
+         var now = DateTime.UtcNow;
+         if( info != null )
+         {
+            if( !expiration.HasValue ) // info never expires
             {
-               if( _seriesMetaCache.TryGetValue( key, out info ) )
-               {
-                  return info;
-               }
+               return info;
+            }
+
+            if( now - info.Timestamp < expiration.Value ) // has not expired
+            {
+               return info;
             }
          }
+         
+         // has expired or never existed, lets retrieve it
 
          // get metadata information from the store
-         var fieldTask = ShowFieldKeysAsync( db, measurementName );
-         var tagTask = ShowTagKeysAsync( db, measurementName );
-         await Task.WhenAll( fieldTask, tagTask ).ConfigureAwait( false );
+         var tagsResult = await ShowTagKeysAsync( db, measurementName );
+         var tags = tagsResult.Series.FirstOrDefault()?.Rows;
 
-         var fields = fieldTask.Result.Series.FirstOrDefault()?.Rows;
-         var tags = tagTask.Result.Series.FirstOrDefault()?.Rows;
-
-         info = new DatabaseMeasurementInfo();
-         if( fields != null )
-         {
-            foreach( var row in fields )
-            {
-               info.Fields.Add( row.FieldKey );
-            }
-         }
+         info = new DatabaseMeasurementInfo( now );
          if( tags != null )
          {
             foreach( var row in tags )
@@ -895,21 +894,21 @@ namespace Vibrant.InfluxDB.Client
          where TInfluxRow : new()
       {
          var queryResult = await GetInternalAsync( CreateQueryUrl( query, db, options ), true ).ConfigureAwait( false );
-         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, options.Precision, false ).ConfigureAwait( false );
+         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, options.Precision, true, options.MetadataExpiration ).ConfigureAwait( false );
       }
 
       private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db )
          where TInfluxRow : new()
       {
          var queryResult = await GetInternalAsync( CreateQueryUrl( query, db ), false ).ConfigureAwait( false );
-         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, null, true ).ConfigureAwait( false );
+         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, null, false, null ).ConfigureAwait( false );
       }
 
       private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query )
          where TInfluxRow : new()
       {
          var queryResult = await GetInternalAsync( CreateQueryUrl( query ), false ).ConfigureAwait( false );
-         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, null, null, false ).ConfigureAwait( false );
+         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, null, null, false, null ).ConfigureAwait( false );
       }
 
       private async Task<InfluxResultSet> ExecuteQueryInternalAsync( string query, string db )

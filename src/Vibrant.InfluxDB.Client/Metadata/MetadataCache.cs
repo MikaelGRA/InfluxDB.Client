@@ -23,6 +23,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
 
             if ( !_typeCache.TryGetValue( type, out cache ) )
             {
+               var computed = new List<PropertyExpressionInfo<TInfluxRow>>();
                var tags = new List<PropertyExpressionInfo<TInfluxRow>>();
                var fields = new List<PropertyExpressionInfo<TInfluxRow>>();
                var all = new List<PropertyExpressionInfo<TInfluxRow>>();
@@ -31,6 +32,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
                {
                   var fieldAttribute = propertyInfo.GetCustomAttribute<InfluxFieldAttribute>();
                   var tagAttribute = propertyInfo.GetCustomAttribute<InfluxTagAttribute>();
+                  var computedAttribute = propertyInfo.GetCustomAttribute<InfluxComputedAttribute>();
                   var timestampAttribute = propertyInfo.GetCustomAttribute<InfluxTimestampAttribute>();
 
                   // list all attributes so we can ensure the attributes specified on a property are valid
@@ -85,9 +87,25 @@ namespace Vibrant.InfluxDB.Client.Metadata
                      tags.Add( expression );
                      all.Add( expression );
                   }
+                  else if( computedAttribute != null )
+                  {
+                     var expression = new PropertyExpressionInfo<TInfluxRow>( computedAttribute.Name, propertyInfo );
+                     if( !_validFieldTypes.Contains( expression.Type ) && !expression.Type.GetTypeInfo().IsEnum )
+                     {
+                        throw new InfluxException( string.Format( Errors.InvalidComputedType, propertyInfo.Name, type.Name ) );
+                     }
+
+                     if( string.IsNullOrEmpty( computedAttribute.Name ) )
+                     {
+                        throw new InfluxException( string.Format( Errors.InvalidNameProperty, propertyInfo.Name, type.Name ) );
+                     }
+
+                     computed.Add( expression );
+                     all.Add( expression );
+                  }
                }
 
-               cache = new InfluxRowTypeInfo<TInfluxRow>( timestamp, tags, fields, all );
+               cache = new InfluxRowTypeInfo<TInfluxRow>( timestamp, tags, fields, computed, all );
 
                _typeCache.Add( typeof( TInfluxRow ), cache );
             }
