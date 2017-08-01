@@ -26,6 +26,15 @@ namespace Vibrant.InfluxDB.Client.Http
          Serializer = JsonSerializer.CreateDefault( settings );
       }
 
+      internal async static Task<JsonStreamObjectIterator> GetObjectIteratorAsync( this HttpContent content, CancellationToken cancellationToken = default( CancellationToken ) )
+      {
+         if( content == null )
+            throw new ArgumentNullException( nameof( content ) );
+
+         var readOnlyStream = await content.ReadAsStreamAsync().ConfigureAwait( false );
+         return new JsonStreamObjectIterator( readOnlyStream, Serializer );
+      }
+
       internal static Task<T> ReadAsJsonAsync<T>( this HttpContent content, CancellationToken cancellationToken = default( CancellationToken ) )
       {
          if( content == null )

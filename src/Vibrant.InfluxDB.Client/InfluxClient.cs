@@ -760,6 +760,12 @@ namespace Vibrant.InfluxDB.Client
          return ExecuteQueryInternalAsync<TInfluxRow>( query, db, options );
       }
 
+      public Task<InfluxChunkedResultSet<TInfluxRow>> ReadChunkedAsync<TInfluxRow>( string db, string query )
+         where TInfluxRow : new()
+      {
+         return ExecuteQueryInternalAsync<TInfluxRow>( query, db, DefaultQueryOptions );
+      }
+
       /// <summary>
       /// Deletes data in accordance with the specified query
       /// </summary>
@@ -890,6 +896,13 @@ namespace Vibrant.InfluxDB.Client
          }
       }
 
+      private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryByObjectIteratorInternalAsync<TInfluxRow>( string query, string db, InfluxQueryOptions options )
+         where TInfluxRow : new()
+      {
+         var objectIterator = await GetInternalByObjectIteratorAsync( CreateQueryUrl( query, db, options ) ).ConfigureAwait( false );
+         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, options.Precision, true, options.MetadataExpiration ).ConfigureAwait( false );
+      }
+
       private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db, InfluxQueryOptions options )
          where TInfluxRow : new()
       {
@@ -949,6 +962,27 @@ namespace Vibrant.InfluxDB.Client
                IEnumerable<string> version = null;
                response.Headers.TryGetValues( "X-Influxdb-Version", out version );
                return new InfluxPingResult { Version = version?.FirstOrDefault() ?? "unknown" };
+            }
+         }
+         catch( HttpRequestException e )
+         {
+            throw new InfluxException( Errors.UnknownError, e );
+         }
+      }
+
+      private async Task<JsonStreamObjectIterator> GetInternalByObjectIteratorAsync( string url )
+      {
+         try
+         {
+            // FIXME: Using here is bad, object iterator must know when to clean up!!!
+
+            using( var request = new HttpRequestMessage( HttpMethod.Get, url ) )
+            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
+            {
+               await EnsureSuccessCode( response ).ConfigureAwait( false );
+
+               var queryResult = await response.Content.GetObjectIteratorAsync().ConfigureAwait( false );
+               return queryResult;
             }
          }
          catch( HttpRequestException e )

@@ -102,126 +102,20 @@ namespace Vibrant.InfluxDB.Client.Parsers
                   foreach( var series in result.Series )
                   {
                      var name = series.Name;
-                     var columns = series.Columns;
-                     var dataPoints = new List<TInfluxRow>();
 
                      // create new dictionary, with correct typing (we must potentially convert strings to enums, if the column being used in the GROUP BY is an enum)
-                     Dictionary<string, object> tags = null;
-                     if( series.Tags != null )
-                     {
-                        tags = new Dictionary<string, object>();
-                        foreach( var kvp in series.Tags )
-                        {
-                           object value;
-                           if( !string.IsNullOrEmpty( kvp.Value ) )
-                           {
-                              PropertyExpressionInfo<TInfluxRow> property;
-                              if( propertyMap.TryGetValue( kvp.Key, out property ) )
-                              {
-                                 // we know this is either an enum or a string
-                                 if( property.IsEnum )
-                                 {
-                                    Enum valueAsEnum;
-                                    if( property.StringToEnum.TryGetValue( kvp.Value, out valueAsEnum ) )
-                                    {
-                                       value = valueAsEnum;
-                                    }
-                                    else
-                                    {
-                                       // could not find the value, simply use the string representation
-                                       value = kvp.Value;
-                                    }
-                                 }
-                                 else
-                                 {
-                                    // since kvp.Value is just a string, so go for it
-                                    value = kvp.Value;
-                                 }
-                              }
-                              else
-                              {
-                                 value = kvp.Value;
-                              }
-                           }
-                           else
-                           {
-                              value = null;
-                           }
+                     var tags = CreateTagDictionaryFromSerieBasedOnAttributes( series, propertyMap );
 
-                           tags.Add( kvp.Key, value );
-                        }
-                     }
+                     // find or create influx serie
                      var influxSerie = existingResult.FindGroupInternal( name, tags, true );
                      if( influxSerie == null )
                      {
                         influxSerie = new InfluxSeries<TInfluxRow>( name, tags );
                         existingResult.AddInfluxSeries( influxSerie );
                      }
-
-                     // Values will be null, if there are no entries in the result set
-                     if( series.Values != null )
-                     {
-                        // construct an array of properties based on the same indexing as the columns returned by the query
-                        var properties = new PropertyExpressionInfo<TInfluxRow>[ columns.Count ];
-                        for( int i = 0 ; i < columns.Count ; i++ )
-                        {
-                           PropertyExpressionInfo<TInfluxRow> propertyInfo;
-                           if( propertyMap.TryGetValue( columns[ i ], out propertyInfo ) )
-                           {
-                              properties[ i ] = propertyInfo;
-                           }
-                        }
-
-                        foreach( var values in series.Values )
-                        {
-                           // construct the data points based on the attributes
-                           var row = new TInfluxRow();
-
-                           // if we implement IHaveMeasurementName, set the measurement name on the IInfluxRow as well
-                           var seriesDataPoint = dataPoints as IHaveMeasurementName;
-                           if( seriesDataPoint != null )
-                           {
-                              seriesDataPoint.MeasurementName = name;
-                           }
-
-                           for( int i = 0 ; i < values.Count ; i++ )
-                           {
-                              var value = values[ i ]; // TODO: What about NULL values? Are they treated as empty strings or actual nulls?
-                              var property = properties[ i ];
-
-                              // set the value based on the property, if both the value and property is not null
-                              if( property != null )
-                              {
-                                 if( value != null )
-                                 {
-                                    if( property.IsDateTime )
-                                    {
-                                       if( value is string )
-                                       {
-                                          property.SetValue( row, DateTime.Parse( (string)value, CultureInfo.InvariantCulture, DateTimeStyles ) );
-                                       }
-                                       else if( value is long )
-                                       {
-                                          property.SetValue( row, DateTimeExtensions.FromEpochTime( (long)value, precision.Value ) );
-                                       }
-                                    }
-                                    else if( property.IsEnum )
-                                    {
-                                       property.SetValue( row, property.GetEnumValue( value ) );
-                                    }
-                                    else
-                                    {
-                                       property.SetValue( row, Convert.ChangeType( value, property.Type, CultureInfo.InvariantCulture ) );
-                                    }
-                                 }
-                              }
-                           }
-
-                           dataPoints.Add( row );
-                        }
-                     }
-
-                     influxSerie.AddRows( dataPoints );
+                     
+                     // add data to found serie
+                     AddValuesToInfluxSeriesByAttributes( influxSerie, series, precision, propertyMap );
                   }
                }
             }
@@ -230,6 +124,137 @@ namespace Vibrant.InfluxDB.Client.Parsers
          return new InfluxResultSet<TInfluxRow>( results.Values.ToList() );
       }
 
+      private static void AddValuesToInfluxSeriesByAttributes<TInfluxRow>(
+         InfluxSeries<TInfluxRow> influxSerie,
+         SeriesResult series,
+         TimestampPrecision? precision,
+         IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> propertyMap )
+         where TInfluxRow : new()
+      {
+
+         // Values will be null, if there are no entries in the result set
+         if( series.Values != null )
+         {
+            var dataPoints = new List<TInfluxRow>();
+
+            var columns = series.Columns;
+            var name = series.Name;
+
+            // construct an array of properties based on the same indexing as the columns returned by the query
+            var properties = new PropertyExpressionInfo<TInfluxRow>[ columns.Count ];
+            for( int i = 0 ; i < columns.Count ; i++ )
+            {
+               PropertyExpressionInfo<TInfluxRow> propertyInfo;
+               if( propertyMap.TryGetValue( columns[ i ], out propertyInfo ) )
+               {
+                  properties[ i ] = propertyInfo;
+               }
+            }
+
+            foreach( var values in series.Values )
+            {
+               // construct the data points based on the attributes
+               var row = new TInfluxRow();
+
+               // if we implement IHaveMeasurementName, set the measurement name on the IInfluxRow as well
+               var seriesDataPoint = dataPoints as IHaveMeasurementName;
+               if( seriesDataPoint != null )
+               {
+                  seriesDataPoint.MeasurementName = name;
+               }
+
+               for( int i = 0 ; i < values.Count ; i++ )
+               {
+                  var value = values[ i ]; // TODO: What about NULL values? Are they treated as empty strings or actual nulls?
+                  var property = properties[ i ];
+
+                  // set the value based on the property, if both the value and property is not null
+                  if( property != null )
+                  {
+                     if( value != null )
+                     {
+                        if( property.IsDateTime )
+                        {
+                           if( value is string )
+                           {
+                              property.SetValue( row, DateTime.Parse( (string)value, CultureInfo.InvariantCulture, DateTimeStyles ) );
+                           }
+                           else if( value is long )
+                           {
+                              property.SetValue( row, DateTimeExtensions.FromEpochTime( (long)value, precision.Value ) );
+                           }
+                        }
+                        else if( property.IsEnum )
+                        {
+                           property.SetValue( row, property.GetEnumValue( value ) );
+                        }
+                        else
+                        {
+                           property.SetValue( row, Convert.ChangeType( value, property.Type, CultureInfo.InvariantCulture ) );
+                        }
+                     }
+                  }
+               }
+
+               dataPoints.Add( row );
+            }
+
+            influxSerie.AddRows( dataPoints );
+         }
+      }
+
+      private static Dictionary<string, object> CreateTagDictionaryFromSerieBasedOnAttributes<TInfluxRow>( 
+         SeriesResult series, 
+         IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> propertyMap )
+      {
+         Dictionary<string, object> tags = null;
+         if( series.Tags != null )
+         {
+            tags = new Dictionary<string, object>();
+            foreach( var kvp in series.Tags )
+            {
+               object value;
+               if( !string.IsNullOrEmpty( kvp.Value ) )
+               {
+                  PropertyExpressionInfo<TInfluxRow> property;
+                  if( propertyMap.TryGetValue( kvp.Key, out property ) )
+                  {
+                     // we know this is either an enum or a string
+                     if( property.IsEnum )
+                     {
+                        Enum valueAsEnum;
+                        if( property.StringToEnum.TryGetValue( kvp.Value, out valueAsEnum ) )
+                        {
+                           value = valueAsEnum;
+                        }
+                        else
+                        {
+                           // could not find the value, simply use the string representation
+                           value = kvp.Value;
+                        }
+                     }
+                     else
+                     {
+                        // since kvp.Value is just a string, so go for it
+                        value = kvp.Value;
+                     }
+                  }
+                  else
+                  {
+                     value = kvp.Value;
+                  }
+               }
+               else
+               {
+                  value = null;
+               }
+
+               tags.Add( kvp.Key, value );
+            }
+         }
+         return tags;
+      }
+      
       private async static Task<InfluxResultSet<TInfluxRow>> CreateBasedOnInterfaceAsync<TInfluxRow>(
          InfluxClient client,
          IEnumerable<QueryResult> queryResults,
@@ -261,12 +286,11 @@ namespace Vibrant.InfluxDB.Client.Parsers
                   foreach( var series in result.Series )
                   {
                      var name = series.Name;
-                     var columns = series.Columns;
-                     var dataPoints = new List<TInfluxRow>();
-                     var setters = new Action<IInfluxRow, string, object>[ columns.Count ];
 
                      // create influx series
                      var tags = series.Tags?.ToDictionary( x => x.Key, x => x.Value == string.Empty ? null : (object)x.Value ) ?? null;
+
+                     // find or create influx serie
                      var influxSerie = existingResult.FindGroupInternal( name, tags, true );
                      if( influxSerie == null )
                      {
@@ -274,84 +298,103 @@ namespace Vibrant.InfluxDB.Client.Parsers
                         existingResult.AddInfluxSeries( influxSerie );
                      }
 
-                     // Values will be null, if there are no entries in the result set
-                     if( series.Values != null )
-                     {
-                        // Get metadata information about the measurement we are querying, as we dont know
-                        // which columns are tags/fields otherwise
-
-                        // PROBLEM: Should NOT always be called!
-                        DatabaseMeasurementInfo meta = null;
-                        if( allowMetadataQuerying )
-                        {
-                           meta = await client.GetMetaInformationAsync( db, name, metadataExpiration ).ConfigureAwait( false ); ;
-                        }
-
-                        for( int i = 0 ; i < columns.Count ; i++ )
-                        {
-                           var columnName = columns[ i ];
-
-                           if( !allowMetadataQuerying )
-                           {
-                              setters[ i ] = ( row, fieldName, value ) => row.SetField( fieldName, value );
-                           }
-                           else if( columnName == InfluxConstants.TimeColumn )
-                           {
-                              setters[ i ] = ( row, timeName, value ) =>
-                              {
-                                 if( value is string )
-                                 {
-                                    row.SetTimestamp( DateTime.Parse( (string)value, CultureInfo.InvariantCulture, DateTimeStyles ) );
-                                 }
-                                 else if( value is long )
-                                 {
-                                    row.SetTimestamp( DateTimeExtensions.FromEpochTime( (long)value, precision.Value ) );
-                                 }
-                              };
-                           }
-                           else if( meta.Tags.Contains( columnName ) )
-                           {
-                              setters[ i ] = ( row, tagName, value ) => row.SetTag( tagName, (string)value );
-                           }
-                           else
-                           {
-                              setters[ i ] = ( row, fieldName, value ) => row.SetField( fieldName, value );
-                           }
-                        }
-
-                        // constructs the IInfluxRows using the IInfluxRow interface
-                        foreach( var values in series.Values )
-                        {
-                           var dataPoint = (IInfluxRow)new TInfluxRow();
-
-                           // if we implement IHaveMeasurementName, set the measurement name on the IInfluxRow as well
-                           var seriesDataPoint = dataPoints as IHaveMeasurementName;
-                           if( seriesDataPoint != null )
-                           {
-                              seriesDataPoint.MeasurementName = name;
-                           }
-
-                           // go through all values that are stored as a List<List<object>>
-                           for( int i = 0 ; i < values.Count ; i++ )
-                           {
-                              var value = values[ i ]; // TODO: What about NULL values? Are they treated as empty strings or actual nulls?
-                              if( value != null )
-                              {
-                                 setters[ i ]( dataPoint, columns[ i ], value );
-                              }
-                           }
-
-                           dataPoints.Add( (TInfluxRow)dataPoint );
-                        }
-                     }
-
-                     influxSerie.AddRows( dataPoints );
+                     // add data to found series
+                     await AddValuesToInfluxSeriesByInterfaceAsync( influxSerie, series, client, db, precision, allowMetadataQuerying, metadataExpiration );
                   }
                }
             }
          }
 
          return new InfluxResultSet<TInfluxRow>( results.Values.ToList() );
+      }
+
+
+      private static async Task AddValuesToInfluxSeriesByInterfaceAsync<TInfluxRow>(
+         InfluxSeries<TInfluxRow> influxSerie,
+         SeriesResult series,
+         InfluxClient client,
+         string db,
+         TimestampPrecision? precision,
+         bool allowMetadataQuerying,
+         TimeSpan? metadataExpiration )
+         where TInfluxRow : new()
+      {
+         // Values will be null, if there are no entries in the result set
+         if( series.Values != null )
+         {
+            var name = series.Name;
+            var columns = series.Columns;
+            var setters = new Action<IInfluxRow, string, object>[ columns.Count ];
+            var dataPoints = new List<TInfluxRow>();
+            // Get metadata information about the measurement we are querying, as we dont know
+            // which columns are tags/fields otherwise
+
+            // PROBLEM: Should NOT always be called!
+            DatabaseMeasurementInfo meta = null;
+            if( allowMetadataQuerying )
+            {
+               meta = await client.GetMetaInformationAsync( db, name, metadataExpiration ).ConfigureAwait( false ); ;
+            }
+
+            for( int i = 0 ; i < columns.Count ; i++ )
+            {
+               var columnName = columns[ i ];
+
+               if( !allowMetadataQuerying )
+               {
+                  setters[ i ] = ( row, fieldName, value ) => row.SetField( fieldName, value );
+               }
+               else if( columnName == InfluxConstants.TimeColumn )
+               {
+                  setters[ i ] = ( row, timeName, value ) =>
+                  {
+                     if( value is string )
+                     {
+                        row.SetTimestamp( DateTime.Parse( (string)value, CultureInfo.InvariantCulture, DateTimeStyles ) );
+                     }
+                     else if( value is long )
+                     {
+                        row.SetTimestamp( DateTimeExtensions.FromEpochTime( (long)value, precision.Value ) );
+                     }
+                  };
+               }
+               else if( meta.Tags.Contains( columnName ) )
+               {
+                  setters[ i ] = ( row, tagName, value ) => row.SetTag( tagName, (string)value );
+               }
+               else
+               {
+                  setters[ i ] = ( row, fieldName, value ) => row.SetField( fieldName, value );
+               }
+            }
+
+            // constructs the IInfluxRows using the IInfluxRow interface
+            foreach( var values in series.Values )
+            {
+               var dataPoint = (IInfluxRow)new TInfluxRow();
+
+               // if we implement IHaveMeasurementName, set the measurement name on the IInfluxRow as well
+               var seriesDataPoint = dataPoints as IHaveMeasurementName;
+               if( seriesDataPoint != null )
+               {
+                  seriesDataPoint.MeasurementName = name;
+               }
+
+               // go through all values that are stored as a List<List<object>>
+               for( int i = 0 ; i < values.Count ; i++ )
+               {
+                  var value = values[ i ]; // TODO: What about NULL values? Are they treated as empty strings or actual nulls?
+                  if( value != null )
+                  {
+                     setters[ i ]( dataPoint, columns[ i ], value );
+                  }
+               }
+
+               dataPoints.Add( (TInfluxRow)dataPoint );
+            }
+
+            influxSerie.AddRows( dataPoints );
+         }
       }
    }
 }
