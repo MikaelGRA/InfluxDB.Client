@@ -996,7 +996,7 @@ namespace Vibrant.InfluxDB.Client
          try
          {
             using( var request = new HttpRequestMessage( HttpMethod.Get, url ) )
-            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
+            using( var response = await _client.SendAsync( request ).ConfigureAwait( false ) )
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
                if( isMeasurementsQuery )
@@ -1022,7 +1022,7 @@ namespace Vibrant.InfluxDB.Client
          try
          {
             using( var request = new HttpRequestMessage( HttpMethod.Get, url ) )
-            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
+            using( var response = await _client.SendAsync( request ).ConfigureAwait( false ) )
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
 
@@ -1045,7 +1045,7 @@ namespace Vibrant.InfluxDB.Client
          try
          {
             using( var request = new HttpRequestMessage( HttpMethod.Post, url ) { Content = new StringContent( "" ) } )
-            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
+            using( var response = await _client.SendAsync( request ).ConfigureAwait( false ) )
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
                var queryResult = await response.Content.ReadAsJsonAsync<QueryResult>().ConfigureAwait( false );
@@ -1063,7 +1063,7 @@ namespace Vibrant.InfluxDB.Client
          try
          {
             using( var request = new HttpRequestMessage( HttpMethod.Post, url ) { Content = content } )
-            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
+            using( var response = await _client.SendAsync( request ).ConfigureAwait( false ) )
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
             }
@@ -1079,7 +1079,7 @@ namespace Vibrant.InfluxDB.Client
          try
          {
             using( var request = new HttpRequestMessage( HttpMethod.Post, url ) { Content = new StringContent( "" ) } )
-            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
+            using( var response = await _client.SendAsync( request ).ConfigureAwait( false ) )
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
             }

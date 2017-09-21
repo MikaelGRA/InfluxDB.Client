@@ -150,7 +150,11 @@ namespace Vibrant.InfluxDB.Client
                }
                else
                {
-                  return tag.Value == null;
+                  // tagValue is null, so only continue if tag.Value is also null
+                  if( tag.Value != null )
+                  {
+                     return false;
+                  }
                }
             }
          }
