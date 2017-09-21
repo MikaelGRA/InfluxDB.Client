@@ -12,7 +12,8 @@ namespace Vibrant.InfluxDB.Client.Resources
       internal static readonly string CountNotConvertEnumToString = "Could not convert the incominng value {0} to the enum on the property {1} on the type {2}.";
       internal static readonly string IndeterminateColumns = "Could not determine which columns in the returned data are tags and which are fields.";
       internal static readonly string InvalidFieldType = "The property {0} on the type {1} which is used as an InfluxField must be one of the following types: string, double, long, bool, DateTime, Nullable<double>, Nullable<long>, Nullable<bool>, Nullable<DateTime> or a user-defined enum.";
-      internal static readonly string InvalidNameProperty = "The property {0} on the type {1} must specify a non-empty name for either an InfluxField or InfluxTag.";
+      internal static readonly string InvalidComputedType = "The property {0} on the type {1} which is used as an InfluxComputed must be one of the following types: string, double, long, bool, DateTime, Nullable<double>, Nullable<long>, Nullable<bool>, Nullable<DateTime> or a user-defined enum.";
+      internal static readonly string InvalidNameProperty = "The property {0} on the type {1} must specify a non-empty name for either an InfluxField, InfluxTag or InfluxComputed.";
       internal static readonly string InvalidTagType = "The property {0} on the type {1} which is used as an InfluxTag must be either a string or a user-defined enum.";
       internal static readonly string InvalidTimestampType = "The property {0} on the type {1} which is used as the InfluxTimestamp must be either a DateTime or a Nullable<DateTime>.";
       internal static readonly string MultipleAttributesOnSingleProperty = "The property {0} on the type {1} has multiple InfluxAttributes. This is not allowed. Please specify only InfluxTimestamp, InfluxTag or InfluxField.";

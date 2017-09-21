@@ -23,13 +23,12 @@ namespace Vibrant.InfluxDB.Client.Tests
       [Fact]
       public async Task Should_Write_Typed_Rows_To_Database_With_Chunking()
       {
-         await _client.DropMeasurementAsync(InfluxClientFixture.DatabaseName, "computerInfo");
          var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 20000, false );
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo1", infos );
 
-         var resultSet = await _client.ReadAsync<ComputerInfo>( 
-            InfluxClientFixture.DatabaseName, 
-            "select * from computerInfo",
+         var resultSet = await _client.ReadAsync<ComputerInfo>(
+            InfluxClientFixture.DatabaseName,
+            "select * from computerInfo1",
             new InfluxQueryOptions { ChunkSize = 1000 } );
 
          var result = resultSet.Results[ 0 ];
@@ -40,16 +39,15 @@ namespace Vibrant.InfluxDB.Client.Tests
       }
 
       [Theory]
-      [InlineData( 500 )]
-      [InlineData( 1000 )]
-      [InlineData( 20000 )]
-      public async Task Should_Write_Typed_Rows_To_Database( int rows )
+      [InlineData( 500, 2011, "computerInfo2_500" )]
+      [InlineData( 1000, 2012, "computerInfo2_1000" )]
+      [InlineData( 20000, 2013, "computerInfo2_20000" )]
+      public async Task Should_Write_Typed_Rows_To_Database( int rows, int startYear, string tableName )
       {
-         await _client.DropMeasurementAsync(InfluxClientFixture.DatabaseName, "computerInfo");
-         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows, false );
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos );
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( startYear, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows, false );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, tableName, infos );
 
-         var secondResultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, "select * from computerInfo" );
+         var secondResultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"select * from {tableName}" );
 
          var result = secondResultSet.Results[ 0 ];
          Assert.Equal( 1, result.Series.Count );
@@ -59,23 +57,23 @@ namespace Vibrant.InfluxDB.Client.Tests
       }
 
       [Theory]
-      [InlineData( 500 )]
-      [InlineData( 1000 )]
-      [InlineData( 20000 )]
-      public async Task Should_Write_Typed_Rows_With_Nulls_To_Database( int rows )
+      [InlineData( 500, 2011 )]
+      [InlineData( 1000, 2012 )]
+      [InlineData( 20000, 2013 )]
+      public async Task Should_Write_Typed_Rows_With_Nulls_To_Database( int rows, int startYear )
       {
-         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows, true );
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos );
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( startYear, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows, true );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo3", infos );
       }
 
       [Theory]
-      [InlineData( 500 )]
-      [InlineData( 1000 )]
-      [InlineData( 20000 )]
-      public async Task Should_Write_Dynamic_Rows_To_Database( int rows )
+      [InlineData( 500, 2011 )]
+      [InlineData( 1000, 2012 )]
+      [InlineData( 20000, 2013 )]
+      public async Task Should_Write_Dynamic_Rows_To_Database( int rows, int startYear )
       {
-         var infos = InfluxClientFixture.CreateDynamicRowsStartingAt( new DateTime( 2012, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows );
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos );
+         var infos = InfluxClientFixture.CreateDynamicRowsStartingAt( new DateTime( startYear, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo4", infos );
       }
 
       [Fact]
@@ -113,13 +111,13 @@ namespace Vibrant.InfluxDB.Client.Tests
       {
          var start = new DateTime( 2013, 1, 1, 1, 1, 1, DateTimeKind.Utc );
          var infos = InfluxClientFixture.CreateTypedRowsStartingAt( start, 500, false );
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo", infos );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo5", infos );
 
 
          var from = start;
          var to = from.AddSeconds( 250 );
 
-         var resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM computerInfo WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'" );
+         var resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM computerInfo5 WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'" );
          Assert.Equal( 1, resultSet.Results.Count );
 
          var result = resultSet.Results[ 0 ];
@@ -129,9 +127,9 @@ namespace Vibrant.InfluxDB.Client.Tests
          Assert.Equal( 250, series.Rows.Count );
 
          // attempt deletion
-         await _client.DeleteRangeAsync( InfluxClientFixture.DatabaseName, "computerInfo", from, to );
+         await _client.DeleteRangeAsync( InfluxClientFixture.DatabaseName, "computerInfo5", from, to );
 
-         resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM computerInfo WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'" );
+         resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM computerInfo5 WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'" );
          Assert.Equal( 1, resultSet.Results.Count );
 
          result = resultSet.Results[ 0 ];
@@ -197,16 +195,16 @@ namespace Vibrant.InfluxDB.Client.Tests
       {
          var start = new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc );
          var infos = InfluxClientFixture.CreateTypedRowsStartingAt( start, 5000, false );
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo", infos );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo1", infos );
 
-         var resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedComputerInfo GROUP BY region" );
+         var resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedComputerInfo1 GROUP BY region" );
          Assert.Equal( 1, resultSet.Results.Count );
 
          var result = resultSet.Results[ 0 ];
-         foreach ( var region in InfluxClientFixture.Regions )
+         foreach( var region in InfluxClientFixture.Regions )
          {
             var kvp = new KeyValuePair<string, object>( "region", region );
-            var group = result.FindGroup( "groupedComputerInfo", new[] { kvp } );
+            var group = result.FindGroup( "groupedComputerInfo1", new[] { kvp } );
             Assert.NotNull( group );
          }
       }
@@ -216,11 +214,11 @@ namespace Vibrant.InfluxDB.Client.Tests
       {
          var start = new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc );
          var infos = InfluxClientFixture.CreateTypedRowsStartingAt( start, 5000, false );
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo", infos );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo2", infos );
 
-         var resultSet = await _client.ReadAsync<ComputerInfo>( 
-            InfluxClientFixture.DatabaseName, 
-            $"SELECT * FROM groupedComputerInfo GROUP BY region",
+         var resultSet = await _client.ReadAsync<ComputerInfo>(
+            InfluxClientFixture.DatabaseName,
+            $"SELECT * FROM groupedComputerInfo2 GROUP BY region",
             new InfluxQueryOptions { ChunkSize = 100 } );
 
          Assert.Equal( 1, resultSet.Results.Count );
@@ -229,7 +227,27 @@ namespace Vibrant.InfluxDB.Client.Tests
          foreach( var region in InfluxClientFixture.Regions )
          {
             var kvp = new KeyValuePair<string, object>( "region", region );
-            var group = result.FindGroup( "groupedComputerInfo", new[] { kvp } );
+            var group = result.FindGroup( "groupedComputerInfo2", new[] { kvp } );
+            Assert.NotNull( group );
+         }
+      }
+
+      [Fact]
+      public async Task Should_Write_And_Query_Grouped_Data_Using_Computed_Columns()
+      {
+         var start = new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc );
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( start, 5000, false );
+         var end = infos.Last().Timestamp;
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo3", infos );
+
+         var resultSet = await _client.ReadAsync<ComputedComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT MEAN(cpu) AS cpu, COUNT(ram) AS ram FROM groupedComputerInfo3 WHERE time >= '{start.ToIso8601()}' AND time <= '{end.ToIso8601()}' GROUP BY time(1ms), region fill(none)" );
+         Assert.Equal( 1, resultSet.Results.Count );
+
+         var result = resultSet.Results[ 0 ];
+         foreach( var region in InfluxClientFixture.Regions )
+         {
+            var kvp = new KeyValuePair<string, object>( "region", region );
+            var group = result.FindGroup( "groupedComputerInfo3", new[] { kvp } );
             Assert.NotNull( group );
          }
       }
@@ -245,7 +263,7 @@ namespace Vibrant.InfluxDB.Client.Tests
          Assert.Equal( 1, resultSet.Results.Count );
 
          var result = resultSet.Results[ 0 ];
-         foreach ( var type in InfluxClientFixture.TestEnums )
+         foreach( var type in InfluxClientFixture.TestEnums )
          {
             var kvp = new KeyValuePair<string, object>( "type", type );
             var group = result.FindGroup( "groupedEnumeratedRows", new[] { kvp } );

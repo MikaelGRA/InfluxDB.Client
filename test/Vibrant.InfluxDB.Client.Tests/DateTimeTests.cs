@@ -30,9 +30,9 @@ namespace Vibrant.InfluxDB.Client.Tests
             OtherTimeAsString = time.ToIso8601()
          };
 
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "dateTimeTests", new[] { row } );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "dateTimeTests1", new[] { row } );
 
-         var resultSet = await _client.ReadAsync<DateTimeRow>( InfluxClientFixture.DatabaseName, "SELECT * FROM dateTimeTests" );
+         var resultSet = await _client.ReadAsync<DateTimeRow>( InfluxClientFixture.DatabaseName, "SELECT * FROM dateTimeTests1" );
          Assert.Equal( 1, resultSet.Results.Count );
 
          var result = resultSet.Results[ 0 ];

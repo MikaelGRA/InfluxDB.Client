@@ -22,18 +22,6 @@ namespace Vibrant.InfluxDB.Client.Parsers
          return typeof( IInfluxRow ).IsAssignableFrom( typeof( TInfluxRow ) );
       }
 
-      private static bool HasAllColumns( DatabaseMeasurementInfo meta, List<string> columns )
-      {
-         foreach( var fieldOrTag in columns )
-         {
-            if( fieldOrTag != InfluxConstants.KeyColumn && fieldOrTag != InfluxConstants.TimeColumn && !meta.Tags.Contains( fieldOrTag ) && !meta.Fields.Contains( fieldOrTag ) )
-            {
-               return false;
-            }
-         }
-         return true;
-      }
-
       internal static InfluxResultSet Create( QueryResult queryResult )
       {
          List<InfluxResult> results = new List<InfluxResult>();
@@ -70,12 +58,13 @@ namespace Vibrant.InfluxDB.Client.Parsers
          IEnumerable<QueryResult> queryResult,
          string db,
          TimestampPrecision? precision,
-         bool isExclusivelyFields )
+         bool allowMetadataQuerying,
+         TimeSpan? metadataExpiration )
          where TInfluxRow : new()
       {
          if( IsIInfluxRow<TInfluxRow>() )
          {
-            return CreateBasedOnInterfaceAsync<TInfluxRow>( client, queryResult, db, precision, isExclusivelyFields );
+            return CreateBasedOnInterfaceAsync<TInfluxRow>( client, queryResult, db, precision, allowMetadataQuerying, metadataExpiration );
          }
          else
          {
@@ -246,7 +235,8 @@ namespace Vibrant.InfluxDB.Client.Parsers
          IEnumerable<QueryResult> queryResults,
          string db,
          TimestampPrecision? precision,
-         bool isExclusivelyFields )
+         bool allowMetadataQuerying,
+         TimeSpan? metadataExpiration )
          where TInfluxRow : new()
       {
          // In this case, we will contruct objects based on the IInfluxRow interface
@@ -289,33 +279,19 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      {
                         // Get metadata information about the measurement we are querying, as we dont know
                         // which columns are tags/fields otherwise
+
+                        // PROBLEM: Should NOT always be called!
                         DatabaseMeasurementInfo meta = null;
-                        if( !isExclusivelyFields )
+                        if( allowMetadataQuerying )
                         {
-                           // get the required metadata
-                           meta = await client.GetMetaInformationAsync( db, name, false ).ConfigureAwait( false );
-
-                           // check that we have all columns, otherwise call method again
-                           bool hasAllColumnsAndTags = HasAllColumns( meta, columns );
-                           if( !hasAllColumnsAndTags )
-                           {
-                              // if we dont have all columns, attempt to query the metadata again (might have changed since last query)
-                              meta = await client.GetMetaInformationAsync( db, name, false ).ConfigureAwait( false );
-                              hasAllColumnsAndTags = HasAllColumns( meta, columns );
-
-                              // if we still dont have all columns, we cant do anything, throw exception
-                              if( !hasAllColumnsAndTags )
-                              {
-                                 throw new InfluxException( Errors.IndeterminateColumns );
-                              }
-                           }
+                           meta = await client.GetMetaInformationAsync( db, name, metadataExpiration ).ConfigureAwait( false ); ;
                         }
 
                         for( int i = 0 ; i < columns.Count ; i++ )
                         {
                            var columnName = columns[ i ];
 
-                           if( isExclusivelyFields )
+                           if( !allowMetadataQuerying )
                            {
                               setters[ i ] = ( row, fieldName, value ) => row.SetField( fieldName, value );
                            }
@@ -337,13 +313,9 @@ namespace Vibrant.InfluxDB.Client.Parsers
                            {
                               setters[ i ] = ( row, tagName, value ) => row.SetTag( tagName, (string)value );
                            }
-                           else if( meta.Fields.Contains( columnName ) )
-                           {
-                              setters[ i ] = ( row, fieldName, value ) => row.SetField( fieldName, value );
-                           }
                            else
                            {
-                              throw new InfluxException( string.Format( Errors.InvalidColumn, columnName ) );
+                              setters[ i ] = ( row, fieldName, value ) => row.SetField( fieldName, value );
                            }
                         }
 

@@ -20,13 +20,13 @@ namespace Vibrant.InfluxDB.Client.Metadata
 
    internal class DatabaseMeasurementInfo
    {
+      internal readonly DateTime Timestamp;
       internal readonly HashSet<string> Tags;
-      internal readonly HashSet<string> Fields;
 
-      public DatabaseMeasurementInfo()
+      public DatabaseMeasurementInfo( DateTime timestamp )
       {
+         Timestamp = timestamp;
          Tags = new HashSet<string>();
-         Fields = new HashSet<string>();
       }
    }
 }
