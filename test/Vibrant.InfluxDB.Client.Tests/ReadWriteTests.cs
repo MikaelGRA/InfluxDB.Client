@@ -136,7 +136,38 @@ namespace Vibrant.InfluxDB.Client.Tests
          Assert.Equal( 0, result.Series.Count );
       }
 
-      [Fact]
+       [Fact]
+       public async Task Should_Write_And_Query_Using_Post_Typed_Data()
+       {
+           var measurementName = "computerInfo6";
+           var start = new DateTime(2013, 1, 1, 1, 1, 1, DateTimeKind.Utc);
+           var infos = InfluxClientFixture.CreateTypedRowsStartingAt(start, 500, false);
+           await _client.WriteAsync(InfluxClientFixture.DatabaseName, measurementName, infos);
+
+
+           var from = start;
+           var to = from.AddSeconds(250);
+
+           var resultSet = await _client.ReadAsync<ComputerInfo>(InfluxClientFixture.DatabaseName, $"SELECT * FROM {measurementName} WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'", true); // <-- useHttpPost here.
+           Assert.Equal(1, resultSet.Results.Count);
+
+           var result = resultSet.Results[0];
+           Assert.Equal(1, result.Series.Count);
+
+           var series = result.Series[0];
+           Assert.Equal(250, series.Rows.Count);
+
+           // attempt deletion
+           await _client.DeleteRangeAsync(InfluxClientFixture.DatabaseName, measurementName, from, to);
+
+           resultSet = await _client.ReadAsync<ComputerInfo>(InfluxClientFixture.DatabaseName, $"SELECT * FROM {measurementName} WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'");
+           Assert.Equal(1, resultSet.Results.Count);
+
+           result = resultSet.Results[0];
+           Assert.Equal(0, result.Series.Count);
+       }
+
+        [Fact]
       public async Task Should_Write_Read_And_Delete_Typed_Data()
       {
          for( int i = 0 ; i < 2 ; i++ )

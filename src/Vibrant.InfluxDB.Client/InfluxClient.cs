@@ -733,31 +733,33 @@ namespace Vibrant.InfluxDB.Client
          return PostInternalIgnoreResultAsync( CreateWriteUrl( db, options ), new InfluxRowContent<TInfluxRow>( rows, getMeasurementName, options.Precision ) );
       }
 
-      /// <summary>
-      /// Executes the query and returns the result with the default query options.
-      /// </summary>
-      /// <typeparam name="TInfluxRow"></typeparam>
-      /// <param name="query"></param>
-      /// <param name="db"></param>
-      /// <returns></returns>
-      public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query )
+       /// <summary>
+       /// Executes the query and returns the result with the default query options.
+       /// </summary>
+       /// <typeparam name="TInfluxRow"></typeparam>
+       /// <param name="query"></param>
+       /// <param name="db"></param>
+       /// <param name="useHttpPost">Use HttpMethod.Post to execute query. Helps with queries that otherwise would result in too long url exception.</param>
+       /// <returns></returns>
+       public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query, bool useHttpPost = false)
          where TInfluxRow : new()
       {
-         return ExecuteQueryInternalAsync<TInfluxRow>( query, db, DefaultQueryOptions );
+         return ExecuteQueryInternalAsync<TInfluxRow>( query, db, DefaultQueryOptions, useHttpPost );
       }
 
-      /// <summary>
-      /// Executes the query and returns the result with the specified query options.
-      /// </summary>
-      /// <typeparam name="TInfluxRow"></typeparam>
-      /// <param name="query"></param>
-      /// <param name="db"></param>
-      /// <param name="options"></param>
-      /// <returns></returns>
-      public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query, InfluxQueryOptions options )
+        /// <summary>
+        /// Executes the query and returns the result with the specified query options.
+        /// </summary>
+        /// <typeparam name="TInfluxRow"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="db"></param>
+        /// <param name="options"></param>
+        /// <param name="useHttpPost">Use HttpMethod.Post to execute query. Helps with queries that otherwise would result in too long url exception.</param>
+        /// <returns></returns>
+        public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query, InfluxQueryOptions options, bool useHttpPost = false)
          where TInfluxRow : new()
       {
-         return ExecuteQueryInternalAsync<TInfluxRow>( query, db, options );
+         return ExecuteQueryInternalAsync<TInfluxRow>( query, db, options, useHttpPost );
       }
 
       /// <summary>
@@ -890,10 +892,20 @@ namespace Vibrant.InfluxDB.Client
          }
       }
 
-      private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db, InfluxQueryOptions options )
+      private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db, InfluxQueryOptions options, bool useHttpPost )
          where TInfluxRow : new()
       {
-         var queryResult = await GetInternalAsync( CreateQueryUrl( query, db, options ), true ).ConfigureAwait( false );
+         var url = CreateQueryUrl(query, db, options);
+         IEnumerable<QueryResult> queryResult;
+         if (useHttpPost)
+         {
+            queryResult = await PostInternalEnumerableResultAsync( url );
+         }
+         else
+         {
+            queryResult = await GetInternalAsync( url, true ).ConfigureAwait( false );
+         }
+         
          return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, options.Precision, true, options.MetadataExpiration ).ConfigureAwait( false );
       }
 
@@ -913,7 +925,7 @@ namespace Vibrant.InfluxDB.Client
 
       private async Task<InfluxResultSet> ExecuteQueryInternalAsync( string query, string db )
       {
-         var queryResult = await PostInternalAsync( CreateQueryUrl( query, db ), false ).ConfigureAwait( false );
+         var queryResult = await PostInternalAsync( CreateQueryUrl( query, db ) ).ConfigureAwait( false );
          return ResultSetFactory.Create( queryResult );
       }
 
@@ -1006,7 +1018,7 @@ namespace Vibrant.InfluxDB.Client
          }
       }
 
-      private async Task<QueryResult> PostInternalAsync( string url, bool isMeasurementsQuery )
+      private async Task<QueryResult> PostInternalAsync( string url )
       {
          try
          {
@@ -1023,6 +1035,12 @@ namespace Vibrant.InfluxDB.Client
             throw new InfluxException( Errors.UnknownError, e );
          }
       }
+
+       private async Task<IEnumerable<QueryResult>> PostInternalEnumerableResultAsync( string url )
+       {
+           var queryResult = await PostInternalAsync(url);
+           return new[] { queryResult };
+       }
 
       private async Task PostInternalIgnoreResultAsync( string url, HttpContent content )
       {
