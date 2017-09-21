@@ -821,7 +821,7 @@ namespace Vibrant.InfluxDB.Client
                return info;
             }
          }
-         
+
          // has expired or never existed, lets retrieve it
 
          // get metadata information from the store
@@ -849,6 +849,26 @@ namespace Vibrant.InfluxDB.Client
          var url = $"write?db={Uri.EscapeDataString( db )}&precision={options.Precision.GetQueryParameter()}&consistency={options.Consistency.GetQueryParameter()}";
          if( !string.IsNullOrEmpty( options.RetentionPolicy ) ) url += $"&rp={options.RetentionPolicy}";
          return url;
+      }
+
+      private FormUrlEncodedContent CreateQueryPostContent( string commandOrQuery, string db, InfluxQueryOptions options )
+      {
+         List<KeyValuePair<string, string>> param = new List<KeyValuePair<string, string>>( 5 );
+         param.Add( new KeyValuePair<string, string>( "db", db ) );
+         param.Add( new KeyValuePair<string, string>( "q", commandOrQuery ) );
+
+         if( options.Precision.HasValue )
+         {
+            param.Add( new KeyValuePair<string, string>( "epoch", options.Precision.Value.GetQueryParameter() ) );
+         }
+
+         if( options.ChunkSize.HasValue )
+         {
+            param.Add( new KeyValuePair<string, string>( "chunked", "true" ) );
+            param.Add( new KeyValuePair<string, string>( "chunk_size", options.ChunkSize.Value.ToString( CultureInfo.InvariantCulture ) ) );
+         }
+
+         return new FormUrlEncodedContent( param );
       }
 
       private string CreateQueryUrl( string commandOrQuery, string db, InfluxQueryOptions options )
@@ -893,7 +913,16 @@ namespace Vibrant.InfluxDB.Client
       private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db, InfluxQueryOptions options )
          where TInfluxRow : new()
       {
-         var queryResult = await GetInternalAsync( CreateQueryUrl( query, db, options ), true ).ConfigureAwait( false );
+         IEnumerable<QueryResult> queryResult;
+         if( options.UsePost )
+         {
+            queryResult = await PostInternalAsync( "query", CreateQueryPostContent( query, db, options ) ).ConfigureAwait( false );
+         }
+         else
+         {
+            queryResult = await GetInternalAsync( CreateQueryUrl( query, db, options ), true ).ConfigureAwait( false );
+         }
+
          return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, options.Precision, true, options.MetadataExpiration ).ConfigureAwait( false );
       }
 
@@ -913,7 +942,7 @@ namespace Vibrant.InfluxDB.Client
 
       private async Task<InfluxResultSet> ExecuteQueryInternalAsync( string query, string db )
       {
-         var queryResult = await PostInternalAsync( CreateQueryUrl( query, db ), false ).ConfigureAwait( false );
+         var queryResult = await PostInternalAsync( CreateQueryUrl( query, db ) ).ConfigureAwait( false );
          return ResultSetFactory.Create( queryResult );
       }
 
@@ -1006,7 +1035,7 @@ namespace Vibrant.InfluxDB.Client
          }
       }
 
-      private async Task<QueryResult> PostInternalAsync( string url, bool isMeasurementsQuery )
+      private async Task<QueryResult> PostInternalAsync( string url )
       {
          try
          {
@@ -1015,6 +1044,24 @@ namespace Vibrant.InfluxDB.Client
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
                var queryResult = await response.Content.ReadAsJsonAsync<QueryResult>().ConfigureAwait( false );
+               return queryResult;
+            }
+         }
+         catch( HttpRequestException e )
+         {
+            throw new InfluxException( Errors.UnknownError, e );
+         }
+      }
+
+      private async Task<List<QueryResult>> PostInternalAsync( string url, HttpContent content )
+      {
+         try
+         {
+            using( var request = new HttpRequestMessage( HttpMethod.Post, url ) { Content = content } )
+            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
+            {
+               await EnsureSuccessCode( response ).ConfigureAwait( false );
+               var queryResult = await response.Content.ReadMultipleAsJsonAsync<QueryResult>().ConfigureAwait( false );
                return queryResult;
             }
          }

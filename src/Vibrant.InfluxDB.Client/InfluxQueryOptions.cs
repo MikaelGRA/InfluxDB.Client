@@ -18,6 +18,7 @@ namespace Vibrant.InfluxDB.Client
       {
          Precision = null;
          ChunkSize = null;
+         UsePost = false;
          MetadataExpiration = TimeSpan.FromHours( 1 );
       }
 
@@ -44,5 +45,12 @@ namespace Vibrant.InfluxDB.Client
       /// A value of null means it never expires. Default is 1 hour.
       /// </summary>
       public TimeSpan? MetadataExpiration { get; set; }
+
+      /// <summary>
+      /// Gets or sets a bool indicating if the http POST method
+      /// should be used instead of the default GET method when
+      /// querying data.
+      /// </summary>
+      public bool UsePost { get; set; }
    }
 }

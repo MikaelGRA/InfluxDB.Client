@@ -20,7 +20,7 @@
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>3.1.0</Version>
+    <Version>3.1.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,6 +32,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System" />
+    <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
