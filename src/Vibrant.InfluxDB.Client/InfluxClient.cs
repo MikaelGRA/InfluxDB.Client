@@ -867,7 +867,7 @@ namespace Vibrant.InfluxDB.Client
          return url;
       }
 
-      private FormUrlEncodedContent CreateQueryPostContent( string commandOrQuery, string db, InfluxQueryOptions options )
+      private FormUrlEncodedContent CreateQueryPostContent( string commandOrQuery, string db, bool isTimeSeriesQuery, InfluxQueryOptions options )
       {
          List<KeyValuePair<string, string>> param = new List<KeyValuePair<string, string>>( 5 );
 
@@ -879,20 +879,24 @@ namespace Vibrant.InfluxDB.Client
          {
             param.Add( new KeyValuePair<string, string>( "q", commandOrQuery ) );
          }
-         if( options.Precision.HasValue )
+
+         if( options != null )
          {
-            param.Add( new KeyValuePair<string, string>( "epoch", options.Precision.Value.GetQueryParameter() ) );
-         }
-         if( options.ChunkSize.HasValue )
-         {
-            param.Add( new KeyValuePair<string, string>( "chunked", "true" ) );
-            param.Add( new KeyValuePair<string, string>( "chunk_size", options.ChunkSize.Value.ToString( CultureInfo.InvariantCulture ) ) );
+            if( options.Precision.HasValue && isTimeSeriesQuery )
+            {
+               param.Add( new KeyValuePair<string, string>( "epoch", options.Precision.Value.GetQueryParameter() ) );
+            }
+            if( options.ChunkSize.HasValue )
+            {
+               param.Add( new KeyValuePair<string, string>( "chunked", "true" ) );
+               param.Add( new KeyValuePair<string, string>( "chunk_size", options.ChunkSize.Value.ToString( CultureInfo.InvariantCulture ) ) );
+            }
          }
 
          return new FormUrlEncodedContent( param );
       }
 
-      private string CreateQueryUrl( string commandOrQuery, string db, InfluxQueryOptions options )
+      private string CreateQueryUrl( string commandOrQuery, string db, bool isTimeSeriesQuery, InfluxQueryOptions options )
       {
          var query = "query";
          char seperator = '?';
@@ -911,7 +915,7 @@ namespace Vibrant.InfluxDB.Client
 
          if( options != null )
          {
-            if( options.Precision.HasValue )
+            if( options.Precision.HasValue && isTimeSeriesQuery )
             {
                query += $"{seperator}epoch={options.Precision.Value.GetQueryParameter()}";
                seperator = '&';
@@ -939,35 +943,35 @@ namespace Vibrant.InfluxDB.Client
          }
       }
 
-      private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db, bool allowMetadataQuerying, bool forcePost, InfluxQueryOptions options )
+      private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db, bool isTimeSeriesQuery, bool forcePost, InfluxQueryOptions options )
          where TInfluxRow : new()
       {
-         List<QueryResult> queryResults = await PerformQueryInternal( query, db, forcePost, options );
-         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResults, db, options.Precision, allowMetadataQuerying, options.MetadataExpiration ).ConfigureAwait( false );
+         List<QueryResult> queryResults = await PerformQueryInternal( query, db, forcePost, isTimeSeriesQuery, options );
+         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResults, db, options.Precision, isTimeSeriesQuery, options.MetadataExpiration ).ConfigureAwait( false );
       }
 
       private async Task<InfluxResultSet> ExecuteQueryInternalAsync( string query, string db, bool forcePost, InfluxQueryOptions options )
       {
-         List<QueryResult> queryResults = await PerformQueryInternal( query, db, forcePost, options );
+         List<QueryResult> queryResults = await PerformQueryInternal( query, db, forcePost, false, options );
          return ResultSetFactory.Create( queryResults );
       }
 
-      private async Task<List<QueryResult>> PerformQueryInternal( string query, string db, bool forcePost, InfluxQueryOptions options )
+      private async Task<List<QueryResult>> PerformQueryInternal( string query, string db, bool forcePost, bool isTimeSeriesQuery, InfluxQueryOptions options )
       {
          List<QueryResult> queryResults;
          if( options.UsePost )
          {
-            queryResults = await PostInternalAsync( "query", CreateQueryPostContent( query, db, options ) ).ConfigureAwait( false );
+            queryResults = await PostInternalAsync( "query", CreateQueryPostContent( query, db, isTimeSeriesQuery, options ) ).ConfigureAwait( false );
          }
          else
          {
             if( forcePost )
             {
-               queryResults = await PostInternalAsync( CreateQueryUrl( query, db, options ) ).ConfigureAwait( false );
+               queryResults = await PostInternalAsync( CreateQueryUrl( query, db, isTimeSeriesQuery, options ) ).ConfigureAwait( false );
             }
             else
             {
-               queryResults = await GetInternalAsync( CreateQueryUrl( query, db, options ) ).ConfigureAwait( false );
+               queryResults = await GetInternalAsync( CreateQueryUrl( query, db, isTimeSeriesQuery, options ) ).ConfigureAwait( false );
             }
          }
 
