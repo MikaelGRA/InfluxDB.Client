@@ -22,16 +22,6 @@ namespace Vibrant.InfluxDB.Client.Parsers
          return typeof( IInfluxRow ).IsAssignableFrom( typeof( TInfluxRow ) );
       }
 
-      internal static InfluxResultSet Create( QueryResult queryResult )
-      {
-         List<InfluxResult> results = new List<InfluxResult>();
-         foreach( var result in queryResult.Results )
-         {
-            results.Add( new InfluxResult( result.StatementId, result.Error ) );
-         }
-         return new InfluxResultSet( results );
-      }
-
       internal static InfluxResultSet Create( IEnumerable<QueryResult> queryResults )
       {
          Dictionary<int, InfluxResult> results = new Dictionary<int, InfluxResult>();

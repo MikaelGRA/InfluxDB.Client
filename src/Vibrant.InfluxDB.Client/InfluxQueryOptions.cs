@@ -38,7 +38,7 @@ namespace Vibrant.InfluxDB.Client
       /// takes to expire and must be retrieved again.
       /// 
       /// This is only used when querying data based on the IInfluxRow interface
-      /// because this interface. This is because the interface has no way to 
+      /// This is because the interface has no way to 
       /// know which retrieved columns are fields or tags. It therefore makes an
       /// implicit query to get this information from the database.
       /// 

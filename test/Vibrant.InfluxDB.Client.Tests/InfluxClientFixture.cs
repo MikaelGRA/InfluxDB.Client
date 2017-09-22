@@ -22,6 +22,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       public InfluxClientFixture()
       {
          Client = new InfluxClient( new Uri( InfluxHost ), "root", "root" );
+         //Client.DefaultQueryOptions.UsePost = true;
          Client.CreateDatabaseAsync( DatabaseName ).Wait();
       }
 
