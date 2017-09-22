@@ -1019,29 +1019,6 @@ namespace Vibrant.InfluxDB.Client
          }
       }
 
-      private async Task GetInternalIgnoreResultAsync( string url )
-      {
-         try
-         {
-            using( var request = new HttpRequestMessage( HttpMethod.Get, url ) )
-            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
-            {
-               await EnsureSuccessCode( response ).ConfigureAwait( false );
-
-               // since we are ignoring the result, we dont return anything
-               // but we still need to check what is being returned
-               if( response.StatusCode == HttpStatusCode.OK )
-               {
-                  var queryResult = await response.Content.ReadAsJsonAsync<QueryResult>().ConfigureAwait( false );
-               }
-            }
-         }
-         catch( HttpRequestException e )
-         {
-            throw new InfluxException( Errors.UnknownError, e );
-         }
-      }
-
       private async Task<List<QueryResult>> PostInternalAsync( string url )
       {
          try
@@ -1083,22 +1060,6 @@ namespace Vibrant.InfluxDB.Client
          try
          {
             using( var request = new HttpRequestMessage( HttpMethod.Post, url ) { Content = content } )
-            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
-            {
-               await EnsureSuccessCode( response ).ConfigureAwait( false );
-            }
-         }
-         catch( HttpRequestException e )
-         {
-            throw new InfluxException( Errors.UnknownError, e );
-         }
-      }
-
-      private async Task PostInternalIgnoreResultAsync( string url )
-      {
-         try
-         {
-            using( var request = new HttpRequestMessage( HttpMethod.Post, url ) { Content = new StringContent( "" ) } )
             using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
