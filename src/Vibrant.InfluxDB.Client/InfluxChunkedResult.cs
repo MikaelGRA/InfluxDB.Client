@@ -7,17 +7,37 @@ using System.Threading.Tasks;
 namespace Vibrant.InfluxDB.Client
 {
    public class InfluxChunkedResult<TInfluxRow>
+      where TInfluxRow : new()
    {
-      public InfluxChunkedResult( int statementId, string error )
+      private readonly ContextualQueryResultIterator<TInfluxRow> _iterator;
+
+      internal InfluxChunkedResult( ContextualQueryResultIterator<TInfluxRow> iterator, int statementId, string error )
       {
+         _iterator = iterator;
+
          StatementId = statementId;
          ErrorMessage = error;
          Succeeded = error == null;
       }
 
+      /// <summary>
+      /// Gets the next serie from the result.
+      /// 
+      /// Null if none are available.
+      /// </summary>
+      /// <returns></returns>
       public async Task<InfluxChunkedSeries<TInfluxRow>> GetNextSeriesAsync()
       {
-         throw new NotImplementedException();
+         if( await _iterator.ConsumeNextSerieAsync().ConfigureAwait( false ) )
+         {
+            var currentSerie = _iterator.CurrentSerie;
+
+            return new InfluxChunkedSeries<TInfluxRow>(
+               _iterator,
+               currentSerie.Name,
+               currentSerie.GroupedTags );
+         }
+         return null;
       }
 
       /// <summary>

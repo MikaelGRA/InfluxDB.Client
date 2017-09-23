@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Vibrant.InfluxDB.Client.Dto;
@@ -9,64 +10,11 @@ using Vibrant.InfluxDB.Client.Parsers;
 
 namespace Vibrant.InfluxDB.Client
 {
-   internal class ContextualQueryResultIterator<TInfluxRow>
+
+   internal class QueryResultIterator<TInfluxRow> : IDisposable
       where TInfluxRow : new()
    {
-      private readonly QueryResultIterator<TInfluxRow> _resultIterator;
-      private InfluxResult<TInfluxRow> _currentResult;
-      private InfluxSeries<TInfluxRow> _currentSerie;
-
-      public ContextualQueryResultIterator( QueryResultIterator<TInfluxRow> resultIterator )
-      {
-         _resultIterator = resultIterator;
-      }
-
-      public async Task<bool> ConsumeNextResultAsync()
-      {
-         bool hasMore = await _resultIterator.ConsumeNextResultAsync();
-         if( !hasMore )
-         {
-            return false;
-         }
-
-         _currentResult = _resultIterator.CurrentResult;
-
-         return true;
-      }
-
-      public async Task<bool> ConsumeNextSerieAsync()
-      {
-         bool hasMore = await _resultIterator.ConsumeNextSerieAsync();
-         if( !hasMore ) // 'next' serie might be in next result, which means we should still return truee
-         {
-            return false;
-         }
-
-         _currentSerie = _resultIterator.CurrentSerie;
-
-         return true;
-      }
-
-      public InfluxResult<TInfluxRow> CurrentResult
-      {
-         get
-         {
-            return _currentResult;
-         }
-      }
-
-      public InfluxSeries<TInfluxRow> CurrentSerie
-      {
-         get
-         {
-            return _currentSerie;
-         }
-      }
-   }
-
-   internal class QueryResultIterator<TInfluxRow>
-      where TInfluxRow : new()
-   {
+      private readonly HttpResponseMessage _responseMessage; 
       private readonly JsonStreamObjectIterator _objectIterator;
       private readonly InfluxQueryOptions _options;
       private readonly InfluxClient _client;
@@ -77,13 +25,11 @@ namespace Vibrant.InfluxDB.Client
       private int _currentSerieIndex;
 
       private bool _hasConsumedAllQueryResults;
+      private bool _disposed = false;
 
-
-      // current statementId
-      // current "group identifier"/"name"?
-
-      internal QueryResultIterator( JsonStreamObjectIterator objectIterator, InfluxClient client, InfluxQueryOptions options, string db )
+      internal QueryResultIterator( HttpResponseMessage responseMessage, JsonStreamObjectIterator objectIterator, InfluxClient client, InfluxQueryOptions options, string db )
       {
+         _responseMessage = responseMessage;
          _objectIterator = objectIterator;
          _client = client;
          _options = options;
@@ -110,9 +56,10 @@ namespace Vibrant.InfluxDB.Client
       {
          if( _hasConsumedAllQueryResults ) return false;
 
-         _hasConsumedAllQueryResults = await ConsumeNextQueryResultAsync().ConfigureAwait( false );
+         var hasMore = await ConsumeNextQueryResultAsync().ConfigureAwait( false );
+         _hasConsumedAllQueryResults = !hasMore;
 
-         return _hasConsumedAllQueryResults;
+         return hasMore;
       }
 
       public async Task<bool> ConsumeNextResultAsync()
@@ -199,6 +146,23 @@ namespace Vibrant.InfluxDB.Client
             return CurrentResult.Series[ _currentSerieIndex ];
          }
       }
+      
+      protected virtual void Dispose( bool disposing )
+      {
+         if( !_disposed )
+         {
+            if( disposing )
+            {
+               _responseMessage.Dispose();
+            }
 
+            _disposed = true;
+         }
+      }
+
+      public void Dispose()
+      {
+         Dispose( true );
+      }
    }
 }

@@ -131,34 +131,7 @@ namespace Vibrant.InfluxDB.Client
             return false;
          }
 
-         if( result.GroupedTags == null && ( tags == null || tags.Count() == 0 ) )
-         {
-            return true;
-         }
-
-         foreach( var tag in tags )
-         {
-            object tagValue;
-            if( result.GroupedTags.TryGetValue( tag.Key, out tagValue ) )
-            {
-               if( tagValue != null )
-               {
-                  if( !tagValue.Equals( tag.Value ) )
-                  {
-                     return false;
-                  }
-               }
-               else
-               {
-                  // tagValue is null, so only continue if tag.Value is also null
-                  if( tag.Value != null )
-                  {
-                     return false;
-                  }
-               }
-            }
-         }
-         return true;
+         return InfluxSeriesComparer.Compare( result, tags );
       }
    }
 }

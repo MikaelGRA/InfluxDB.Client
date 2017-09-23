@@ -8,28 +8,65 @@ using Vibrant.InfluxDB.Client.Parsers;
 
 namespace Vibrant.InfluxDB.Client
 {
-   public class InfluxChunkedResultSet<TInfluxRow>
+   public class InfluxChunkedResultSet<TInfluxRow> : IDisposable
       where TInfluxRow : new()
    {
-      private QueryResultIterator<TInfluxRow> _iterator;
-      private InfluxResultSet<TInfluxRow> _currentSet;
+      private ContextualQueryResultIterator<TInfluxRow> _iterator;
 
-      private int? _currentStatementId;
+      private bool _disposed = false;
 
-      internal InfluxChunkedResultSet( JsonStreamObjectIterator objectIterator, InfluxClient client, InfluxQueryOptions options, string db )
+      internal InfluxChunkedResultSet( ContextualQueryResultIterator<TInfluxRow> contextualIterator, InfluxClient client, InfluxQueryOptions options, string db )
       {
-         _iterator = new QueryResultIterator<TInfluxRow>( objectIterator, client, options, db );
+         _iterator = contextualIterator;
       }
 
+      /// <summary>
+      /// Gets the next result from the result set.
+      /// 
+      /// Null if none are available.
+      /// </summary>
+      /// <returns></returns>
       public async Task<InfluxChunkedResult<TInfluxRow>> GetNextResultAsync()
       {
-         bool hasMore = false;
-         if( !_currentStatementId.HasValue )
+         if( _iterator == null ) return null;
+
+         if( await _iterator.ConsumeNextResultAsync().ConfigureAwait( false ) )
          {
-            hasMore = await _iterator.ConsumeNextAsync();
+            var currentResult = _iterator.CurrentResult;
+
+            return new InfluxChunkedResult<TInfluxRow>(
+               _iterator,
+               currentResult.StatementId,
+               currentResult.ErrorMessage );
          }
 
+         // here we can close it
+         _iterator.Dispose();
+         _iterator = null;
 
+         return null;
+      }
+
+      private void Dispose( bool disposing )
+      {
+         if( !_disposed )
+         {
+            if( disposing )
+            {
+               if(_iterator != null )
+               {
+                  _iterator.Dispose();
+                  _iterator = null;
+               }
+            }
+
+            _disposed = true;
+         }
+      }
+      
+      public void Dispose()
+      {
+         Dispose( true );
       }
    }
 }

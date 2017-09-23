@@ -8,14 +8,16 @@ using System.Threading.Tasks;
 namespace Vibrant.InfluxDB.Client
 {
    public class InfluxChunkedSeries<TInfluxRow>
+      where TInfluxRow : new()
    {
-      public InfluxChunkedSeries( string name, IDictionary<string, object> tags )
+      private readonly ContextualQueryResultIterator<TInfluxRow> _iterator;
+
+      internal InfluxChunkedSeries( ContextualQueryResultIterator<TInfluxRow> iterator, string name, IReadOnlyDictionary<string, object> tags )
       {
+         _iterator = iterator;
+
          Name = name;
-         if( tags != null )
-         {
-            GroupedTags = new ReadOnlyDictionary<string, object>( tags );
-         }
+         GroupedTags = tags;
       }
 
       /// <summary>
@@ -28,9 +30,21 @@ namespace Vibrant.InfluxDB.Client
       /// </summary>
       public IReadOnlyDictionary<string, object> GroupedTags { get; private set; }
 
+      /// <summary>
+      /// Gets the next chunk from the serie.
+      /// 
+      /// Null if none are available.
+      /// </summary>
+      /// <returns></returns>
       public async Task<InfluxChunk<TInfluxRow>> GetNextChunkAsync()
       {
-         throw new NotImplementedException();
+         List<TInfluxRow> batch;
+         if( ( batch = await _iterator.GetNextBatchAsync().ConfigureAwait( false ) ) != null )
+         {
+            return new InfluxChunk<TInfluxRow>( batch );
+         }
+
+         return null;
       }
    }
 }

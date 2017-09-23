@@ -8,14 +8,14 @@ namespace Vibrant.InfluxDB.Client
 {
    public class InfluxChunk<TInfluxRow>
    {
-      public InfluxChunk()
+      internal InfluxChunk( List<TInfluxRow> rows )
       {
-         Rows = new List<TInfluxRow>();
+         Rows = rows;
       }
 
       /// <summary>
       /// Gets the rows of the InfluxChunk.
       /// </summary>
-      public List<TInfluxRow> Rows { get; set; }
+      public List<TInfluxRow> Rows { get; private set; }
    }
 }
