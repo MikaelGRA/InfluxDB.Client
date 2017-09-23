@@ -186,6 +186,18 @@ public async Task Should_Query_Dynamic_Data()
 }
 ```
 
+## Reading only operations
+
+Often, you may not be selecting the exact structure that you are also inserting. Maybe you are doing some aggregation or calculations that you are retrieving that changes the name of the returned columns.
+
+If this is the case you can simply define a new class and use that as the generic return type. In this case you can just use the 
+
+```c#
+[InfluxComputedAttribute]
+```
+
+When using this attribute, any field or tag can go into the property.
+
 ## Other operations
 
 The InfluxClient also defines a host of other management operations. That can be divided up into two categories.
