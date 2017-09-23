@@ -16,6 +16,7 @@ using Vibrant.InfluxDB.Client.Parsers;
 using Vibrant.InfluxDB.Client.Resources;
 using Vibrant.InfluxDB.Client.Rows;
 using Vibrant.InfluxDB.Client.Http;
+using Vibrant.InfluxDB.Client.Helpers;
 
 namespace Vibrant.InfluxDB.Client
 {

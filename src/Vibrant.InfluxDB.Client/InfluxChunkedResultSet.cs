@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vibrant.InfluxDB.Client.Helpers;
 using Vibrant.InfluxDB.Client.Http;
 using Vibrant.InfluxDB.Client.Parsers;
 

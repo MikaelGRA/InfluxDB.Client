@@ -8,9 +8,8 @@ using Vibrant.InfluxDB.Client.Dto;
 using Vibrant.InfluxDB.Client.Http;
 using Vibrant.InfluxDB.Client.Parsers;
 
-namespace Vibrant.InfluxDB.Client
+namespace Vibrant.InfluxDB.Client.Helpers
 {
-
    internal class QueryResultIterator<TInfluxRow> : IDisposable
       where TInfluxRow : new()
    {
@@ -38,6 +37,7 @@ namespace Vibrant.InfluxDB.Client
 
       private async Task<bool> ConsumeNextQueryResultAsync()
       {
+         // read the next object from the object iterator (stream)
          var queryResult = _objectIterator.ReadNext<QueryResult>();
          if( queryResult == null )
          {
@@ -45,20 +45,25 @@ namespace Vibrant.InfluxDB.Client
             return false;
          }
 
+         // if we found something, construct a normal result object, and initialize our indices
          _currentResultSet = await ResultSetFactory.CreateAsync<TInfluxRow>( _client, new[] { queryResult }, _db, _options.Precision, true, _options.MetadataExpiration ).ConfigureAwait( false );
          _currentResultIndex = -1;
          _currentSerieIndex = -1;
 
+         // indicate we found something
          return true;
       }
 
       private async Task<bool> ConsumeNextResultSetAsync()
       {
+         // short circuit, so we dont go to the stream after we already found there is no more data
          if( _hasConsumedAllQueryResults ) return false;
-
+         
+         // consume the next query result and store it in this instance
          var hasMore = await ConsumeNextQueryResultAsync().ConfigureAwait( false );
          _hasConsumedAllQueryResults = !hasMore;
 
+         // indicate we found something
          return hasMore;
       }
 
@@ -74,9 +79,11 @@ namespace Vibrant.InfluxDB.Client
             }
          }
 
+         // advance to next result/series
          _currentResultIndex++;
          _currentSerieIndex = -1;
 
+         // within bounds?
          if( _currentResultIndex < CurrentResultSet.Results.Count )
          {
             return true;
@@ -89,10 +96,11 @@ namespace Vibrant.InfluxDB.Client
             return false;
          }
 
-         // at this point, we need to check if the result represents the SAME statement
+         // advance to next result/series
          _currentResultIndex++;
          _currentSerieIndex = -1;
 
+         // within bounds?
          if( _currentResultIndex < CurrentResultSet.Results.Count )
          {
             return true;
@@ -113,8 +121,10 @@ namespace Vibrant.InfluxDB.Client
             }
          }
 
+         // advance to next series
          _currentSerieIndex++;
 
+         // within bounds?
          if( _currentSerieIndex < CurrentResult.Series.Count )
          {
             return true;

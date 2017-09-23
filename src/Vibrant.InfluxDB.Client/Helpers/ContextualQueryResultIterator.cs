@@ -2,8 +2,15 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Vibrant.InfluxDB.Client
+namespace Vibrant.InfluxDB.Client.Helpers
 {
+   internal enum AllowedCalls
+   {
+      ConsumeNextResultAsync = 0b001,
+      ConsumeNextSerieAsync = 0b010,
+      GetNextBatchAsync = 0b100
+   }
+
    internal class ContextualQueryResultIterator<TInfluxRow> : IDisposable
       where TInfluxRow : new()
    {
@@ -24,6 +31,8 @@ namespace Vibrant.InfluxDB.Client
 
       public async Task<bool> ConsumeNextResultAsync()
       {
+         // throw invalid operation if not called correctly!
+
          if( _consumedNextResult_Result.HasValue )
          {
             var resultOfPreviousCall = _consumedNextResult_Result.Value;
@@ -39,12 +48,13 @@ namespace Vibrant.InfluxDB.Client
          }
 
          _currentResult = _resultIterator.CurrentResult;
-
          return true;
       }
 
       public async Task<bool> ConsumeNextSerieAsync()
       {
+         // throw invalid operation if not called correctly!
+
          if( _consumedNextSerie_Result.HasValue )
          {
             var resultOfPreviousCall = _consumedNextSerie_Result.Value;
@@ -57,7 +67,7 @@ namespace Vibrant.InfluxDB.Client
          {
             // in which case we might consume a result, we might not use here
             _consumedNextResult_Result = await _resultIterator.ConsumeNextResultAsync().ConfigureAwait( false );
-            if( _consumedNextResult_Result == true ) // may be consumed!!!
+            if( _consumedNextResult_Result == true )
             {
                var previousResult = _currentResult;
                _currentResult = _resultIterator.CurrentResult;
@@ -68,7 +78,6 @@ namespace Vibrant.InfluxDB.Client
                   if( hasMore )
                   {
                      _currentSerie = _resultIterator.CurrentSerie;
-
                      return true;
                   }
 
@@ -80,17 +89,18 @@ namespace Vibrant.InfluxDB.Client
                _currentResult = null;
             }
 
-
+            _currentSerie = null;
             return false;
          }
 
          _currentSerie = _resultIterator.CurrentSerie;
-
          return true;
       }
 
       public async Task<List<TInfluxRow>> GetNextBatchAsync()
       {
+         // throw invalid operation if not called correctly!
+
          if( hasConsumedCurrentBatch )
          {
             var previousSerie = _currentSerie;
