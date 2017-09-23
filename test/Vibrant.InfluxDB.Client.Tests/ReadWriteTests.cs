@@ -304,8 +304,6 @@ namespace Vibrant.InfluxDB.Client.Tests
          }
       }
 
-      // TODO: Test for each scenario!!
-
       [Fact]
       public async Task Should_Write_And_Query_Deferred_Grouped_Data_With_Multi_Query()
       {
