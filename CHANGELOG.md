@@ -1,4 +1,11 @@
 # Changelog
+
+## 3.2.0
+ * Fixed #17
+
+## 3.1.0
+ * Fixed #14
+
 ## 3.0.4
  * Fixed issue #12
  * Fixed internal tests so they no longer collide
