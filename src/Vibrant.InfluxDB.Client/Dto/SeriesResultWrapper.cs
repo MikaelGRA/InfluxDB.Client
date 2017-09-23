@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace Vibrant.InfluxDB.Client.Dto
 {
    internal class SeriesResultWrapper
-    {
+   {
       [JsonProperty( "series" )]
       internal List<SeriesResult> Series { get; set; }
 

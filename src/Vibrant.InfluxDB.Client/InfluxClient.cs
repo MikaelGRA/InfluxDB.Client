@@ -499,7 +499,6 @@ namespace Vibrant.InfluxDB.Client
       /// <summary>
       /// The SHOW SERIES query returns the distinct series in your database.
       /// </summary>
-      /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
       /// <returns></returns>
       public async Task<InfluxResult<ShowSeriesRow>> ShowSeriesAsync( string db )
@@ -612,6 +611,7 @@ namespace Vibrant.InfluxDB.Client
       /// The SHOW TAG VALUES query returns the set of tag values for a specific tag key across all measurements in the database.
       /// </summary>
       /// <typeparam name="TInfluxRow"></typeparam>
+      /// <typeparam name="TValue"></typeparam>
       /// <param name="db"></param>
       /// <param name="tagKey"></param>
       /// <returns></returns>
@@ -626,6 +626,7 @@ namespace Vibrant.InfluxDB.Client
       /// The SHOW TAG VALUES query returns the set of tag values for a specific tag key across all measurements in the database.
       /// </summary>
       /// <typeparam name="TInfluxRow"></typeparam>
+      /// <typeparam name="TValue"></typeparam>
       /// <param name="db"></param>
       /// <param name="tagKey"></param>
       /// <param name="measurementName"></param>

@@ -13,6 +13,11 @@ namespace Vibrant.InfluxDB.Client
    /// <typeparam name="TInfluxRow"></typeparam>
    public class InfluxSeries<TInfluxRow>
    {
+      /// <summary>
+      /// Constructs an InfluxSeries with the specified name an (optional) tags.
+      /// </summary>
+      /// <param name="name"></param>
+      /// <param name="tags"></param>
       public InfluxSeries( string name, IDictionary<string, object> tags )
       {
          Name = name;
@@ -21,6 +26,16 @@ namespace Vibrant.InfluxDB.Client
          {
             GroupedTags = new ReadOnlyDictionary<string, object>( tags );
          }
+      }
+
+      /// <summary>
+      /// Constructs an InfluxSeries wit hthe specified name.
+      /// </summary>
+      /// <param name="name"></param>
+      public InfluxSeries( string name )
+         : this( name, null )
+      {
+
       }
 
       /// <summary>
@@ -37,10 +52,5 @@ namespace Vibrant.InfluxDB.Client
       /// Gets the rows of the InfluxSeries.
       /// </summary>
       public List<TInfluxRow> Rows { get; set; }
-
-      public void AddRows( IEnumerable<TInfluxRow> rows )
-      {
-         Rows.AddRange( rows );
-      }
    }
 }

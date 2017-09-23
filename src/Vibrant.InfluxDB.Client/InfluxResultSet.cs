@@ -11,6 +11,10 @@ namespace Vibrant.InfluxDB.Client
    /// <typeparam name="TInfluxRow"></typeparam>
    public class InfluxResultSet<TInfluxRow>
    {
+      /// <summary>
+      /// Constructs an InfluxResultSet with the specified results.
+      /// </summary>
+      /// <param name="results"></param>
       public InfluxResultSet( List<InfluxResult<TInfluxRow>> results )
       {
          Results = results;
@@ -27,6 +31,10 @@ namespace Vibrant.InfluxDB.Client
    /// </summary>
    public class InfluxResultSet
    {
+      /// <summary>
+      /// Constructs an InfluxResultSet wit hthe specified results.
+      /// </summary>
+      /// <param name="results"></param>
       public InfluxResultSet( List<InfluxResult> results )
       {
          Results = results;

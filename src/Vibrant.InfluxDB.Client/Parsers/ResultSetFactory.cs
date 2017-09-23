@@ -102,7 +102,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      if( influxSerie == null )
                      {
                         influxSerie = new InfluxSeries<TInfluxRow>( name, tags );
-                        existingResult.AddInfluxSeries( influxSerie );
+                        existingResult.Series.Add( influxSerie );
                      }
                      
                      // add data to found serie
@@ -190,7 +190,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                dataPoints.Add( row );
             }
 
-            influxSerie.AddRows( dataPoints );
+            influxSerie.Rows.AddRange( dataPoints );
          }
       }
 
@@ -286,7 +286,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      if( influxSerie == null )
                      {
                         influxSerie = new InfluxSeries<TInfluxRow>( name, tags );
-                        existingResult.AddInfluxSeries( influxSerie );
+                        existingResult.Series.Add( influxSerie );
                      }
 
                      // add data to found series
@@ -384,7 +384,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                dataPoints.Add( (TInfluxRow)dataPoint );
             }
 
-            influxSerie.AddRows( dataPoints );
+            influxSerie.Rows.AddRange( dataPoints );
          }
       }
    }

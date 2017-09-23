@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client
 {
+   /// <summary>
+   /// InfluxChunkedSeries represents a result when using the ReadChunkedAsync method of InfluxClient.
+   /// </summary>
+   /// <typeparam name="TInfluxRow"></typeparam>
    public class InfluxChunkedSeries<TInfluxRow>
       where TInfluxRow : new()
    {

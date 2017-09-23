@@ -8,11 +8,14 @@ using Vibrant.InfluxDB.Client.Parsers;
 
 namespace Vibrant.InfluxDB.Client
 {
+   /// <summary>
+   /// InfluxChunkedResultSet represents a result when using the ReadChunkedAsync method of InfluxClient.
+   /// </summary>
+   /// <typeparam name="TInfluxRow"></typeparam>
    public class InfluxChunkedResultSet<TInfluxRow> : IDisposable
       where TInfluxRow : new()
    {
       private ContextualQueryResultIterator<TInfluxRow> _iterator;
-
       private bool _disposed = false;
 
       internal InfluxChunkedResultSet( ContextualQueryResultIterator<TInfluxRow> contextualIterator, InfluxClient client, InfluxQueryOptions options, string db )
@@ -64,6 +67,9 @@ namespace Vibrant.InfluxDB.Client
          }
       }
       
+      /// <summary>
+      /// Disposes the underlying stream and http response that this result set represents.
+      /// </summary>
       public void Dispose()
       {
          Dispose( true );

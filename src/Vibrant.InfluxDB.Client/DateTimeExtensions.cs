@@ -90,6 +90,12 @@ namespace Vibrant.InfluxDB.Client
          }
       }
 
+      /// <summary>
+      /// Returns a string representing a influx timespan.
+      /// </summary>
+      /// <param name="that"></param>
+      /// <param name="requireSingleUnit"></param>
+      /// <returns></returns>
       public static string ToInfluxTimeSpan( this TimeSpan that, bool requireSingleUnit )
       {
          if( that.Ticks > -10 && that.Ticks < 10 )

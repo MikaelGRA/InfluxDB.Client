@@ -5,8 +5,14 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client.Rows
 {
-    public class ShowSeriesRow
+   /// <summary>
+   /// Class representing the structured returned by the SHOW SERIES command.
+   /// </summary>
+   public class ShowSeriesRow
    {
+      /// <summary>
+      /// Gets the key.
+      /// </summary>
       [InfluxField( "key" )]
       public string Key { get; private set; }
    }

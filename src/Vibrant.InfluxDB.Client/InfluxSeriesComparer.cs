@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client
 {
-   public static class InfluxSeriesComparer
+   internal static class InfluxSeriesComparer
    {
       public static bool Compare<TInfluxRow>( InfluxSeries<TInfluxRow> left, InfluxSeries<TInfluxRow> right )
       {

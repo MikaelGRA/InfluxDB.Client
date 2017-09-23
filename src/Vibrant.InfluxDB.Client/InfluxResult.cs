@@ -10,6 +10,11 @@ namespace Vibrant.InfluxDB.Client
    /// </summary>
    public class InfluxResult
    {
+      /// <summary>
+      /// Constructs a new InfluxResult with the specified statementId and error, if any.
+      /// </summary>
+      /// <param name="statementId"></param>
+      /// <param name="error"></param>
       public InfluxResult( int statementId, string error )
       {
          StatementId = statementId;
@@ -32,7 +37,7 @@ namespace Vibrant.InfluxDB.Client
       /// </summary>
       public int StatementId { get; private set; }
 
-      public void AppendErrorMessage( string message )
+      internal void AppendErrorMessage( string message )
       {
          if( message != null )
          {
@@ -53,22 +58,34 @@ namespace Vibrant.InfluxDB.Client
    /// <typeparam name="TInfluxRow"></typeparam>
    public class InfluxResult<TInfluxRow> : InfluxResult
    {
+      /// <summary>
+      /// Constructs a new InfluxResult with the specified statementId and error, if any.
+      /// </summary>
+      /// <param name="statementId"></param>
+      /// <param name="error"></param>
       public InfluxResult( int statementId, string error )
          : this( statementId, error, new List<InfluxSeries<TInfluxRow>>() )
       {
          Series = new List<InfluxSeries<TInfluxRow>>();
       }
 
-      public InfluxResult( int statementId, string error, List<InfluxSeries<TInfluxRow>> rows )
+      /// <summary>
+      /// Constructs a new InfluxResult with the specified statementId, error, if any and the series of 
+      /// which the result should consist.
+      /// </summary>
+      /// <param name="statementId"></param>
+      /// <param name="error"></param>
+      /// <param name="series"></param>
+      public InfluxResult( int statementId, string error, List<InfluxSeries<TInfluxRow>> series )
          : base( statementId, error )
       {
-         Series = rows;
+         Series = series;
       }
 
       /// <summary>
       /// Gets the series.
       /// </summary>
-      public List<InfluxSeries<TInfluxRow>> Series { get; private set; }
+      public List<InfluxSeries<TInfluxRow>> Series { get; set; }
 
       /// <summary>
       /// Finds the serie that can be identified by the specified tags. 
@@ -104,11 +121,6 @@ namespace Vibrant.InfluxDB.Client
             throw new InvalidOperationException( "This query result set is not grouped." );
 
          return FindGroupInternal( seriesName, tags, true );
-      }
-
-      public void AddInfluxSeries( InfluxSeries<TInfluxRow> series )
-      {
-         Series.Add( series );
       }
 
       internal InfluxSeries<TInfluxRow> FindGroupInternal( string seriesName, IEnumerable<KeyValuePair<string, object>> tags, bool requireNameComparison )
