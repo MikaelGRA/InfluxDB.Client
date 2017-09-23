@@ -136,6 +136,39 @@ namespace Vibrant.InfluxDB.Client.Tests
          Assert.Equal( 0, result.Series.Count );
       }
 
+      //[Fact]
+      //public async Task Should_Write_And_Query_Typed_Data_Using_Post()
+      //{
+      //   var start = new DateTime( 2013, 1, 1, 1, 1, 1, DateTimeKind.Utc );
+      //   var infos = InfluxClientFixture.CreateTypedRowsStartingAt( start, 500, false );
+      //   await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo6", infos );
+      //   var options = new InfluxQueryOptions
+      //   {
+      //      UsePost = true
+      //   };
+
+      //   var from = start;
+      //   var to = from.AddSeconds( 250 );
+
+      //   var resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM computerInfo6 WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'", options );
+      //   Assert.Equal( 1, resultSet.Results.Count );
+
+      //   var result = resultSet.Results[ 0 ];
+      //   Assert.Equal( 1, result.Series.Count );
+
+      //   var series = result.Series[ 0 ];
+      //   Assert.Equal( 250, series.Rows.Count );
+
+      //   // attempt deletion
+      //   await _client.DeleteRangeAsync( InfluxClientFixture.DatabaseName, "computerInfo6", from, to );
+
+      //   resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM computerInfo6 WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'", options );
+      //   Assert.Equal( 1, resultSet.Results.Count );
+
+      //   result = resultSet.Results[ 0 ];
+      //   Assert.Equal( 0, result.Series.Count );
+      //}
+
       [Fact]
       public async Task Should_Write_Read_And_Delete_Typed_Data()
       {

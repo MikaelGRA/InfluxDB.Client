@@ -18,6 +18,7 @@ namespace Vibrant.InfluxDB.Client
       {
          Precision = null;
          ChunkSize = null;
+         UsePost = false;
          MetadataExpiration = TimeSpan.FromHours( 1 );
       }
 
@@ -37,12 +38,19 @@ namespace Vibrant.InfluxDB.Client
       /// takes to expire and must be retrieved again.
       /// 
       /// This is only used when querying data based on the IInfluxRow interface
-      /// because this interface. This is because the interface has no way to 
+      /// This is because the interface has no way to 
       /// know which retrieved columns are fields or tags. It therefore makes an
       /// implicit query to get this information from the database.
       /// 
       /// A value of null means it never expires. Default is 1 hour.
       /// </summary>
       public TimeSpan? MetadataExpiration { get; set; }
+
+      /// <summary>
+      /// Gets or sets a bool indicating if the http POST method
+      /// should be used instead of the default GET method when
+      /// querying data.
+      /// </summary>
+      public bool UsePost { get; set; }
    }
 }
