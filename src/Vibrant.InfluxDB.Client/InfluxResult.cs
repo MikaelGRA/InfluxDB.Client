@@ -143,7 +143,7 @@ namespace Vibrant.InfluxDB.Client
             return false;
          }
 
-         return InfluxSeriesComparer.Compare( result, tags );
+         return InfluxSeriesComparer.Compare( result.GroupedTags, tags );
       }
    }
 }

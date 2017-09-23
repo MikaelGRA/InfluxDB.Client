@@ -43,10 +43,9 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxChunk<TInfluxRow>> GetNextChunkAsync()
       {
-         List<TInfluxRow> batch;
-         if( ( batch = await _iterator.GetNextBatchAsync().ConfigureAwait( false ) ) != null )
+         if( await _iterator.ConsumeNextBatchAsync().ConfigureAwait( false ) )
          {
-            return new InfluxChunk<TInfluxRow>( batch );
+            return new InfluxChunk<TInfluxRow>( _iterator.CurrentBatch );
          }
 
          return null;

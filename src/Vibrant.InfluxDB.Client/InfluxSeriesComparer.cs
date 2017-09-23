@@ -10,39 +10,45 @@ namespace Vibrant.InfluxDB.Client
    {
       public static bool Compare<TInfluxRow>( InfluxSeries<TInfluxRow> left, InfluxSeries<TInfluxRow> right )
       {
-         return Compare( left, right.GroupedTags );
+         return Compare( left.GroupedTags, right.GroupedTags );
       }
 
-      public static bool Compare<TInfluxRow>( InfluxSeries<TInfluxRow> left, IEnumerable<KeyValuePair<string, object>> rightTags )
+      public static bool Compare( IReadOnlyDictionary<string, object> leftTags, IEnumerable<KeyValuePair<string, object>> rightTags )
       {
-         if( left.GroupedTags == null && ( rightTags == null || rightTags.Count() == 0 ) )
+         if( leftTags != null && rightTags != null )
          {
-            return true;
-         }
-
-         foreach( var tag in rightTags )
-         {
-            object tagValue;
-            if( left.GroupedTags.TryGetValue( tag.Key, out tagValue ) )
+            if( leftTags.Count == 0 && rightTags.Count() == 0 )
             {
-               if( tagValue != null )
+               return true;
+            }
+
+            foreach( var tag in rightTags )
+            {
+               object tagValue;
+               if( leftTags.TryGetValue( tag.Key, out tagValue ) )
                {
-                  if( !tagValue.Equals( tag.Value ) )
+                  if( tagValue != null )
                   {
-                     return false;
+                     if( !tagValue.Equals( tag.Value ) )
+                     {
+                        return false;
+                     }
                   }
-               }
-               else
-               {
-                  // tagValue is null, so only continue if tag.Value is also null
-                  if( tag.Value != null )
+                  else
                   {
-                     return false;
+                     // tagValue is null, so only continue if tag.Value is also null
+                     if( tag.Value != null )
+                     {
+                        return false;
+                     }
                   }
                }
             }
+            return true;
          }
-         return true;
+
+         return false;
+
       }
    }
 }

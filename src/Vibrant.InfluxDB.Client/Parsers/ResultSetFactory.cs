@@ -198,10 +198,9 @@ namespace Vibrant.InfluxDB.Client.Parsers
          SeriesResult series, 
          IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> propertyMap )
       {
-         Dictionary<string, object> tags = null;
+         Dictionary<string, object> tags = new Dictionary<string, object>();
          if( series.Tags != null )
          {
-            tags = new Dictionary<string, object>();
             foreach( var kvp in series.Tags )
             {
                object value;
@@ -279,7 +278,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      var name = series.Name;
 
                      // create influx series
-                     var tags = series.Tags?.ToDictionary( x => x.Key, x => x.Value == string.Empty ? null : (object)x.Value ) ?? null;
+                     var tags = series.Tags?.ToDictionary( x => x.Key, x => x.Value == string.Empty ? null : (object)x.Value ) ?? new Dictionary<string, object>();
 
                      // find or create influx serie
                      var influxSerie = existingResult.FindGroupInternal( name, tags, true );

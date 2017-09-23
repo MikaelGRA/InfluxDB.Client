@@ -304,15 +304,18 @@ namespace Vibrant.InfluxDB.Client.Tests
          }
       }
 
-      [Fact]
-      public async Task Should_Write_And_Query_Deferred_Grouped_Data_With_Multi_Query()
+      [Theory]
+      [InlineData( 100, 'A' )]
+      [InlineData( 200, 'B' )]
+      [InlineData( 5000, 'C' )]
+      public async Task Should_Write_And_Query_Deferred_Grouped_Data_With_Multi_Query( int count, char c )
       {
          var start = new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc );
-         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( start, 5000, false );
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo4", infos );
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo5", infos );
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( start, count, false );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, $"groupedComputerInfo4{c}", infos );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, $"groupedComputerInfo5{c}", infos );
 
-         var chunkedResultSet = await _client.ReadChunkedAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedComputerInfo4 GROUP BY region;SELECT * FROM groupedComputerInfo5 GROUP BY region", new InfluxQueryOptions { ChunkSize = 200 } );
+         var chunkedResultSet = await _client.ReadChunkedAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedComputerInfo4{c} GROUP BY region;SELECT * FROM groupedComputerInfo5{c} GROUP BY region", new InfluxQueryOptions { ChunkSize = 200 } );
          
          InfluxChunkedResult<ComputerInfo> currentResult;
          InfluxChunkedSeries<ComputerInfo> currentSerie;
@@ -339,7 +342,7 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          Assert.Equal( 1 * 2, resultCount );
          Assert.Equal( InfluxClientFixture.Regions.Length * 2, serieCount );
-         Assert.Equal( 5000 * 2, rowCount );
+         Assert.Equal( count * 2, rowCount );
       }
 
       [Fact]
@@ -358,6 +361,7 @@ namespace Vibrant.InfluxDB.Client.Tests
          int serieCount = 0;
          int rowCount = 0;
 
+         HashSet<DateTime> times = new HashSet<DateTime>();
          using( chunkedResultSet )
          {
             while( ( currentResult = await chunkedResultSet.GetNextResultAsync() ) != null )
@@ -366,6 +370,11 @@ namespace Vibrant.InfluxDB.Client.Tests
                {
                   while( ( currentChunk = await currentSerie.GetNextChunkAsync() ) != null )
                   {
+                     foreach( var row in currentChunk.Rows )
+                     {
+                        Assert.False( times.Contains( row.Timestamp ) );
+                        times.Add( row.Timestamp );
+                     }
                      rowCount += currentChunk.Rows.Count;
                   }
                   serieCount++;
@@ -395,6 +404,7 @@ namespace Vibrant.InfluxDB.Client.Tests
          int serieCount = 0;
          int rowCount = 0;
 
+         HashSet<DateTime> times = new HashSet<DateTime>();
          using( chunkedResultSet )
          {
             while( ( currentResult = await chunkedResultSet.GetNextResultAsync() ) != null )
@@ -403,6 +413,11 @@ namespace Vibrant.InfluxDB.Client.Tests
                {
                   while( ( currentChunk = await currentSerie.GetNextChunkAsync() ) != null )
                   {
+                     foreach( var row in currentChunk.Rows )
+                     {
+                        Assert.False( times.Contains( row.Timestamp ) );
+                        times.Add( row.Timestamp );
+                     }
                      rowCount += currentChunk.Rows.Count;
                   }
                   serieCount++;
@@ -414,6 +429,88 @@ namespace Vibrant.InfluxDB.Client.Tests
          Assert.Equal( 1, resultCount );
          Assert.Equal( 1, serieCount );
          Assert.Equal( 5000, rowCount );
+      }
+
+      [Fact]
+      public async Task Should_Write_And_Query_Deferred_Grouped_Data_Breaking()
+      {
+         var start = new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc );
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( start, 5000, false );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo8", infos );
+
+         var chunkedResultSet = await _client.ReadChunkedAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedComputerInfo8 GROUP BY region", new InfluxQueryOptions { ChunkSize = 200 } );
+
+         InfluxChunkedResult<ComputerInfo> currentResult;
+         InfluxChunkedSeries<ComputerInfo> currentSerie;
+         InfluxChunk<ComputerInfo> currentChunk;
+         int resultCount = 0;
+         int serieCount = 0;
+         int rowCount = 0;
+
+         using( chunkedResultSet )
+         {
+            while( ( currentResult = await chunkedResultSet.GetNextResultAsync() ) != null )
+            {
+               while( ( currentSerie = await currentResult.GetNextSeriesAsync() ) != null )
+               {
+                  while( ( currentChunk = await currentSerie.GetNextChunkAsync() ) != null )
+                  {
+                     rowCount += currentChunk.Rows.Count;
+                     break;
+                  }
+                  serieCount++;
+               }
+               resultCount++;
+            }
+         }
+
+         Assert.Equal( 1, resultCount );
+         Assert.Equal( InfluxClientFixture.Regions.Length, serieCount );
+         Assert.Equal( 1000, rowCount );
+      }
+
+      [Fact]
+      public async Task Should_Write_And_Query_Deferred_Grouped_Data_Breaking_2()
+      {
+         var start = new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc );
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( start, 5000, false );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo9", infos );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo10", infos );
+
+         var chunkedResultSet = await _client.ReadChunkedAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedComputerInfo9 GROUP BY region;SELECT * FROM groupedComputerInfo10 GROUP BY region", new InfluxQueryOptions { ChunkSize = 200 } );
+
+         InfluxChunkedResult<ComputerInfo> currentResult;
+         InfluxChunkedSeries<ComputerInfo> currentSerie;
+         InfluxChunk<ComputerInfo> currentChunk;
+         int resultCount = 0;
+         int serieCount = 0;
+         int rowCount = 0;
+         HashSet<string> measurements = new HashSet<string>();
+
+         using( chunkedResultSet )
+         {
+            while( ( currentResult = await chunkedResultSet.GetNextResultAsync() ) != null )
+            {
+               while( ( currentSerie = await currentResult.GetNextSeriesAsync() ) != null )
+               {
+                  while( ( currentChunk = await currentSerie.GetNextChunkAsync() ) != null )
+                  {
+                     rowCount += currentChunk.Rows.Count;
+                     break;
+                  }
+                  measurements.Add( currentSerie.Name );
+                  serieCount++;
+                  break;
+               }
+               resultCount++;
+            }
+         }
+
+         Assert.Equal( 2, resultCount );
+         Assert.Equal( 2, serieCount );
+         Assert.Equal( 400, rowCount );
+         Assert.True( measurements.Contains( "groupedComputerInfo9" ) );
+         Assert.True( measurements.Contains( "groupedComputerInfo10" ) );
       }
    }
 }
