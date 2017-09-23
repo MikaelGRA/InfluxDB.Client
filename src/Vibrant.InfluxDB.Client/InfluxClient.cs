@@ -778,7 +778,7 @@ namespace Vibrant.InfluxDB.Client
       public Task<InfluxChunkedResultSet<TInfluxRow>> ReadChunkedAsync<TInfluxRow>( string db, string query )
          where TInfluxRow : new()
       {
-         return ExecuteQueryInternalAsync<TInfluxRow>( query, db, DefaultQueryOptions );
+         return ExecuteQueryInternalAsync<TInfluxRow>( query, db, true, false, DefaultQueryOptions );
       }
 
       /// <summary>
@@ -952,7 +952,7 @@ namespace Vibrant.InfluxDB.Client
       private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryByObjectIteratorInternalAsync<TInfluxRow>( string query, string db, InfluxQueryOptions options )
          where TInfluxRow : new()
       {
-         var objectIterator = await GetInternalByObjectIteratorAsync( CreateQueryUrl( query, db, options ) ).ConfigureAwait( false );
+         var objectIterator = await GetInternalByObjectIteratorAsync( CreateQueryUrl( query, db, true, options ) ).ConfigureAwait( false );
          return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResult, db, options.Precision, true, options.MetadataExpiration ).ConfigureAwait( false );
       }
 
@@ -1025,9 +1025,7 @@ namespace Vibrant.InfluxDB.Client
             using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
-
-               var queryResult = await response.Content.GetObjectIteratorAsync().ConfigureAwait( false );
-               return queryResult;
+               return await response.Content.GetObjectIteratorAsync().ConfigureAwait( false );
             }
          }
          catch( HttpRequestException e )
@@ -1036,7 +1034,7 @@ namespace Vibrant.InfluxDB.Client
          }
       }
 
-      private async Task<List<QueryResult>> GetInternalAsync( string url, bool isMeasurementsQuery )
+      private async Task<List<QueryResult>> GetInternalAsync( string url )
       {
          try
          {
@@ -1058,7 +1056,7 @@ namespace Vibrant.InfluxDB.Client
          try
          {
             using( var request = new HttpRequestMessage( HttpMethod.Post, url ) { Content = new StringContent( "" ) } )
-            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
+            using( var response = await _client.SendAsync( request ).ConfigureAwait( false ) )
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
                var queryResults = await response.Content.ReadMultipleAsJsonAsync<QueryResult>().ConfigureAwait( false );
@@ -1076,7 +1074,7 @@ namespace Vibrant.InfluxDB.Client
          try
          {
             using( var request = new HttpRequestMessage( HttpMethod.Post, url ) { Content = content } )
-            using( var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false ) )
+            using( var response = await _client.SendAsync( request ).ConfigureAwait( false ) )
             {
                await EnsureSuccessCode( response ).ConfigureAwait( false );
                var queryResult = await response.Content.ReadMultipleAsJsonAsync<QueryResult>().ConfigureAwait( false );
