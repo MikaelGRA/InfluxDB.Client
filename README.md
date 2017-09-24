@@ -190,7 +190,7 @@ public async Task Should_Query_Dynamic_Data()
 
 Often, you may not be selecting the exact structure that you are also inserting. Maybe you are doing some aggregation or calculations on the data that you are retrieving that changes the name of the returned columns.
 
-In this case, you can simply define a new class and use the InfluxComputedAttribute. Anything columns that matches the name specified in the attribute (tag or field, aggregated or not) will go into the property with this attribute.
+In this case, you can simply define a new class and use the InfluxComputedAttribute. Any columns that matches the name specified in the attribute (tag or field, aggregated or not) will go into the property with this attribute.
 
 ```c#
 [InfluxComputedAttribute]
