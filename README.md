@@ -207,423 +207,491 @@ The InfluxClient also defines a host of other management operations. That can be
 The interface for all these operations can be seen below:
 
 ```c#
-#region Ping
+      #region Ping
 
-/// <summary>
-/// Executes a ping.
-/// </summary>
-/// <returns></returns>
-public Task<InfluxPingResult> PingAsync()
+      /// <summary>
+      /// Executes a ping.
+      /// </summary>
+      /// <returns></returns>
+      public Task<InfluxPingResult> PingAsync();
 
-/// <summary>
-/// Executes a ping and waits for the leader to respond.
-/// </summary>
-/// <param name="secondsToWaitForLeader"></param>
-/// <returns></returns>
-public Task<InfluxPingResult> PingAsync( int secondsToWaitForLeader )
+      /// <summary>
+      /// Executes a ping and waits for the leader to respond.
+      /// </summary>
+      /// <param name="secondsToWaitForLeader"></param>
+      /// <returns></returns>
+      public Task<InfluxPingResult> PingAsync( int secondsToWaitForLeader );
 
-#endregion
+      #endregion
 
-#region System Monitoring
+      #region System Monitoring
 
-/// <summary>
-/// Shows InfluxDB stats.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <returns></returns>
-public async Task<InfluxResult<TInfluxRow>> ShowStatsAsync<TInfluxRow>()
+      /// <summary>
+      /// Shows InfluxDB stats.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <returns></returns>
+      public async Task<InfluxResult<TInfluxRow>> ShowStatsAsync<TInfluxRow>();
 
-/// <summary>
-/// Shows InfluxDB diagnostics.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <returns></returns>
-public async Task<InfluxResult<TInfluxRow>> ShowDiagnosticsAsync<TInfluxRow>()
+      /// <summary>
+      /// Shows InfluxDB diagnostics.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <returns></returns>
+      public async Task<InfluxResult<TInfluxRow>> ShowDiagnosticsAsync<TInfluxRow>();
 
-/// <summary>
-/// Shows Shards.
-/// </summary>
-/// <returns></returns>
-public async Task<InfluxResult<ShardRow>> ShowShards()
+      /// <summary>
+      /// Shows Shards.
+      /// </summary>
+      /// <returns></returns>
+      public async Task<InfluxResult<ShardRow>> ShowShards();
 
-#endregion
+      #endregion
 
-#region Authentication and Authorization
+      #region Authentication and Authorization
 
-/// <summary>
-/// CREATE a new admin user.
-/// </summary>
-/// <param name="username"></param>
-/// <param name="password"></param>
-/// <returns></returns>
-public Task CreateAdminUserAsync( string username, string password )
+      /// <summary>
+      /// CREATE a new admin user.
+      /// </summary>
+      /// <param name="username"></param>
+      /// <param name="password"></param>
+      /// <returns></returns>
+      public Task<InfluxResultSet> CreateAdminUserAsync( string username, string password );
 
-/// <summary>
-/// CREATE a new non-admin user.
-/// </summary>
-/// <param name="username"></param>
-/// <param name="password"></param>
-/// <returns></returns>
-public Task CreateUserAsync( string username, string password )
+      /// <summary>
+      /// CREATE a new non-admin user.
+      /// </summary>
+      /// <param name="username"></param>
+      /// <param name="password"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> CreateUserAsync( string username, string password );
 
-/// GRANT administrative privileges to an existing user.
-/// </summary>
-/// <param name="username"></param>
-/// <param name="password"></param>
-/// <returns></returns>
-public Task GrantAdminPrivilegesAsync( string username )
+      /// <summary>
+      /// GRANT administrative privileges to an existing user.
+      /// </summary>
+      /// <param name="username"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> GrantAdminPrivilegesAsync( string username );
 
-/// <summary>
-/// GRANT READ, WRITE or ALL database privileges to an existing user.
-/// </summary>
-/// <param name="privilege"></param>
-/// <param name="db"></param>
-/// <param name="username"></param>
-/// <returns></returns>
-public Task GrantPrivilegeAsync( string db, DatabasePriviledge privilege, string username )
+      /// <summary>
+      /// GRANT READ, WRITE or ALL database privileges to an existing user.
+      /// </summary>
+      /// <param name="privilege"></param>
+      /// <param name="db"></param>
+      /// <param name="username"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> GrantPrivilegeAsync( string db, DatabasePriviledge privilege, string username );
 
-/// <summary>
-/// REVOKE administrative privileges from an admin user
-/// </summary>
-/// <param name="username"></param>
-/// <returns></returns>
-public Task RevokeAdminPrivilegesAsync( string username )
+      /// <summary>
+      /// REVOKE administrative privileges from an admin user
+      /// </summary>
+      /// <param name="username"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> RevokeAdminPrivilegesAsync( string username );
 
-/// <summary>
-/// REVOKE READ, WRITE, or ALL database privileges from an existing user.
-/// </summary>
-/// <param name="privilege"></param>
-/// <param name="db"></param>
-/// <param name="username"></param>
-/// <returns></returns>
-public Task RevokePrivilegeAsync( string db, DatabasePriviledge privilege, string username )
+      /// <summary>
+      /// REVOKE READ, WRITE, or ALL database privileges from an existing user.
+      /// </summary>
+      /// <param name="privilege"></param>
+      /// <param name="db"></param>
+      /// <param name="username"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> RevokePrivilegeAsync( string db, DatabasePriviledge privilege, string username );
 
-/// <summary>
-/// SET a user’s password.
-/// </summary>
-/// <param name="username"></param>
-/// <param name="password"></param>
-/// <returns></returns>
-public Task SetPasswordAsync( string username, string password )
+      /// <summary>
+      /// SET a user’s password.
+      /// </summary>
+      /// <param name="username"></param>
+      /// <param name="password"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> SetPasswordAsync( string username, string password );
 
-/// <summary>
-/// DROP a user.
-/// </summary>
-/// <param name="username"></param>
-/// <returns></returns>
-public Task DropUserAsync( string username )
+      /// <summary>
+      /// DROP a user.
+      /// </summary>
+      /// <param name="username"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> DropUserAsync( string username );
 
-/// <summary>
-/// SHOW all existing users and their admin status.
-/// </summary>
-/// <returns></returns>
-public async Task<InfluxResult<UserRow>> ShowUsersAsync()
+      /// <summary>
+      /// SHOW all existing users and their admin status.
+      /// </summary>
+      /// <returns></returns>
+      public async Task<InfluxResult<UserRow>> ShowUsersAsync();
 
-/// <summary>
-/// SHOW a user’s database privileges.
-/// </summary>
-/// <param name="username"></param>
-/// <returns></returns>
-public async Task<InfluxResult<GrantsRow>> ShowGrantsAsync( string username )
+      /// <summary>
+      /// SHOW a user’s database privileges.
+      /// </summary>
+      /// <param name="username"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<GrantsRow>> ShowGrantsAsync( string username );
 
-#endregion
+      #endregion
 
-#region Database Management
+      #region Database Management
 
-/// <summary>
-/// Create a database with CREATE DATABASE.
-/// </summary>
-/// <param name="db"></param>
-/// <returns></returns>
-public Task CreateDatabaseAsync( string db )
+      /// <summary>
+      /// Create a database with CREATE DATABASE.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> CreateDatabaseAsync( string db );
 
-/// <summary>
-/// Delete a database with DROP DATABASE
-/// </summary>
-/// <param name="db"></param>
-/// <returns></returns>
-public Task DropDatabaseAsync( string db )
+      /// <summary>
+      /// Delete a database with DROP DATABASE
+      /// </summary>
+      /// <param name="db"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> DropDatabaseAsync( string db );
 
-/// <summary>
-/// Delete series with DROP SERIES
-/// </summary>
-/// <param name="db"></param>
-/// <param name="measurementName"></param>
-/// <returns></returns>
-public Task DropSeries( string db, string measurementName )
+      /// <summary>
+      /// Delete series with DROP SERIES
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="measurementName"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> DropSeries( string db, string measurementName );
 
-/// <summary>
-/// Delete series with DROP SERIES
-/// </summary>
-/// <param name="db"></param>
-/// <param name="measurementName"></param>
-/// <param name="where"></param>
-/// <returns></returns>
-public Task DropSeries( string db, string measurementName, string where )
+      /// <summary>
+      /// Delete series with DROP SERIES
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="measurementName"></param>
+      /// <param name="where"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> DropSeries( string db, string measurementName, string where );
 
-/// <summary>
-/// Delete measurements with DROP MEASUREMENT
-/// </summary>
-/// <param name="measurementName"></param>
-/// <param name="db"></param>
-/// <returns></returns>
-public Task DropMeasurementAsync( string db, string measurementName )
+      /// <summary>
+      /// Delete measurements with DROP MEASUREMENT
+      /// </summary>
+      /// <param name="measurementName"></param>
+      /// <param name="db"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> DropMeasurementAsync( string db, string measurementName );
 
-/// <summary>
-/// Create retention policies with CREATE RETENTION POLICY
-/// </summary>
-/// <param name="policyName"></param>
-/// <param name="db"></param>
-/// <param name="duration"></param>
-/// <param name="replicationLevel"></param>
-/// <param name="isDefault"></param>
-/// <returns></returns>
-public Task CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault )
+      /// <summary>
+      /// Create retention policies with CREATE RETENTION POLICY
+      /// </summary>
+      /// <param name="policyName"></param>
+      /// <param name="db"></param>
+      /// <param name="duration"></param>
+      /// <param name="replicationLevel"></param>
+      /// <param name="isDefault"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault );
 
-/// <summary>
-/// Modify retention policies with ALTER RETENTION POLICY
-/// </summary>
-/// <param name="policyName"></param>
-/// <param name="db"></param>
-/// <param name="duration"></param>
-/// <param name="replicationLevel"></param>
-/// <param name="isDefault"></param>
-/// <returns></returns>
-public Task AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault )
+      /// <summary>
+      /// Modify retention policies with ALTER RETENTION POLICY
+      /// </summary>
+      /// <param name="policyName"></param>
+      /// <param name="db"></param>
+      /// <param name="duration"></param>
+      /// <param name="replicationLevel"></param>
+      /// <param name="isDefault"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault );
 
-/// <summary>
-/// Delete retention policies with DROP RETENTION POLICY
-/// </summary>
-/// <param name="policyName"></param>
-/// <param name="db"></param>
-/// <returns></returns>
-public Task DropRetentionPolicyAsync( string db, string policyName )
+      /// <summary>
+      /// Delete retention policies with DROP RETENTION POLICY
+      /// </summary>
+      /// <param name="policyName"></param>
+      /// <param name="db"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> DropRetentionPolicyAsync( string db, string policyName );
 
-#endregion
+      #endregion
 
-#region Continous Queries
+      #region Continous Queries
 
-/// <summary>
-/// To see the continuous queries you have defined, query SHOW CONTINUOUS QUERIES and InfluxDB will return the name and query for each continuous query in the database.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <returns></returns>
-public async Task<InfluxResult<ContinuousQueryRow>> ShowContinuousQueries( string db )
+      /// <summary>
+      /// To see the continuous queries you have defined, query SHOW CONTINUOUS QUERIES and InfluxDB will return the name and query for each continuous query in the database.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<ContinuousQueryRow>> ShowContinuousQueries( string db );
 
-/// <summary>
-/// Creates a continuous query.
-/// </summary>
-/// <param name="name"></param>
-/// <param name="db"></param>
-/// <param name="continuousQuery"></param>
-/// <returns></returns>
-public Task CreateContinuousQuery( string db, string name, string continuousQuery )
+      /// <summary>
+      /// Creates a continuous query.
+      /// </summary>
+      /// <param name="name"></param>
+      /// <param name="db"></param>
+      /// <param name="continuousQuery"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> CreateContinuousQuery( string db, string name, string continuousQuery );
 
-/// <summary>
-/// Drops a continuous query.
-/// </summary>
-/// <param name="name"></param>
-/// <param name="db"></param>
-/// <returns></returns>
-public Task DropContinuousQuery( string db, string name )
+      /// <summary>
+      /// Drops a continuous query.
+      /// </summary>
+      /// <param name="name"></param>
+      /// <param name="db"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> DropContinuousQuery( string db, string name ); return resultSet.Results.FirstOrDefault();
+      }
 
-#endregion
+      #endregion
 
-#region Schema Exploration
+      #region Schema Exploration
 
-/// <summary>
-/// Get a list of all the databases in your system.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <returns></returns>
-public async Task<InfluxResult<DatabaseRow>> ShowDatabasesAsync()
+      /// <summary>
+      /// Get a list of all the databases in your system.
+      /// </summary>
+      /// <returns></returns>
+      public async Task<InfluxResult<DatabaseRow>> ShowDatabasesAsync();
 
-/// <summary>
-/// The SHOW RETENTION POLICIES query lists the existing retention policies on a given database.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <returns></returns>
-public async Task<InfluxResult<RetentionPolicyRow>> ShowRetentionPoliciesAsync( string db )
+      /// <summary>
+      /// The SHOW RETENTION POLICIES query lists the existing retention policies on a given database.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<RetentionPolicyRow>> ShowRetentionPoliciesAsync( string db );
 
-/// <summary>
-/// The SHOW SERIES query returns the distinct series in your database.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <returns></returns>
-public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db )
+      /// <summary>
+      /// The SHOW SERIES query returns the distinct series in your database.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<ShowSeriesRow>> ShowSeriesAsync( string db );
 
-/// <summary>
-/// The SHOW SERIES query returns the distinct series in your database.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <param name="measurementName"></param>
-/// <returns></returns>
-public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db, string measurementName )
+      /// <summary>
+      /// The SHOW SERIES query returns the distinct series in your database.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="measurementName"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db, string measurementName );
 
-/// <summary>
-/// The SHOW SERIES query returns the distinct series in your database.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <param name="measurementName"></param>
-/// <param name="where"></param>
-/// <returns></returns>
-public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db, string measurementName, string where )
+      /// <summary>
+      /// The SHOW SERIES query returns the distinct series in your database.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="measurementName"></param>
+      /// <param name="where"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db, string measurementName, string where );
 
-/// <summary>
-/// The SHOW MEASUREMENTS query returns the measurements in your database.
-/// </summary>
-/// <param name="db"></param>
-/// <returns></returns>
-public Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db )
+      /// <summary>
+      /// The SHOW MEASUREMENTS query returns the measurements in your database.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db );
 
-/// <summary>
-/// The SHOW MEASUREMENTS query returns the measurements in your database.
-/// </summary>
-/// <param name="db"></param>
-/// <param name="where"></param>
-/// <returns></returns>
-public Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db, string where )
+      /// <summary>
+      /// The SHOW MEASUREMENTS query returns the measurements in your database.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="where"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db, string where );
 
-/// <summary>
-/// The SHOW MEASUREMENTS query returns the measurements in your database.
-/// </summary>
-/// <param name="db"></param>
-/// <param name="measurementRegex"></param>
-/// <returns></returns>
-public Task<InfluxResult<MeasurementRow>> ShowMeasurementsWithMeasurementAsync( string db, string measurementRegex )
+      /// <summary>
+      /// The SHOW MEASUREMENTS query returns the measurements in your database.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="measurementRegex"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsWithMeasurementAsync( string db, string measurementRegex );
 
-/// <summary>
-/// The SHOW MEASUREMENTS query returns the measurements in your database.
-/// </summary>
-/// <param name="db"></param>
-/// <param name="measurementRegex"></param>
-/// <param name="where"></param>
-/// <returns></returns>
-public Task<InfluxResult<MeasurementRow>> ShowMeasurementsWithMeasurementAsync( string db, string measurementRegex, string where )
+      /// <summary>
+      /// The SHOW MEASUREMENTS query returns the measurements in your database.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="measurementRegex"></param>
+      /// <param name="where"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsWithMeasurementAsync( string db, string measurementRegex, string where );
 
-/// <summary>
-/// SHOW TAG KEYS returns the tag keys associated with each measurement.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <returns></returns>
-public async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( string db )
+      /// <summary>
+      /// SHOW TAG KEYS returns the tag keys associated with each measurement.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( string db );
 
-/// <summary>
-/// SHOW TAG KEYS returns the tag keys associated with each measurement.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <param name="measurementName"></param>
-/// <returns></returns>
-public async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( string db, string measurementName )
+      /// <summary>
+      /// SHOW TAG KEYS returns the tag keys associated with each measurement.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="measurementName"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( string db, string measurementName );
 
-/// <summary>
-/// The SHOW TAG VALUES query returns the set of tag values for a specific tag key across all measurements in the database.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <param name="tagKey"></param>
-/// <returns></returns>
-public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsync<TInfluxRow>( string db, string tagKey )
+      /// <summary>
+      /// The SHOW TAG VALUES query returns the set of tag values for a specific tag key across all measurements in the database.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <typeparam name="TValue"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="tagKey"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsAsync<TInfluxRow, TValue>( string db, string tagKey );
 
-/// <summary>
-/// The SHOW TAG VALUES query returns the set of tag values for a specific tag key across all measurements in the database.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <param name="tagKey"></param>
-/// <param name="measurementName"></param>
-/// <returns></returns>
-public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsync<TInfluxRow>( string db, string tagKey, string measurementName )
+      /// <summary>
+      /// The SHOW TAG VALUES query returns the set of tag values for a specific tag key across all measurements in the database.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <typeparam name="TValue"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="tagKey"></param>
+      /// <param name="measurementName"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsAsync<TInfluxRow, TValue>( string db, string tagKey, string measurementName );
+
+      /// <summary>
+      /// The SHOW TAG VALUES query returns the set of tag values for a specific tag key across all measurements in the database.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="tagKey"></param>
+      /// <returns></returns>
+      public Task<InfluxResult<TagValueRow>> ShowTagValuesAsync( string db, string tagKey );
+
+      /// <summary>
+      /// The SHOW TAG VALUES query returns the set of tag values for a specific tag key across all measurements in the database.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="tagKey"></param>
+      /// <param name="measurementName"></param>
+      /// <returns></returns>
+      public Task<InfluxResult<TagValueRow>> ShowTagValuesAsync( string db, string tagKey, string measurementName );
 
 
-/// <summary>
-/// The SHOW FIELD KEYS query returns the field keys across each measurement in the database.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <returns></returns>
-public async Task<InfluxResult<FieldKeyRow>> ShowFieldKeysAsync( string db )
+      /// <summary>
+      /// The SHOW FIELD KEYS query returns the field keys across each measurement in the database.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<FieldKeyRow>> ShowFieldKeysAsync( string db );
 
-/// <summary>
-/// The SHOW FIELD KEYS query returns the field keys across each measurement in the database.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <param name="measurementName"></param>
-/// <returns></returns>
-public async Task<InfluxResult<FieldKeyRow>> ShowFieldKeysAsync( string db, string measurementName )
+      /// <summary>
+      /// The SHOW FIELD KEYS query returns the field keys across each measurement in the database.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="measurementName"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<FieldKeyRow>> ShowFieldKeysAsync( string db, string measurementName );
 
-#endregion
+      #endregion
 
-#region Data Management
+      #region Data Management
 
-/// <summary>
-/// Writes the rows with default write options.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <param name="measurementName"></param>
-/// <param name="rows"></param>
-/// <returns></returns>
-public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows )
+      /// <summary>
+      /// Writes the rows with default write options.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="measurementName"></param>
+      /// <param name="rows"></param>
+      /// <returns></returns>
+      public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows );
 
-/// <summary>
-/// Writes the rows with the specified write options.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <param name="measurementName"></param>
-/// <param name="rows"></param>
-/// <param name="options"></param>
-/// <returns></returns>
-public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
+      /// <summary>
+      /// Writes the rows with the specified write options.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="measurementName"></param>
+      /// <param name="rows"></param>
+      /// <param name="options"></param>
+      /// <returns></returns>
+      public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options );
 
-/// <summary>
-/// Writes the rows with default write options.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <param name="rows"></param>
-/// <returns></returns>
-public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows )
+      /// <summary>
+      /// Writes the rows with default write options.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="rows"></param>
+      /// <returns></returns>
+      public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows );
 
-/// <summary>
-/// Writes the rows with the specified write options.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="db"></param>
-/// <param name="rows"></param>
-/// <param name="options"></param>
-/// <returns></returns>
-public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
+      /// <summary>
+      /// Writes the rows with the specified write options.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="rows"></param>
+      /// <param name="options"></param>
+      /// <returns></returns>
+      public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options );
 
-/// <summary>
-/// Executes the query and returns the result with the default query options.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="query"></param>
-/// <param name="db"></param>
-/// <returns></returns>
-public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query )
+      private Task WriteAsync<TInfluxRow>( string db, Func<TInfluxRow, string> getMeasurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options );
 
-/// <summary>
-/// Executes the query and returns the result with the specified query options.
-/// </summary>
-/// <typeparam name="TInfluxRow"></typeparam>
-/// <param name="query"></param>
-/// <param name="db"></param>
-/// <param name="options"></param>
-/// <returns></returns>
-public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query, InfluxQueryOptions options )
+      /// <summary>
+      /// Executes the query and returns the result with the default query options.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="query"></param>
+      /// <param name="db"></param>
+      /// <returns></returns>
+      public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query );
 
-#endregion
+      /// <summary>
+      /// Executes the query and returns the result with the specified query options.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="query"></param>
+      /// <param name="db"></param>
+      /// <param name="options"></param>
+      /// <returns></returns>
+      public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query, InfluxQueryOptions options );
+
+      /// <summary>
+      /// Executes the query and returns a deferred result that can be iterated over as they
+      /// are returned by the database.
+      /// 
+      /// It does not make sense to use this method unless you are returning a big payload and
+      /// have enabled chunking through InfluxQueryOptions.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="query"></param>
+      /// <returns></returns>
+      public Task<InfluxChunkedResultSet<TInfluxRow>> ReadChunkedAsync<TInfluxRow>( string db, string query );
+
+      /// <summary>
+      /// Executes the query and returns a deferred result that can be iterated over as they
+      /// are returned by the database.
+      /// 
+      /// It does not make sense to use this method unless you are returning a big payload and
+      /// have enabled chunking through InfluxQueryOptions.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="query"></param>
+      /// <param name="options"></param>
+      /// <returns></returns>
+      public Task<InfluxChunkedResultSet<TInfluxRow>> ReadChunkedAsync<TInfluxRow>( string db, string query, InfluxQueryOptions options );
+
+      /// <summary>
+      /// Deletes data in accordance with the specified query
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="deleteQuery"></param>
+      /// <returns></returns>
+      public Task DeleteAsync( string db, string deleteQuery );
+
+      /// <summary>
+      /// Deletes all data older than the specified timestamp.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="measurementName"></param>
+      /// <param name="to"></param>
+      /// <returns></returns>
+      public Task DeleteOlderThanAsync( string db, string measurementName, DateTime to );
+
+      /// <summary>
+      /// Deletes all data in the specified range.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="measurementName"></param>
+      /// <param name="from"></param>
+      /// <param name="to"></param>
+      /// <returns></returns>
+      public Task DeleteRangeAsync( string db, string measurementName, DateTime from, DateTime to );
+
+      #endregion
 ```
 
 To get an exact indication for what each of the parameters are refer to the documentation page provided by influxDB:
