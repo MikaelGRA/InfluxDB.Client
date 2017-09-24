@@ -12,7 +12,7 @@ namespace Vibrant.InfluxDB.Client
          switch ( that )
          {
             case TimestampPrecision.Nanosecond:
-               return "n";
+               return "ns";
             case TimestampPrecision.Microsecond:
                return "u";
             case TimestampPrecision.Millisecond:

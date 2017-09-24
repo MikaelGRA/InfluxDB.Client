@@ -46,7 +46,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
          }
 
          // if we found something, construct a normal result object, and initialize our indices
-         _currentResultSet = await ResultSetFactory.CreateAsync<TInfluxRow>( _client, new[] { queryResult }, _db, _options.Precision, true, _options.MetadataExpiration ).ConfigureAwait( false );
+         _currentResultSet = await ResultSetFactory.CreateAsync<TInfluxRow>( _client, new[] { queryResult }, _db, true, _options ).ConfigureAwait( false );
          _currentResultIndex = -1;
          _currentSerieIndex = -1;
 

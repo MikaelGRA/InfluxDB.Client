@@ -85,25 +85,25 @@ namespace Vibrant.InfluxDB.Client
       /// Executes an arbitrary command that returns a table as a result.
       /// </summary>
       /// <typeparam name="TInfluxRow"></typeparam>
-      /// <param name="command"></param>
+      /// <param name="commandOrQuery"></param>
       /// <param name="db"></param>
       /// <returns></returns>
-      public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string command, string db )
+      public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery, string db )
          where TInfluxRow : new()
       {
-         return ExecuteQueryInternalAsync<TInfluxRow>( command, db, false, true, DefaultQueryOptions );
+         return ExecuteQueryInternalAsync<TInfluxRow>( commandOrQuery, db, false, true, DefaultQueryOptions );
       }
 
       /// <summary>
       /// Executes an arbitrary command or query that returns a table as a result.
       /// </summary>
       /// <typeparam name="TInfluxRow"></typeparam>
-      /// <param name="command"></param>
+      /// <param name="commandOrQuery"></param>
       /// <returns></returns>
-      public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string command )
+      public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery )
          where TInfluxRow : new()
       {
-         return ExecuteQueryInternalAsync<TInfluxRow>( command, null, false, true, DefaultQueryOptions );
+         return ExecuteQueryInternalAsync<TInfluxRow>( commandOrQuery, null, false, true, DefaultQueryOptions );
       }
 
       /// <summary>
@@ -820,9 +820,10 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <param name="deleteQuery"></param>
       /// <returns></returns>
-      public Task DeleteAsync( string db, string deleteQuery )
+      public async Task<InfluxResult> DeleteAsync( string db, string deleteQuery )
       {
-         return ExecuteQueryInternalAsync( deleteQuery, db, true, DefaultQueryOptions );
+         var resultSet = await ExecuteQueryInternalAsync( deleteQuery, db, true, DefaultQueryOptions ).ConfigureAwait( false );
+         return resultSet.Results.FirstOrDefault();
       }
 
       /// <summary>
@@ -832,7 +833,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="measurementName"></param>
       /// <param name="to"></param>
       /// <returns></returns>
-      public Task DeleteOlderThanAsync( string db, string measurementName, DateTime to )
+      public Task<InfluxResult> DeleteOlderThanAsync( string db, string measurementName, DateTime to )
       {
          return DeleteAsync( db, $"DELETE FROM \"{measurementName}\" WHERE time < '{to.ToIso8601()}'" );
       }
@@ -845,7 +846,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="from"></param>
       /// <param name="to"></param>
       /// <returns></returns>
-      public Task DeleteRangeAsync( string db, string measurementName, DateTime from, DateTime to )
+      public Task<InfluxResult> DeleteRangeAsync( string db, string measurementName, DateTime from, DateTime to )
       {
          return DeleteAsync( db, $"DELETE FROM \"{measurementName}\" WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'" );
       }
@@ -993,7 +994,7 @@ namespace Vibrant.InfluxDB.Client
          where TInfluxRow : new()
       {
          List<QueryResult> queryResults = await PerformQueryInternal( query, db, forcePost, isTimeSeriesQuery, options ).ConfigureAwait( false );
-         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResults, db, options.Precision, isTimeSeriesQuery, options.MetadataExpiration ).ConfigureAwait( false );
+         return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResults, db, isTimeSeriesQuery, options ).ConfigureAwait( false );
       }
 
       private async Task<InfluxResultSet> ExecuteQueryInternalAsync( string query, string db, bool forcePost, InfluxQueryOptions options )

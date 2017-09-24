@@ -12,10 +12,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       private bool _disposed;
 
       public const string DatabaseName = "unittestdb";
-      //public static readonly string InfluxHost = "http://winflux.westeurope.cloudapp.azure.com:8086";
-      //public static readonly string InfluxHost = "http://localhost:8086"; http://ipv4.fiddler
       public static readonly string InfluxHost = "http://ipv4.fiddler:8086";
-      //public static readonly string InfluxHost = "http://52.174.58.40:8086";
 
       public InfluxClient Client { get; set; }
 
@@ -23,6 +20,8 @@ namespace Vibrant.InfluxDB.Client.Tests
       {
          Client = new InfluxClient( new Uri( InfluxHost ), "root", "root" );
          //Client.DefaultQueryOptions.UsePost = true;
+         //Client.DefaultQueryOptions.Precision = TimestampPrecision.Nanosecond;
+         //Client.DefaultQueryOptions.AllowLocalTimestamps = true;
          Client.CreateDatabaseAsync( DatabaseName ).Wait();
       }
 

@@ -16,7 +16,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
 {
    internal static class ResultSetFactory
    {
-      private static readonly DateTimeStyles DateTimeStyles = DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal;
+      private static readonly DateTimeStyles OnlyUtcStyles = DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal;
 
       internal static bool IsIInfluxRow<TInfluxRow>()
       {
@@ -48,24 +48,23 @@ namespace Vibrant.InfluxDB.Client.Parsers
          InfluxClient client,
          IEnumerable<QueryResult> queryResult,
          string db,
-         TimestampPrecision? precision,
          bool allowMetadataQuerying,
-         TimeSpan? metadataExpiration )
+         InfluxQueryOptions options )
          where TInfluxRow : new()
       {
          if( IsIInfluxRow<TInfluxRow>() )
          {
-            return CreateBasedOnInterfaceAsync<TInfluxRow>( client, queryResult, db, precision, allowMetadataQuerying, metadataExpiration );
+            return CreateBasedOnInterfaceAsync<TInfluxRow>( client, queryResult, db, allowMetadataQuerying, options );
          }
          else
          {
-            return Task.FromResult( CreateBasedOnAttributes<TInfluxRow>( queryResult, precision ) );
+            return Task.FromResult( CreateBasedOnAttributes<TInfluxRow>( queryResult, options ) );
          }
       }
 
       private static InfluxResultSet<TInfluxRow> CreateBasedOnAttributes<TInfluxRow>(
          IEnumerable<QueryResult> queryResults,
-         TimestampPrecision? precision )
+         InfluxQueryOptions options )
          where TInfluxRow : new()
       {
          // Create type based on attributes
@@ -104,9 +103,9 @@ namespace Vibrant.InfluxDB.Client.Parsers
                         influxSerie = new InfluxSeries<TInfluxRow>( name, tags );
                         existingResult.Series.Add( influxSerie );
                      }
-                     
+
                      // add data to found serie
-                     AddValuesToInfluxSeriesByAttributes( influxSerie, series, precision, propertyMap );
+                     AddValuesToInfluxSeriesByAttributes( influxSerie, series, propertyMap, options );
                   }
                }
             }
@@ -118,8 +117,8 @@ namespace Vibrant.InfluxDB.Client.Parsers
       private static void AddValuesToInfluxSeriesByAttributes<TInfluxRow>(
          InfluxSeries<TInfluxRow> influxSerie,
          SeriesResult series,
-         TimestampPrecision? precision,
-         IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> propertyMap )
+         IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> propertyMap,
+         InfluxQueryOptions options )
          where TInfluxRow : new()
       {
 
@@ -128,6 +127,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
          {
             var dataPoints = new List<TInfluxRow>();
 
+            var precision = options.Precision;
             var columns = series.Columns;
             var name = series.Name;
 
@@ -168,7 +168,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                         {
                            if( value is string )
                            {
-                              property.SetValue( row, DateTime.Parse( (string)value, CultureInfo.InvariantCulture, DateTimeStyles ) );
+                              property.SetValue( row, DateTime.Parse( (string)value, CultureInfo.InvariantCulture, OnlyUtcStyles ) );
                            }
                            else if( value is long )
                            {
@@ -194,8 +194,8 @@ namespace Vibrant.InfluxDB.Client.Parsers
          }
       }
 
-      private static Dictionary<string, object> CreateTagDictionaryFromSerieBasedOnAttributes<TInfluxRow>( 
-         SeriesResult series, 
+      private static Dictionary<string, object> CreateTagDictionaryFromSerieBasedOnAttributes<TInfluxRow>(
+         SeriesResult series,
          IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> propertyMap )
       {
          Dictionary<string, object> tags = new Dictionary<string, object>();
@@ -244,14 +244,13 @@ namespace Vibrant.InfluxDB.Client.Parsers
          }
          return tags;
       }
-      
+
       private async static Task<InfluxResultSet<TInfluxRow>> CreateBasedOnInterfaceAsync<TInfluxRow>(
          InfluxClient client,
          IEnumerable<QueryResult> queryResults,
          string db,
-         TimestampPrecision? precision,
          bool allowMetadataQuerying,
-         TimeSpan? metadataExpiration )
+         InfluxQueryOptions options )
          where TInfluxRow : new()
       {
          // In this case, we will contruct objects based on the IInfluxRow interface
@@ -289,7 +288,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      }
 
                      // add data to found series
-                     await AddValuesToInfluxSeriesByInterfaceAsync( influxSerie, series, client, db, precision, allowMetadataQuerying, metadataExpiration );
+                     await AddValuesToInfluxSeriesByInterfaceAsync( influxSerie, series, client, db, allowMetadataQuerying, options );
                   }
                }
             }
@@ -304,14 +303,14 @@ namespace Vibrant.InfluxDB.Client.Parsers
          SeriesResult series,
          InfluxClient client,
          string db,
-         TimestampPrecision? precision,
          bool allowMetadataQuerying,
-         TimeSpan? metadataExpiration )
+         InfluxQueryOptions options )
          where TInfluxRow : new()
       {
          // Values will be null, if there are no entries in the result set
          if( series.Values != null )
          {
+            var precision = options.Precision;
             var name = series.Name;
             var columns = series.Columns;
             var setters = new Action<IInfluxRow, string, object>[ columns.Count ];
@@ -323,7 +322,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
             DatabaseMeasurementInfo meta = null;
             if( allowMetadataQuerying )
             {
-               meta = await client.GetMetaInformationAsync( db, name, metadataExpiration ).ConfigureAwait( false );
+               meta = await client.GetMetaInformationAsync( db, name, options.MetadataExpiration ).ConfigureAwait( false );
             }
 
             for( int i = 0 ; i < columns.Count ; i++ )
@@ -340,7 +339,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                   {
                      if( value is string )
                      {
-                        row.SetTimestamp( DateTime.Parse( (string)value, CultureInfo.InvariantCulture, DateTimeStyles ) );
+                        row.SetTimestamp( DateTime.Parse( (string)value, CultureInfo.InvariantCulture, OnlyUtcStyles ) );
                      }
                      else if( value is long )
                      {

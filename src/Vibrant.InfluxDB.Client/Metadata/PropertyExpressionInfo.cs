@@ -21,6 +21,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
       internal readonly string LineProtocolEscapedKey;
       internal readonly string QueryProtocolEscapedKey;
       internal readonly string Key;
+      //internal readonly bool IsTimestampColumn;
       internal readonly bool IsDateTime;
       internal readonly bool IsEnum;
 
@@ -57,6 +58,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
             Type = type;
          }
 
+         //IsTimestampColumn = key == "time";
          IsEnum = Type.GetTypeInfo().IsEnum;
          IsDateTime = Type == typeof( DateTime );
          LineProtocolEscapedKey = LineProtocolEscape.EscapeKey( key );

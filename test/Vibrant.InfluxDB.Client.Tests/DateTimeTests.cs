@@ -42,8 +42,8 @@ namespace Vibrant.InfluxDB.Client.Tests
          Assert.Equal( 1, series.Rows.Count );
 
          Assert.Equal( row.OtherTime, series.Rows[ 0 ].OtherTime );
-         Assert.Equal( row.Timestamp, series.Rows[ 0 ].Timestamp );
          Assert.Equal( row.OtherTimeAsString, series.Rows[ 0 ].OtherTimeAsString );
+         Assert.Equal( row.Timestamp, series.Rows[ 0 ].Timestamp );
       }
 
       [Fact]
@@ -68,8 +68,8 @@ namespace Vibrant.InfluxDB.Client.Tests
          Assert.Equal( 1, series.Rows.Count );
 
          Assert.Equal( time.ToIso8601(), series.Rows[ 0 ].Fields[ "otherTime" ] );
-         Assert.Equal( row.Timestamp, series.Rows[ 0 ].Timestamp );
          Assert.Equal( time.ToIso8601(), series.Rows[ 0 ].Fields[ "otherTimeAsString" ] );
+         Assert.Equal( row.Timestamp, series.Rows[ 0 ].Timestamp );
       }
    }
 }
