@@ -213,7 +213,10 @@ public async Task Should_Write_And_Query_Deferred_Grouped_Data_With_Multi_Query(
    await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo4", infos );
    await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo5", infos );
 
-   var chunkedResultSet = await _client.ReadChunkedAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedComputerInfo4 GROUP BY region;SELECT * FROM groupedComputerInfo5 GROUP BY region", new InfluxQueryOptions { ChunkSize = 200 } );
+   var chunkedResultSet = await _client.ReadChunkedAsync<ComputerInfo>( 
+      InfluxClientFixture.DatabaseName, 
+      $"SELECT * FROM groupedComputerInfo4 GROUP BY region;SELECT * FROM groupedComputerInfo5 GROUP BY region", 
+      new InfluxQueryOptions { ChunkSize = 200 } );
 
    InfluxChunkedResult<ComputerInfo> currentResult;
    InfluxChunkedSeries<ComputerInfo> currentSerie;
