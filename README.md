@@ -198,6 +198,56 @@ If this is the case you can simply define a new class and use that as the generi
 
 When using this attribute, any field or tag can go into the property.
 
+## Chunking
+
+Sometimes you may retrieve a massive amount of data from the database, so much in fact, that keeping it all in memory at any one time is unfeasible. In this case you need the chunking feature provided by InfluxDB. You can take advantage of this feature by enable chunking through the InfluxQueryOptions class. When enabled the client will provide the chunking options to InfluxDB when it is retrieving data.
+
+The default ReadAsync operations will, however, simply read all chunks before returning control to the user. To support scenarios where you want to read the data chunk by chunk, you can instead use the method ReadChunkedAsync. This will return a different type of result set that allows you to asynchonously iterate over all the chunks (while still maintaining the structure of the queries that you initially made). Here's an example taken from the unit tests:
+
+```C#
+[Fact]
+public async Task Should_Write_And_Query_Deferred_Grouped_Data_With_Multi_Query()
+{
+   var start = new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc );
+   var infos = InfluxClientFixture.CreateTypedRowsStartingAt( start, 5000, false );
+   await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo4", infos );
+   await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo5", infos );
+
+   var chunkedResultSet = await _client.ReadChunkedAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedComputerInfo4 GROUP BY region;SELECT * FROM groupedComputerInfo5 GROUP BY region", new InfluxQueryOptions { ChunkSize = 200 } );
+
+   InfluxChunkedResult<ComputerInfo> currentResult;
+   InfluxChunkedSeries<ComputerInfo> currentSerie;
+   InfluxChunk<ComputerInfo> currentChunk;
+   int resultCount = 0;
+   int serieCount = 0;
+   int rowCount = 0;
+
+   using( chunkedResultSet )
+   {
+      while( ( currentResult = await chunkedResultSet.GetNextResultAsync() ) != null )
+      {
+         while( ( currentSerie = await currentResult.GetNextSeriesAsync() ) != null )
+         {
+            while( ( currentChunk = await currentSerie.GetNextChunkAsync() ) != null )
+            {
+               rowCount += currentChunk.Rows.Count;
+            }
+            serieCount++;
+         }
+         resultCount++;
+      }
+   }
+
+   Assert.Equal( 1 * 2, resultCount );
+   Assert.Equal( InfluxClientFixture.Regions.Length * 2, serieCount );
+   Assert.Equal( 5000 * 2, rowCount );
+}
+```
+
+In the coming versions of C# there will be the capability to iterate over async enumerables, and once this feature hits, I will support that as well. See the video below:
+
+https://channel9.msdn.com/Blogs/Seth-Juarez/A-Preview-of-C-8-with-Mads-Torgersen#time=16m30s
+
 ## Other operations
 
 The InfluxClient also defines a host of other management operations. That can be divided up into two categories.
