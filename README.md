@@ -692,6 +692,42 @@ The interface for all these operations can be seen below:
       public Task DeleteRangeAsync( string db, string measurementName, DateTime from, DateTime to );
 
       #endregion
+      
+      #region Raw Operations
+
+      /// <summary>
+      /// Executes an arbitrary command that returns a table as a result.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="command"></param>
+      /// <param name="db"></param>
+      /// <returns></returns>
+      public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string command, string db );
+
+      /// <summary>
+      /// Executes an arbitrary command or query that returns a table as a result.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="command"></param>
+      /// <returns></returns>
+      public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string command );
+
+      /// <summary>
+      /// Executes an arbitrary command that does not return a table.
+      /// </summary>
+      /// <param name="commandOrQuery"></param>
+      /// <param name="db"></param>
+      /// <returns></returns>
+      public Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery, string db );
+
+      /// <summary>
+      /// Executes an arbitrary command that does not return a table.
+      /// </summary>
+      /// <param name="commandOrQuery"></param>
+      /// <returns></returns>
+      public Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery );
+
+      #endregion
 ```
 
 To get an exact indication for what each of the parameters are refer to the documentation page provided by influxDB:
