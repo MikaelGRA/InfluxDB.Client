@@ -200,7 +200,7 @@ When using this attribute, any field or tag can go into the property.
 
 ## Chunking (Coming in version 3.3.0)
 
-Sometimes you may retrieve a massive amount of data from the database, so much in fact, that keeping it all in memory at any one time is unfeasible. In this case you need the chunking feature provided by InfluxDB. You can take advantage of this feature by enable chunking through the InfluxQueryOptions class. When enabled the client will provide the chunking options to InfluxDB when it is retrieving data.
+Sometimes you may retrieve a massive amount of data from the database, so much in fact, that keeping it all in memory at any one time is unfeasible. In this case you need the chunking feature provided by InfluxDB. You can take advantage of this feature by enabling chunking through the InfluxQueryOptions class. When enabled the client will provide the chunking options to InfluxDB when it is retrieving data.
 
 The default ReadAsync operations will, however, simply read all chunks before returning control to the user. To support scenarios where you want to read the data chunk by chunk, you can instead use the method ReadChunkedAsync. This will return a different type of result set that allows you to asynchonously iterate over all the chunks (while still maintaining the structure of the queries that you initially made). Here's an example taken from the unit tests:
 
