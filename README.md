@@ -198,7 +198,7 @@ If this is the case you can simply define a new class and use that as the generi
 
 When using this attribute, any field or tag can go into the property.
 
-## Chunking
+## Chunking (Coming in version 3.3.0)
 
 Sometimes you may retrieve a massive amount of data from the database, so much in fact, that keeping it all in memory at any one time is unfeasible. In this case you need the chunking feature provided by InfluxDB. You can take advantage of this feature by enable chunking through the InfluxQueryOptions class. When enabled the client will provide the chunking options to InfluxDB when it is retrieving data.
 
