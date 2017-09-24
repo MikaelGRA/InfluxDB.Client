@@ -616,8 +616,6 @@ The interface for all these operations can be seen below:
       /// <returns></returns>
       public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options );
 
-      private Task WriteAsync<TInfluxRow>( string db, Func<TInfluxRow, string> getMeasurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options );
-
       /// <summary>
       /// Executes the query and returns the result with the default query options.
       /// </summary>
