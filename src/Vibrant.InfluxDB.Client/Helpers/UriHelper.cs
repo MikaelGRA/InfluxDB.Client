@@ -20,7 +20,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
             var length = data.Length - i <= 32765 ? data.Length - i : 32765;
             escaped.Append( Uri.EscapeDataString( data.Substring( i, length ) ) );
          }
-         return escaped.ToString();//.Replace( "%20", "+" );
+         return escaped.ToString().Replace( "%20", "+" );
       }
    }
 }
