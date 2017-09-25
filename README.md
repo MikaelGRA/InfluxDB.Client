@@ -186,17 +186,19 @@ public async Task Should_Query_Dynamic_Data()
 }
 ```
 
-## Reading only operations
+## Read only operations
 
-Often, you may not be selecting the exact structure that you are also inserting. Maybe you are doing some aggregation or calculations that you are retrieving that changes the name of the returned columns.
+Often, you may not be selecting the exact structure that you are also inserting. Maybe you are doing some aggregation or calculations on the data that you are retrieving that changes the name of the returned columns.
 
-If this is the case you can simply define a new class and use that as the generic return type. In this case you can just use the 
+In this case, you can simply define a new class and use the InfluxComputedAttribute. Any columns that matches the name specified in the attribute (tag or field, aggregated or not) will go into the property with this attribute.
 
 ```c#
 [InfluxComputedAttribute]
 ```
 
-When using this attribute, any field or tag can go into the property.
+Classes with this attribute should not be used for insertion, as there is no way for the client to know if it is a field or tag.
+
+If you are using the IInfluxRow interface (DynamicInfluxRow, for instance), then the "Fields" collection is filled up with all columns that does not match a known tag for the specific measurement.
 
 ## Chunking
 
