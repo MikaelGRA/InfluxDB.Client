@@ -3,6 +3,7 @@
 ## 3.3.0
  * Added feature #15 to support better reading of chunked data
  * Fixed bug where "n" was being used to represent nanoseconds instead of "ns"
+ * Changed behavior of InfluxSeries.GroupedTags to never be null, instead it will be an empty array if no GROUP BY is specified
  
 ## 3.2.0
  * Fixed #17
