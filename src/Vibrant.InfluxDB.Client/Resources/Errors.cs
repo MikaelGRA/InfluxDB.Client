@@ -21,5 +21,6 @@ namespace Vibrant.InfluxDB.Client.Resources
       internal static readonly string UnexpectedQueryResult = "No measurements were returned in the query. Likely because the measurement does not exist, no data exists for the queried period or because there was an error in the identifiers used in the query.";
       internal static readonly string UnknownError = "An unknown error occurred. Please inspect the inner exception.";
       internal static readonly string InvalidColumn = "Could not determine whether the column '{0}' is a tag, field or a timestamp.";
+      internal static readonly string InvalidTagOrFieldName = "The name of a field or tag cannot contain newline characters.";
    }
 }

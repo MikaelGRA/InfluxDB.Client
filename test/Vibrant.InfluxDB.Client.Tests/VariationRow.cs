@@ -11,13 +11,13 @@ namespace Vibrant.InfluxDB.Client.Tests
       [InfluxTimestamp]
       public DateTime Timestamp { get; set; }
 
-      [InfluxTag( "type odd name" )]
+      [InfluxTag( "type= odd, name" )]
       public string Type { get; set; }
 
       [InfluxTag( "categoryTag" )]
       public TestEnum2 CategoryTag { get; set; }
 
-      [InfluxField( "message" )]
+      [InfluxField( "mes,sa=ge" )]
       public string Message { get; set; }
 
       [InfluxField( "count" )]

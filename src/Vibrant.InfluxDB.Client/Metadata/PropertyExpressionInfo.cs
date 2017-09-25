@@ -19,7 +19,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
       internal readonly Dictionary<string, Enum> StringToEnum;
       internal readonly PropertyInfo Property;
       internal readonly string LineProtocolEscapedKey;
-      internal readonly string QueryProtocolEscapedKey;
+      //internal readonly string QueryProtocolEscapedKey;
       internal readonly string Key;
       //internal readonly bool IsTimestampColumn;
       internal readonly bool IsDateTime;
@@ -27,6 +27,11 @@ namespace Vibrant.InfluxDB.Client.Metadata
 
       internal PropertyExpressionInfo( string key, PropertyInfo property )
       {
+         if( key.Contains( "\n" ) )
+         {
+            throw new InfluxException( Errors.InvalidTagOrFieldName );
+         }
+
          Property = property;
 
          // Instance type of target entity class 
@@ -48,7 +53,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
          SetValue = setterLambda.Compile();
 
          var type = property.PropertyType;
-         if ( type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof( Nullable<> ) )
+         if( type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof( Nullable<> ) )
          {
             // unwrap the nullable type
             Type = type.GetGenericArguments()[ 0 ];
@@ -62,7 +67,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
          IsEnum = Type.GetTypeInfo().IsEnum;
          IsDateTime = Type == typeof( DateTime );
          LineProtocolEscapedKey = LineProtocolEscape.EscapeKey( key );
-         QueryProtocolEscapedKey = QueryEscape.EscapeKey( key );
+         //QueryProtocolEscapedKey = QueryEscape.EscapeKey( key );
          Key = key;
 
          // ensure we can convert between string/enum
@@ -72,14 +77,14 @@ namespace Vibrant.InfluxDB.Client.Metadata
             StringToEnum = new Dictionary<string, Enum>();
 
             var values = Enum.GetValues( Type );
-            foreach ( Enum value in values )
+            foreach( Enum value in values )
             {
                string stringValue = value.ToString();
                var memberInfo = Type.GetField( stringValue );
-               if ( memberInfo != null  )
+               if( memberInfo != null )
                {
                   var attribute = memberInfo.GetCustomAttribute<EnumMemberAttribute>();
-                  if ( attribute != null )
+                  if( attribute != null )
                   {
                      stringValue = attribute.Value;
                   }
@@ -96,14 +101,14 @@ namespace Vibrant.InfluxDB.Client.Metadata
       {
          // attempt converions
          var valueAsString = value as string;
-         if ( valueAsString == null )
+         if( valueAsString == null )
          {
             throw new InfluxException( string.Format( Errors.CouldNotParseEnum, Property.Name, typeof( TInfluxRow ).Name, value.ToString() ) );
          }
 
          // attempt parsing
          Enum valueAsEnum;
-         if ( !StringToEnum.TryGetValue( valueAsString, out valueAsEnum ) )
+         if( !StringToEnum.TryGetValue( valueAsString, out valueAsEnum ) )
          {
             throw new InfluxException( string.Format( Errors.CouldNotParseEnum, Property.Name, typeof( TInfluxRow ).Name, value.ToString() ) );
          }
@@ -114,18 +119,18 @@ namespace Vibrant.InfluxDB.Client.Metadata
       internal string GetStringValue( object value )
       {
          var valueAsString = value as string;
-         if ( valueAsString != null )
+         if( valueAsString != null )
          {
             return valueAsString;
          }
 
          var valueAsEnum = value as Enum;
-         if ( valueAsEnum == null )
+         if( valueAsEnum == null )
          {
             throw new InfluxException( string.Format( Errors.CountNotConvertEnumToString, value.ToString(), Property.Name, typeof( TInfluxRow ).Name ) );
          }
 
-         if ( !EnumToString.TryGetValue( valueAsEnum, out valueAsString ) )
+         if( !EnumToString.TryGetValue( valueAsEnum, out valueAsString ) )
          {
             throw new InfluxException( string.Format( Errors.CountNotConvertEnumToString, value.ToString(), Property.Name, typeof( TInfluxRow ).Name ) );
          }

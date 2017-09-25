@@ -902,12 +902,12 @@ namespace Vibrant.InfluxDB.Client
 
       private string CreateWriteUrl( string db, InfluxWriteOptions options )
       {
-         var url = $"write?db={Uri.EscapeDataString( db )}&precision={options.Precision.GetQueryParameter()}&consistency={options.Consistency.GetQueryParameter()}";
+         var url = $"write?db={UriHelper.SafeEscapeDataString( db )}&precision={options.Precision.GetQueryParameter()}&consistency={options.Consistency.GetQueryParameter()}";
          if( !string.IsNullOrEmpty( options.RetentionPolicy ) ) url += $"&rp={options.RetentionPolicy}";
          return url;
       }
 
-      private FormUrlEncodedContent CreateQueryPostContent( string commandOrQuery, string db, bool isTimeSeriesQuery, InfluxQueryOptions options )
+      private LongFormUrlEncodedContent CreateQueryPostContent( string commandOrQuery, string db, bool isTimeSeriesQuery, InfluxQueryOptions options )
       {
          List<KeyValuePair<string, string>> param = new List<KeyValuePair<string, string>>( 5 );
 
@@ -933,7 +933,7 @@ namespace Vibrant.InfluxDB.Client
             }
          }
 
-         return new FormUrlEncodedContent( param );
+         return new LongFormUrlEncodedContent( param );
       }
 
       private string CreateQueryUrl( string commandOrQuery, string db, bool isTimeSeriesQuery, InfluxQueryOptions options )
@@ -943,13 +943,13 @@ namespace Vibrant.InfluxDB.Client
 
          if( !string.IsNullOrEmpty( db ) )
          {
-            query += $"{seperator}db={Uri.EscapeDataString( db )}";
+            query += $"{seperator}db={UriHelper.SafeEscapeDataString( db )}";
             seperator = '&';
          }
 
          if( !string.IsNullOrEmpty( commandOrQuery ) )
          {
-            query += $"{seperator}q={Uri.EscapeDataString( commandOrQuery )}";
+            query += $"{seperator}q={UriHelper.SafeEscapeDataString( commandOrQuery )}";
             seperator = '&';
          }
 
