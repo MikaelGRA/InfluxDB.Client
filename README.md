@@ -789,14 +789,3 @@ To get an exact indication for what each of the parameters are refer to the docu
  * https://docs.influxdata.com/influxdb/v1.0/query_language/database_management/
  * https://docs.influxdata.com/influxdb/v1.0/query_language/continuous_queries/
 
-Finally if you need to execute a custom operation or multiple management operations at once, you can use one of the following methods:
-
-```c#
-public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery, string db )
-
-public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery )
-
-public Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery, string db )
-
-public Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery )
-```
