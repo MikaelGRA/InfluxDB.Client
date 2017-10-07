@@ -101,17 +101,17 @@ namespace Vibrant.InfluxDB.Client
          switch( precision )
          {
             case TimestampPrecision.Nanosecond:
-               return ( that - Epoch + that.Offset ).Ticks * 100;
+               return ( that.DateTime - Epoch + that.Offset ).Ticks * 100;
             case TimestampPrecision.Microsecond:
-               return ( that - Epoch + that.Offset ).Ticks / TicksPerMicrosecond;
+               return ( that.DateTime - Epoch + that.Offset ).Ticks / TicksPerMicrosecond;
             case TimestampPrecision.Millisecond:
-               return ( that - Epoch + that.Offset ).Ticks / TimeSpan.TicksPerMillisecond;
+               return ( that.DateTime - Epoch + that.Offset ).Ticks / TimeSpan.TicksPerMillisecond;
             case TimestampPrecision.Second:
-               return ( that - Epoch + that.Offset ).Ticks / TimeSpan.TicksPerSecond;
+               return ( that.DateTime - Epoch + that.Offset ).Ticks / TimeSpan.TicksPerSecond;
             case TimestampPrecision.Minute:
-               return ( that - Epoch + that.Offset ).Ticks / TimeSpan.TicksPerMinute;
+               return ( that.DateTime - Epoch + that.Offset ).Ticks / TimeSpan.TicksPerMinute;
             case TimestampPrecision.Hours:
-               return ( that - Epoch + that.Offset ).Ticks / TimeSpan.TicksPerHour;
+               return ( that.DateTime - Epoch + that.Offset ).Ticks / TimeSpan.TicksPerHour;
             default:
                throw new ArgumentException( "Invalid parameter value.", nameof( precision ) );
          }

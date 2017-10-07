@@ -15,6 +15,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
       internal readonly Action<TInfluxRow, object> SetValue;
       internal readonly Func<TInfluxRow, object> GetValue;
       internal readonly Type Type;
+      internal readonly Type RawType;
       internal readonly Dictionary<Enum, string> EnumToString;
       internal readonly Dictionary<string, Enum> StringToEnum;
       internal readonly PropertyInfo Property;
@@ -53,6 +54,8 @@ namespace Vibrant.InfluxDB.Client.Metadata
          SetValue = setterLambda.Compile();
 
          var type = property.PropertyType;
+         RawType = type;
+
          if( type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof( Nullable<> ) )
          {
             // unwrap the nullable type

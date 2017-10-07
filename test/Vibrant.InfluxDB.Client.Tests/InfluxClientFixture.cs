@@ -59,6 +59,36 @@ namespace Vibrant.InfluxDB.Client.Tests
          return infos;
       }
 
+      public static LocalizedComputerInfo[] CreateTypedRowsStartingAtWithOffset( DateTime start, TimeSpan offset, int rows, bool includeNulls )
+      {
+         var rng = new Random();
+
+         var timestamp = start;
+         var infos = new LocalizedComputerInfo[ rows ];
+         for( int i = 0 ; i < rows ; i++ )
+         {
+            long ram = rng.Next( int.MaxValue );
+            double cpu = rng.NextDouble();
+            string region = Regions[ rng.Next( Regions.Length ) ];
+            string host = Hosts[ rng.Next( Hosts.Length ) ];
+
+            if( includeNulls )
+            {
+               var info = new LocalizedComputerInfo { Timestamp = new DateTimeOffset( timestamp, offset ), RAM = ram, Region = region };
+               infos[ i ] = info;
+            }
+            else
+            {
+               var info = new LocalizedComputerInfo { Timestamp = new DateTimeOffset( timestamp, offset ), CPU = cpu, RAM = ram, Host = host, Region = region };
+               infos[ i ] = info;
+            }
+
+            timestamp = timestamp.AddSeconds( 1 );
+         }
+
+         return infos;
+      }
+
       public static EnumeratedRow[] CreateEnumeratedRowsStartingAt( DateTime start, int rows )
       {
          var rng = new Random();

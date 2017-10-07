@@ -48,10 +48,6 @@ namespace Vibrant.InfluxDB.Client.Metadata
                   if ( timestampAttribute != null )
                   {
                      timestamp = new PropertyExpressionInfo<TInfluxRow>( "time", propertyInfo );
-                     if ( timestamp.Type != typeof( DateTime ) )
-                     {
-                        throw new InfluxException( string.Format( Errors.InvalidTimestampType, propertyInfo.Name, type.Name ) );
-                     }
 
                      all.Add( timestamp );
                   }

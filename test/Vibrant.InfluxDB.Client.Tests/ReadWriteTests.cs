@@ -201,6 +201,48 @@ namespace Vibrant.InfluxDB.Client.Tests
       }
 
       [Fact]
+      public async Task Should_Write_Read_And_Delete_Typed_Data_With_Timezones_And_Offset()
+      {
+         HashSet<TimeSpan> validOffsets = new HashSet<TimeSpan> { TimeSpan.FromHours( 1 ), TimeSpan.FromHours( 2 ) }; // valid offsets in 'Europe/Copenhagen'
+         var start = new DateTime( 2011, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified );
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAtWithOffset( start, TimeSpan.FromHours( 5 ), 250, false );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "otherData2", infos );
+
+         var from = start + TimeSpan.FromHours( 5 );
+         var to = from.AddSeconds( 250 );
+
+         var resultSet = await _client.ReadAsync<LocalizedComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM otherData2 WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}' tz('Europe/Copenhagen')" );
+         Assert.Equal( 1, resultSet.Results.Count );
+
+         var result = resultSet.Results[ 0 ];
+         Assert.Equal( 1, result.Series.Count );
+
+         var series = result.Series[ 0 ];
+         Assert.Equal( 250, series.Rows.Count );
+
+         // iterate all check timestamps to UTC timestamps
+         var current = DateTime.SpecifyKind( from, DateTimeKind.Utc );
+         for( int i = 0 ; i < 250 ; i++ )
+         {
+            var row = series.Rows[ i ];
+            Assert.Equal( current, row.Timestamp.ToUniversalTime() );
+            Assert.True( validOffsets.Contains( row.Timestamp.Offset ) );
+
+            current = current.AddSeconds( 1 );
+         }
+
+
+         // attempt deletion
+         await _client.DeleteRangeAsync( InfluxClientFixture.DatabaseName, "otherData2", from, to );
+
+         resultSet = await _client.ReadAsync<LocalizedComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM otherData2 WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}' tz('Europe/Copenhagen')" );
+         Assert.Equal( 1, resultSet.Results.Count );
+
+         result = resultSet.Results[ 0 ];
+         Assert.Equal( 0, result.Series.Count );
+      }
+
+      [Fact]
       public async Task Should_Write_Type_With_Null_Timestamp()
       {
          var row = new SimpleRow

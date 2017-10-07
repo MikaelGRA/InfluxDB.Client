@@ -6,6 +6,24 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client.Tests
 {
+   public class LocalizedComputerInfo
+   {
+      [InfluxTimestamp]
+      internal DateTimeOffset Timestamp { get; set; }
+
+      [InfluxTag( "host" )]
+      internal string Host { get; set; }
+
+      [InfluxTag( "region" )]
+      internal string Region { get; set; }
+
+      [InfluxField( "cpu" )]
+      internal double? CPU { get; set; }
+
+      [InfluxField( "ram" )]
+      internal long RAM { get; set; }
+   }
+
    public class ComputerInfo
    {
       [InfluxTimestamp]
@@ -23,6 +41,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       [InfluxField( "ram" )]
       internal long RAM { get; set; }
    }
+   
    public class ComputedComputerInfo
    {
       [InfluxTimestamp]

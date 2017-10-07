@@ -38,7 +38,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
 
       public Type GetTimestampType()
       {
-         return Timestamp?.Type ?? typeof( NullTimestamp );
+         return Timestamp?.RawType ?? typeof( NullTimestamp );
       }
    }
 }
