@@ -8,13 +8,13 @@ namespace Vibrant.InfluxDB.Client
 {
    /// <summary>
    /// ITimestampParser is responsible for parsing the 'time' column
-   /// of data returned, allowing for use of custom DateTime types.
+   /// of data returned, allowing use of custom DateTime types.
    /// </summary>
    /// <typeparam name="TTimestamp"></typeparam>
    public interface ITimestampParser<TTimestamp>
    {
       /// <summary>
-      /// Parses a epoch time (UTC) of iso timestamp (potentially with offset) to a date and time.
+      /// Parses a epoch time (UTC) or ISO8601-timestamp (potentially with offset) to a date and time.
       /// This is used when reading data from influxdb.
       /// </summary>
       /// <param name="precision">TimestampPrecision provided by the current InfluxQueryOptions.</param>
@@ -28,6 +28,6 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="precision">TimestampPrecision provided by the current InfluxWriteOptions.</param>
       /// <param name="timestamp">The timestamp to convert.</param>
       /// <returns>The UTC epoch time.</returns>
-      long ToEpoch( TimestampPrecision? precision, TTimestamp timestamp );
+      long ToEpoch( TimestampPrecision precision, TTimestamp timestamp );
    }
 }

@@ -6,15 +6,26 @@ using System.Threading.Tasks;
 namespace Vibrant.InfluxDB.Client.Rows
 {
    /// <summary>
-   /// IInfluxRow is an interface that allows using custom types as rows in InfluxDB.
+   /// IInfluxRow is an interface that allows using more dynamic types as rows in InfluxDB.
    /// 
    /// When implementing this interface, InfluxAttributes are ignored and the interface 
    /// is used instead.
+   /// 
+   /// This interface uses DateTime? as the timestamp type.
    /// </summary>
    public interface IInfluxRow : IInfluxRow<DateTime?>
    {
    }
 
+   /// <summary>
+   /// IInfluxRow is an interface that allows using more dynamic types as rows in InfluxDB.
+   /// 
+   /// When implementing this interface, InfluxAttributes are ignored and the interface 
+   /// is used instead.
+   /// 
+   /// The generic parameter is the type that is used for the timestamp.
+   /// </summary>
+   /// <typeparam name="TTimestamp"></typeparam>
    public interface IInfluxRow<TTimestamp>
    {
       /// <summary>

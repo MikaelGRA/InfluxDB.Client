@@ -10,24 +10,24 @@ namespace Vibrant.InfluxDB.Client
    public class LocalDateTimeOffsetParser : ITimestampParser<DateTimeOffset>
    {
       /// <inheritdoc />
-      public long ToEpoch( TimestampPrecision? precision, DateTimeOffset timestamp )
+      public long ToEpoch( TimestampPrecision precision, DateTimeOffset timestamp )
       {
-         return timestamp.ToPrecision( precision.Value );
+         return timestamp.ToPrecision( precision );
       }
 
       /// <inheritdoc />
       public DateTimeOffset ToTimestamp( TimestampPrecision? precision, object epochTimeLongOrIsoTimestampString )
       {
-         if( epochTimeLongOrIsoTimestampString is string )
+         if( !precision.HasValue )
          {
+            // if no precision is specified, the time column is returned as a ISO8601-timestamp.
             return DateTimeOffset.Parse( (string)epochTimeLongOrIsoTimestampString, CultureInfo.InvariantCulture );
          }
-         else if( epochTimeLongOrIsoTimestampString is long )
+         else
          {
+            // the offset cannot be preserved with an epoch time, will throw to alert user
             throw new InfluxException( Errors.MissingOffsetInEpochTime );
          }
-
-         throw new InfluxException( string.Format( Errors.CouldNotParseTimestamp, epochTimeLongOrIsoTimestampString ) );
       }
    }
 }
