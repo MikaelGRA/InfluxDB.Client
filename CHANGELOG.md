@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.3.1
+ * Fixed #19
+
 ## 3.3.0
  * Added feature #15 to support better reading of chunked data
  * Fixed bug where "n" was being used to represent nanoseconds instead of "ns"
