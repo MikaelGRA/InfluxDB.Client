@@ -10,7 +10,7 @@ namespace Vibrant.InfluxDB.Client.Rows
    /// A class implementing the IInfluxRow interface that can be used with the DLR. This
    /// allows you to query data that you do not know the structure of.
    /// </summary>
-   public class DynamicInfluxRow : DynamicObject, IInfluxRow
+   public class DynamicInfluxRow<TTimestamp> : DynamicObject, IInfluxRow<TTimestamp>
    {
       /// <summary>
       /// Constructs a new empty DynamicInfluxRow.
@@ -25,7 +25,7 @@ namespace Vibrant.InfluxDB.Client.Rows
       /// Gets the timestamp.
       /// </summary>
       /// <returns></returns>
-      public DateTime? GetTimestamp()
+      public TTimestamp GetTimestamp()
       {
          return Timestamp;
       }
@@ -34,7 +34,7 @@ namespace Vibrant.InfluxDB.Client.Rows
       /// Sets the timestamp.
       /// </summary>
       /// <param name="value"></param>
-      public void SetTimestamp( DateTime? value )
+      public void SetTimestamp( TTimestamp value )
       {
          Timestamp = value;
       }
@@ -100,7 +100,7 @@ namespace Vibrant.InfluxDB.Client.Rows
       /// <summary>
       /// Gets or sets the timestamp.
       /// </summary>
-      public DateTime? Timestamp { get; set; }
+      public TTimestamp Timestamp { get; set; }
 
       /// <summary>
       /// Gets a dictionary of all the Tags.
@@ -121,25 +121,18 @@ namespace Vibrant.InfluxDB.Client.Rows
       /// <returns></returns>
       public override bool TryGetMember( GetMemberBinder binder, out object result )
       {
-         if ( binder.Name == "Timestamp" || binder.Name == InfluxConstants.TimeColumn )
+         if( binder.Name == "Timestamp" || binder.Name == InfluxConstants.TimeColumn )
          {
-            if ( Timestamp.HasValue )
-            {
-               result = Timestamp.Value;
-            }
-            else
-            {
-               result = null;
-            }
+            result = Timestamp;
             return true;
          }
 
-         if ( Fields.TryGetValue( binder.Name, out result ) )
+         if( Fields.TryGetValue( binder.Name, out result ) )
          {
             return true;
          }
          string result2 = null;
-         if ( Tags.TryGetValue( binder.Name, out result2 ) )
+         if( Tags.TryGetValue( binder.Name, out result2 ) )
          {
             result = result2;
             return true;
@@ -148,5 +141,13 @@ namespace Vibrant.InfluxDB.Client.Rows
          // always return true, simply return a null if a value does not exist
          return true;
       }
+   }
+
+   /// <summary>
+   /// A class implementing the IInfluxRow interface that can be used with the DLR. This
+   /// allows you to query data that you do not know the structure of.
+   /// </summary>
+   public class DynamicInfluxRow : DynamicInfluxRow<DateTime?>, IInfluxRow
+   {
    }
 }
