@@ -53,17 +53,5 @@ namespace Vibrant.InfluxDB.Client
       /// querying data.
       /// </summary>
       public bool UsePost { get; set; }
-
-      ///// <summary>
-      ///// Gets or sets a bool indicating if local timestamps are allowed to be
-      ///// returned when querying.
-      ///// 
-      ///// This is relevant when specifying the "tz" clause in a query, as influxdb
-      ///// will then return timestamps with their offset. If this is set to true,
-      ///// this client library will make no attempt at converting these to UTC.
-      ///// 
-      ///// The default behavior is to always convert to UTC.
-      ///// </summary>
-      //public bool AllowLocalTimestamps { get; set; }
    }
 }

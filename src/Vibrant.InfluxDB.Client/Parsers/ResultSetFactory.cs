@@ -11,16 +11,41 @@ using Vibrant.InfluxDB.Client.Metadata;
 using Vibrant.InfluxDB.Client.Resources;
 using Vibrant.InfluxDB.Client.Rows;
 using Vibrant.InfluxDB.Client.Http;
+using System.Collections.Concurrent;
 
 namespace Vibrant.InfluxDB.Client.Parsers
 {
    internal static class ResultSetFactory
    {
       private static readonly DateTimeStyles OnlyUtcStyles = DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal;
+      private static readonly MethodInfo CreateBasedOnAttributesMethod = typeof( ResultSetFactory ).GetMethod( "CreateBasedOnAttributes", BindingFlags.Static | BindingFlags.NonPublic );
+      private static readonly MethodInfo CreateBasedOnInterfaceAsyncMethod = typeof( ResultSetFactory ).GetMethod( "CreateBasedOnInterfaceAsync", BindingFlags.Static | BindingFlags.NonPublic );
 
-      internal static bool IsIInfluxRow<TInfluxRow>()
+      private static readonly ConcurrentDictionary<Type, Type> TypeDefinitionMap = new ConcurrentDictionary<Type, Type>();
+
+      internal static Type GetGenericTypeDefinitionForImplementedInfluxInterface<TInfluxRow>()
       {
-         return typeof( IInfluxRow ).IsAssignableFrom( typeof( TInfluxRow ) );
+         Type foundTypeGenericTypeDefinition = null;
+
+         if( !TypeDefinitionMap.TryGetValue( typeof( TInfluxRow ), out foundTypeGenericTypeDefinition ) )
+         {
+            foreach( var i in typeof( TInfluxRow ).GetInterfaces() )
+            {
+               if( i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == typeof( IInfluxRow<> ) )
+               {
+                  if( foundTypeGenericTypeDefinition != null )
+                  {
+                     throw new InfluxException( string.Format( Errors.MultiInterfaceImplementations, typeof( TInfluxRow ).FullName ) );
+                  }
+
+                  foundTypeGenericTypeDefinition = i;
+               }
+            }
+
+            TypeDefinitionMap[ typeof( TInfluxRow ) ] = foundTypeGenericTypeDefinition;
+         }
+
+         return foundTypeGenericTypeDefinition;
       }
 
       internal static InfluxResultSet Create( IEnumerable<QueryResult> queryResults )
@@ -52,24 +77,33 @@ namespace Vibrant.InfluxDB.Client.Parsers
          InfluxQueryOptions options )
          where TInfluxRow : new()
       {
-         if( IsIInfluxRow<TInfluxRow>() )
+         var genericTypeDefinitionOfImplementedInterface = GetGenericTypeDefinitionForImplementedInfluxInterface<TInfluxRow>();
+
+         if( genericTypeDefinitionOfImplementedInterface != null )
          {
-            return CreateBasedOnInterfaceAsync<TInfluxRow>( client, queryResult, db, allowMetadataQuerying, options );
+            var timestampGenericParameter = genericTypeDefinitionOfImplementedInterface.GetGenericArguments()[ 0 ];
+            var createBasedOnInterfaceAsync = CreateBasedOnInterfaceAsyncMethod.MakeGenericMethod( new[] { typeof( TInfluxRow ), timestampGenericParameter } );
+            return (Task<InfluxResultSet<TInfluxRow>>)createBasedOnInterfaceAsync.Invoke( null, new object[] { client, queryResult, db, allowMetadataQuerying, options } );
          }
          else
          {
-            return Task.FromResult( CreateBasedOnAttributes<TInfluxRow>( queryResult, options ) );
+            var propertyMap = MetadataCache.GetOrCreate<TInfluxRow>();
+            var timestampGenericParameter = propertyMap.GetTimestampType();
+            var createBasedOnAttributes = CreateBasedOnAttributesMethod.MakeGenericMethod( new[] { typeof( TInfluxRow ), timestampGenericParameter } );
+            return Task.FromResult( (InfluxResultSet<TInfluxRow>)createBasedOnAttributes.Invoke( null, new object[] { client, queryResult, options, propertyMap } ) );
          }
       }
 
-      private static InfluxResultSet<TInfluxRow> CreateBasedOnAttributes<TInfluxRow>(
+      private static InfluxResultSet<TInfluxRow> CreateBasedOnAttributes<TInfluxRow, TTimestamp>(
+         InfluxClient client,
          IEnumerable<QueryResult> queryResults,
-         InfluxQueryOptions options )
+         InfluxQueryOptions options,
+         InfluxRowTypeInfo<TInfluxRow> propertyMap )
          where TInfluxRow : new()
       {
          // Create type based on attributes
          Dictionary<int, InfluxResult<TInfluxRow>> results = new Dictionary<int, InfluxResult<TInfluxRow>>();
-         var propertyMap = MetadataCache.GetOrCreate<TInfluxRow>().All;
+         var timestampParser = client.TimestampParserRegistry.FindTimestampParserOrNull<TTimestamp>();
 
          foreach( var queryResult in queryResults )
          {
@@ -94,7 +128,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      var name = series.Name;
 
                      // create new dictionary, with correct typing (we must potentially convert strings to enums, if the column being used in the GROUP BY is an enum)
-                     var tags = CreateTagDictionaryFromSerieBasedOnAttributes( series, propertyMap );
+                     var tags = CreateTagDictionaryFromSerieBasedOnAttributes( series, propertyMap.All );
 
                      // find or create influx serie
                      var influxSerie = existingResult.FindGroupInternal( name, tags, true );
@@ -105,7 +139,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      }
 
                      // add data to found serie
-                     AddValuesToInfluxSeriesByAttributes( influxSerie, series, propertyMap, options );
+                     AddValuesToInfluxSeriesByAttributes<TInfluxRow, TTimestamp>( influxSerie, series, propertyMap.All, options, timestampParser );
                   }
                }
             }
@@ -114,14 +148,14 @@ namespace Vibrant.InfluxDB.Client.Parsers
          return new InfluxResultSet<TInfluxRow>( results.Values.ToList() );
       }
 
-      private static void AddValuesToInfluxSeriesByAttributes<TInfluxRow>(
+      private static void AddValuesToInfluxSeriesByAttributes<TInfluxRow, TTimestamp>(
          InfluxSeries<TInfluxRow> influxSerie,
          SeriesResult series,
          IReadOnlyDictionary<string, PropertyExpressionInfo<TInfluxRow>> propertyMap,
-         InfluxQueryOptions options )
+         InfluxQueryOptions options,
+         ITimestampParser<TTimestamp> timestampParser )
          where TInfluxRow : new()
       {
-
          // Values will be null, if there are no entries in the result set
          if( series.Values != null )
          {
@@ -164,16 +198,13 @@ namespace Vibrant.InfluxDB.Client.Parsers
                   {
                      if( value != null )
                      {
-                        if( property.IsDateTime )
+                        if( property.Key == InfluxConstants.TimeColumn )
                         {
-                           if( value is string )
-                           {
-                              property.SetValue( row, DateTime.Parse( (string)value, CultureInfo.InvariantCulture, OnlyUtcStyles ) );
-                           }
-                           else if( value is long )
-                           {
-                              property.SetValue( row, DateTimeExtensions.FromEpochTime( (long)value, precision.Value ) );
-                           }
+                           property.SetValue( row, timestampParser.ToTimestamp( options.Precision, value ) );
+                        }
+                        else if( property.IsDateTime )
+                        {
+                           property.SetValue( row, DateTime.Parse( (string)value, CultureInfo.InvariantCulture, OnlyUtcStyles ) );
                         }
                         else if( property.IsEnum )
                         {
@@ -245,14 +276,16 @@ namespace Vibrant.InfluxDB.Client.Parsers
          return tags;
       }
 
-      private async static Task<InfluxResultSet<TInfluxRow>> CreateBasedOnInterfaceAsync<TInfluxRow>(
+      private async static Task<InfluxResultSet<TInfluxRow>> CreateBasedOnInterfaceAsync<TInfluxRow, TTimestamp>(
          InfluxClient client,
          IEnumerable<QueryResult> queryResults,
          string db,
          bool allowMetadataQuerying,
          InfluxQueryOptions options )
-         where TInfluxRow : new()
+         where TInfluxRow : IInfluxRow<TTimestamp>, new()
       {
+         var timestampParser = client.TimestampParserRegistry.FindTimestampParserOrNull<TTimestamp>();
+
          // In this case, we will contruct objects based on the IInfluxRow interface
          Dictionary<int, InfluxResult<TInfluxRow>> results = new Dictionary<int, InfluxResult<TInfluxRow>>();
          foreach( var queryResult in queryResults )
@@ -288,7 +321,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      }
 
                      // add data to found series
-                     await AddValuesToInfluxSeriesByInterfaceAsync( influxSerie, series, client, db, allowMetadataQuerying, options );
+                     await AddValuesToInfluxSeriesByInterfaceAsync<TInfluxRow, TTimestamp>( influxSerie, series, client, db, allowMetadataQuerying, options, timestampParser );
                   }
                }
             }
@@ -298,14 +331,15 @@ namespace Vibrant.InfluxDB.Client.Parsers
       }
 
 
-      private static async Task AddValuesToInfluxSeriesByInterfaceAsync<TInfluxRow>(
+      private static async Task AddValuesToInfluxSeriesByInterfaceAsync<TInfluxRow, TTimestamp>(
          InfluxSeries<TInfluxRow> influxSerie,
          SeriesResult series,
          InfluxClient client,
          string db,
          bool allowMetadataQuerying,
-         InfluxQueryOptions options )
-         where TInfluxRow : new()
+         InfluxQueryOptions options,
+         ITimestampParser<TTimestamp> timestampParser )
+         where TInfluxRow : IInfluxRow<TTimestamp>, new()
       {
          // Values will be null, if there are no entries in the result set
          if( series.Values != null )
@@ -313,7 +347,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
             var precision = options.Precision;
             var name = series.Name;
             var columns = series.Columns;
-            var setters = new Action<IInfluxRow, string, object>[ columns.Count ];
+            var setters = new Action<TInfluxRow, string, object>[ columns.Count ];
             var dataPoints = new List<TInfluxRow>();
             // Get metadata information about the measurement we are querying, as we dont know
             // which columns are tags/fields otherwise
@@ -335,17 +369,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                }
                else if( columnName == InfluxConstants.TimeColumn )
                {
-                  setters[ i ] = ( row, timeName, value ) =>
-                  {
-                     if( value is string )
-                     {
-                        row.SetTimestamp( DateTime.Parse( (string)value, CultureInfo.InvariantCulture, OnlyUtcStyles ) );
-                     }
-                     else if( value is long )
-                     {
-                        row.SetTimestamp( DateTimeExtensions.FromEpochTime( (long)value, precision.Value ) );
-                     }
-                  };
+                  setters[ i ] = ( row, timeName, value ) => row.SetTimestamp( timestampParser.ToTimestamp( options.Precision, value ) );
                }
                else if( meta.Tags.Contains( columnName ) )
                {
@@ -360,7 +384,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
             // constructs the IInfluxRows using the IInfluxRow interface
             foreach( var values in series.Values )
             {
-               var dataPoint = (IInfluxRow)new TInfluxRow();
+               var dataPoint = new TInfluxRow();
 
                // if we implement IHaveMeasurementName, set the measurement name on the IInfluxRow as well
                var seriesDataPoint = dataPoints as IHaveMeasurementName;
@@ -379,7 +403,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                   }
                }
 
-               dataPoints.Add( (TInfluxRow)dataPoint );
+               dataPoints.Add( dataPoint );
             }
 
             influxSerie.Rows.AddRange( dataPoints );

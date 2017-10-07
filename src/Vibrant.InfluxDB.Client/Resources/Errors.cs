@@ -22,5 +22,9 @@ namespace Vibrant.InfluxDB.Client.Resources
       internal static readonly string UnknownError = "An unknown error occurred. Please inspect the inner exception.";
       internal static readonly string InvalidColumn = "Could not determine whether the column '{0}' is a tag, field or a timestamp.";
       internal static readonly string InvalidTagOrFieldName = "The name of a field or tag cannot contain newline characters.";
+      internal static readonly string MultiInterfaceImplementations = "The class '{0}' implements the interface 'IIinfluxRow<>' multiple times with different generic parameters.";
+      internal static readonly string CouldNotFindTimestampParser = "Could not find a registered timestamp parser for the type '{0}'.";
+      internal static readonly string CouldNotParseTimestamp = "Could not parse the timestamp '{0}'.";
+      internal static readonly string MissingOffsetInEpochTime = "Cannot parse an epoch time to a DateTimeOffset. Consider not specifying a TimestampPrecision in the InfluxQueryOptions when using DateTimeOffset.";
    }
 }

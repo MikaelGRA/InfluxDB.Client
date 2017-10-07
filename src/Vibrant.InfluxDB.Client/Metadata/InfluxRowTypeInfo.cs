@@ -35,5 +35,10 @@ namespace Vibrant.InfluxDB.Client.Metadata
          var newLambda = Expression.Lambda<Func<TInfluxRow>>( Expression.New( typeof( TInfluxRow ) ), true );
          New = newLambda.Compile();
       }
+
+      public Type GetTimestampType()
+      {
+         return Timestamp?.Type ?? typeof( NullTimestamp );
+      }
    }
 }

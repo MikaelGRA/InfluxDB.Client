@@ -91,6 +91,33 @@ namespace Vibrant.InfluxDB.Client
       }
 
       /// <summary>
+      /// Returns a long representing the number of ticks (in the given precision) the DateTime is from 1. Jan 1970 (UTC).
+      /// </summary>
+      /// <param name="that"></param>
+      /// <param name="precision"></param>
+      /// <returns></returns>
+      public static long ToPrecision( this DateTimeOffset that, TimestampPrecision precision )
+      {
+         switch( precision )
+         {
+            case TimestampPrecision.Nanosecond:
+               return ( that - Epoch + that.Offset ).Ticks * 100;
+            case TimestampPrecision.Microsecond:
+               return ( that - Epoch + that.Offset ).Ticks / TicksPerMicrosecond;
+            case TimestampPrecision.Millisecond:
+               return ( that - Epoch + that.Offset ).Ticks / TimeSpan.TicksPerMillisecond;
+            case TimestampPrecision.Second:
+               return ( that - Epoch + that.Offset ).Ticks / TimeSpan.TicksPerSecond;
+            case TimestampPrecision.Minute:
+               return ( that - Epoch + that.Offset ).Ticks / TimeSpan.TicksPerMinute;
+            case TimestampPrecision.Hours:
+               return ( that - Epoch + that.Offset ).Ticks / TimeSpan.TicksPerHour;
+            default:
+               throw new ArgumentException( "Invalid parameter value.", nameof( precision ) );
+         }
+      }
+
+      /// <summary>
       /// Returns a string representing a influx timespan.
       /// </summary>
       /// <param name="that"></param>

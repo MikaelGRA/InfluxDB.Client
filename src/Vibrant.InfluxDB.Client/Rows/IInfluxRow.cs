@@ -11,19 +11,23 @@ namespace Vibrant.InfluxDB.Client.Rows
    /// When implementing this interface, InfluxAttributes are ignored and the interface 
    /// is used instead.
    /// </summary>
-   public interface IInfluxRow
+   public interface IInfluxRow : IInfluxRow<DateTime?>
+   {
+   }
+
+   public interface IInfluxRow<TTimestamp>
    {
       /// <summary>
       /// Sets the timestamp.
       /// </summary>
       /// <param name="value"></param>
-      void SetTimestamp( DateTime? value );
+      void SetTimestamp( TTimestamp value );
 
       /// <summary>
       /// Gets the timestamp.
       /// </summary>
       /// <returns></returns>
-      DateTime? GetTimestamp();
+      TTimestamp GetTimestamp();
 
       /// <summary>
       /// Sets a field.

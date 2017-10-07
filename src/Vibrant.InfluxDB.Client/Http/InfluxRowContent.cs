@@ -15,21 +15,24 @@ using Vibrant.InfluxDB.Client.Rows;
 
 namespace Vibrant.InfluxDB.Client.Http
 {
-   internal class InfluxRowContent<TInfluxRow> : HttpContent
+   internal class InfluxRowContent<TInfluxRow, TTimestamp> : HttpContent
       where TInfluxRow : new()
    {
       private static readonly MediaTypeHeaderValue TextMediaType = new MediaTypeHeaderValue( "text/plain" ) { CharSet = "utf-8" };
       private static readonly Encoding UTF8 = new UTF8Encoding( false );
-
+      private readonly bool _isBasedOnInterface;
       private readonly IEnumerable<TInfluxRow> _dataPoints;
       private readonly Func<TInfluxRow, string> _getMeasurementName;
-      private readonly TimestampPrecision _precision;
+      private readonly InfluxWriteOptions _options;
+      private readonly ITimestampParser<TTimestamp> _timestampParser;
 
-      internal InfluxRowContent( IEnumerable<TInfluxRow> dataPoints, Func<TInfluxRow, string> getMeasurementName, TimestampPrecision precision )
+      internal InfluxRowContent( InfluxClient client, bool isBasedOnInterface, IEnumerable<TInfluxRow> dataPoints, Func<TInfluxRow, string> getMeasurementName, InfluxWriteOptions options )
       {
+         _isBasedOnInterface = isBasedOnInterface;
          _dataPoints = dataPoints;
          _getMeasurementName = getMeasurementName;
-         _precision = precision;
+         _options = options;
+         _timestampParser = client.TimestampParserRegistry.FindTimestampParserOrNull<TTimestamp>();
 
          Headers.ContentType = TextMediaType;
       }
@@ -38,12 +41,12 @@ namespace Vibrant.InfluxDB.Client.Http
       {
          var writer = new StreamWriter( stream, UTF8 );
 
-         var precision = _precision;
+         var precision = _options.Precision;
          var getMeasurementName = _getMeasurementName;
 
-         if ( ResultSetFactory.IsIInfluxRow<TInfluxRow>() )
+         if ( _isBasedOnInterface )
          {
-            foreach ( IInfluxRow dp in _dataPoints )
+            foreach ( IInfluxRow<TTimestamp> dp in _dataPoints )
             {
                // write measurement name
                writer.Write( getMeasurementName( (TInfluxRow)dp ) );
@@ -110,7 +113,7 @@ namespace Vibrant.InfluxDB.Client.Http
                if ( ts != null )
                {
                   writer.Write( ' ' );
-                  long ticks = ts.Value.ToPrecision( precision );
+                  long ticks = _timestampParser.ToEpoch( precision, ts );
                   writer.Write( ticks );
                }
 
@@ -203,7 +206,7 @@ namespace Vibrant.InfluxDB.Client.Http
                   if ( ts != null )
                   {
                      writer.Write( ' ' );
-                     long ticks = ( (DateTime)ts ).ToPrecision( precision );
+                     long ticks = _timestampParser.ToEpoch( precision, (TTimestamp)ts );
                      writer.Write( ticks );
                   }
                }

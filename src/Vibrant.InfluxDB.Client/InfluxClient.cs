@@ -48,6 +48,7 @@ namespace Vibrant.InfluxDB.Client
 
          DefaultWriteOptions = new InfluxWriteOptions();
          DefaultQueryOptions = new InfluxQueryOptions();
+         TimestampParserRegistry = new DefaultTimestampParserRegistry();
 
          if( !string.IsNullOrEmpty( username ) && !string.IsNullOrEmpty( password ) )
          {
@@ -78,6 +79,11 @@ namespace Vibrant.InfluxDB.Client
       /// Gets the default query optionns.
       /// </summary>
       public InfluxQueryOptions DefaultQueryOptions { get; private set; }
+
+      /// <summary>
+      /// Gets the timestamp parser registry.
+      /// </summary>
+      public ITimestampParserRegistry TimestampParserRegistry { get; private set; }
 
       #region Raw Operations
 
@@ -749,7 +755,21 @@ namespace Vibrant.InfluxDB.Client
       private Task WriteAsync<TInfluxRow>( string db, Func<TInfluxRow, string> getMeasurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
          where TInfluxRow : new()
       {
-         return PostInternalIgnoreResultAsync( CreateWriteUrl( db, options ), new InfluxRowContent<TInfluxRow>( rows, getMeasurementName, options.Precision ) );
+         Type genericTimestampParameter;
+
+         var interfaceType = ResultSetFactory.GetGenericTypeDefinitionForImplementedInfluxInterface<TInfluxRow>();
+         if( interfaceType != null )
+         {
+            genericTimestampParameter = interfaceType.GetGenericArguments()[ 0 ];
+         }
+         else
+         {
+            genericTimestampParameter = MetadataCache.GetOrCreate<TInfluxRow>().GetTimestampType();
+         }
+
+         Type influxRowContent = typeof( InfluxRowContent<,> ).MakeGenericType( new[] { typeof( TInfluxRow ), genericTimestampParameter } );
+         var ctor = influxRowContent.GetConstructors( BindingFlags.NonPublic | BindingFlags.Instance )[ 0 ];
+         return PostInternalIgnoreResultAsync( CreateWriteUrl( db, options ), (HttpContent)ctor.Invoke( new object[] { this, interfaceType != null, rows, getMeasurementName, options } ) );
       }
 
       /// <summary>
