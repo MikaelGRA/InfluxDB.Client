@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.4.0
+ * Added support for custom timestamps and preserving timestamp offsets #20
+
 ## 3.3.1
  * Fixed #19
 
