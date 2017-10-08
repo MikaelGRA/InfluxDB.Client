@@ -50,7 +50,7 @@ public class ComputerInfo
 ```
 
 On your POCO class you must specify these things:
- * 1 property with the type DateTime or DateTime? as the timestamp used in InfluxDB by adding the [InfluxTimestamp] attribute.
+ * 1 property with the type DateTime, DateTime?, DateTimeOffset or DateTimeOffset? as the timestamp used in InfluxDB by adding the [InfluxTimestamp] attribute.
  * 0-* properties with the type string or a user-defined enum (nullables too) with the [InfluxTag] attribute that InfluxDB will use as indexed tags.
  * 1-* properties with the type string, long, double, bool, DateTime or a user-defined enum (nullables too) with the [InfluxField] attribute that InfluxDB will use as fields.
 
@@ -162,6 +162,8 @@ public async Task Should_Write_Dynamic_Rows_To_Database()
 
 Do note, that if you use dynamic classes, user-defined enums and DateTimes as fields/tags are not supported, as there is no way to differentiate between a string and an enum/DateTime.
 
+Also note, if you want to use custom timestamp type or DateTimeOffset with this interface, you can use the generic IInfluxRow<TTimestamp> interface or DynamicInfluxRow<TTimestamp> class.
+
 Here's how to query from the database:
 
 ```c#
@@ -252,6 +254,41 @@ public async Task Should_Write_And_Query_Deferred_Grouped_Data_With_Multi_Query(
 In the coming versions of C# there will be the capability to iterate over async enumerables, and once this feature hits, I will support that as well. See the video below:
 
 https://channel9.msdn.com/Blogs/Seth-Juarez/A-Preview-of-C-8-with-Mads-Torgersen#time=16m30s
+
+## Preserving timezone offsets
+
+When specifying the timezone clause, influxdb will return timestamps with their offsets. You can preserve this offset in the returned timestamp by using either a DateTimeOffset or Nullable<DateTimeOffset> as the timestamp type. If you use DateTime or Nullable<DateTIme> as the timestamp type, the timestamp will always be converted to UTC.
+   
+### Custom timestamp type
+
+Alternatively, you can implement your own ITimestampParser to support custom types, for instance NodaTime. Once implemented you can register on the InfluxClient. Simply implement the following interface:
+
+```C#
+/// <summary>
+/// ITimestampParser is responsible for parsing the 'time' column
+/// of data returned, allowing use of custom DateTime types.
+/// </summary>
+/// <typeparam name="TTimestamp"></typeparam>
+public interface ITimestampParser<TTimestamp>
+{
+   /// <summary>
+   /// Parses a epoch time (UTC) or ISO8601-timestamp (potentially with offset) to a date and time.
+   /// This is used when reading data from influxdb.
+   /// </summary>
+   /// <param name="precision">TimestampPrecision provided by the current InfluxQueryOptions.</param>
+   /// <param name="epochTimeLongOrIsoTimestampString">The raw value returned by the query.</param>
+   /// <returns>The parsed timestamp.</returns>
+   TTimestamp ToTimestamp( TimestampPrecision? precision, object epochTimeLongOrIsoTimestampString );
+
+   /// <summary>
+   /// Converts the timestamp to epoch time (UTC). This is used when writing data to influxdb.
+   /// </summary>
+   /// <param name="precision">TimestampPrecision provided by the current InfluxWriteOptions.</param>
+   /// <param name="timestamp">The timestamp to convert.</param>
+   /// <returns>The UTC epoch time.</returns>
+   long ToEpoch( TimestampPrecision precision, TTimestamp timestamp );
+}
+```
 
 ## Other operations
 
