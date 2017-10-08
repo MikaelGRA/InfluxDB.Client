@@ -20,7 +20,7 @@ namespace Vibrant.InfluxDB.Client
       /// <inheritdoc />
       public DateTime? ToTimestamp( TimestampPrecision? precision, object epochTimeLongOrIsoTimestampString )
       {
-         if( !precision.HasValue || epochTimeLongOrIsoTimestampString is string )
+         if( !precision.HasValue && epochTimeLongOrIsoTimestampString is string )
          {
             // if no precision is specified, the time column is returned as a ISO8601-timestamp.
             return DateTime.Parse( (string)epochTimeLongOrIsoTimestampString, CultureInfo.InvariantCulture, OnlyUtcStyles );
