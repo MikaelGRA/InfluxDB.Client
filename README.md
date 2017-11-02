@@ -292,6 +292,39 @@ public interface ITimestampParser<TTimestamp>
 }
 ```
 
+## Writing to multiple measurements at once
+
+Often you may want to write to multiple measurements with different measurement names by executing a single call. 
+
+This can be achieved by implemented the following inteface on your POCO classes:
+
+```C#
+
+   /// <summary>
+   /// Interface that can be used to specify a per-row measurement name.
+   /// </summary>
+   public interface IHaveMeasurementName
+   {
+      /// <summary>
+      /// Gets or sets the measurement name.
+      /// </summary>
+      string MeasurementName { get; set; }
+   }
+   
+```
+
+And using one of the overloads of the WriteAsync method that does not take a measurementName as argument:
+
+```C#
+
+      public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows )
+      
+      public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
+      
+```
+
+In case you want to do this with dynamic classes, you can simply use the NamedDynamicInfluxRow (which implements this interface) or implement a class that implements both IInfluxRow and IHaveMeasurementName yourself.
+
 ## Other operations
 
 The InfluxClient also defines a host of other management operations. That can be divided up into two categories.
