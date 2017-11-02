@@ -77,6 +77,48 @@ namespace Vibrant.InfluxDB.Client.Tests
       }
 
       [Fact]
+      public async Task Should_Write_Named_Dynamic_Rows_To_Database()
+      {
+         var infos = InfluxClientFixture.CreateNamedDynamicRowsStartingAt( "namedComputerInfo", new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 500 );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, infos );
+
+         var resultSet = await _client.ReadAsync<NamedDynamicInfluxRow>( InfluxClientFixture.DatabaseName, "SELECT * FROM namedComputerInfo" );
+         Assert.Equal( 1, resultSet.Results.Count );
+
+         var result = resultSet.Results[ 0 ];
+         Assert.Equal( 1, result.Series.Count );
+
+         var series = result.Series[ 0 ];
+         Assert.Equal( 500, series.Rows.Count );
+
+         foreach( var row in series.Rows )
+         {
+            Assert.Equal( "namedComputerInfo", row.MeasurementName );
+         }
+      }
+
+      [Fact]
+      public async Task Should_Write_Named_Typed_Rows_To_Database()
+      {
+         var infos = InfluxClientFixture.CreateNamedTypedRowsStartingAt( "namedComputerInfo1", new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 500 );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, infos );
+
+         var resultSet = await _client.ReadAsync<NamedComputerInfo>( InfluxClientFixture.DatabaseName, "SELECT * FROM namedComputerInfo1" );
+         Assert.Equal( 1, resultSet.Results.Count );
+
+         var result = resultSet.Results[ 0 ];
+         Assert.Equal( 1, result.Series.Count );
+
+         var series = result.Series[ 0 ];
+         Assert.Equal( 500, series.Rows.Count );
+
+         foreach( var row in series.Rows )
+         {
+            Assert.Equal( "namedComputerInfo1", row.MeasurementName );
+         }
+      }
+
+      [Fact]
       public async Task Should_Write_All_Field_Types_To_Database()
       {
          var row = new VariationRow
@@ -399,7 +441,7 @@ namespace Vibrant.InfluxDB.Client.Tests
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, $"groupedComputerInfo5{c}", infos );
 
          var chunkedResultSet = await _client.ReadChunkedAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedComputerInfo4{c} GROUP BY region;SELECT * FROM groupedComputerInfo5{c} GROUP BY region", new InfluxQueryOptions { ChunkSize = 200 } );
-         
+
          InfluxChunkedResult<ComputerInfo> currentResult;
          InfluxChunkedSeries<ComputerInfo> currentSerie;
          InfluxChunk<ComputerInfo> currentChunk;

@@ -179,10 +179,10 @@ namespace Vibrant.InfluxDB.Client.Parsers
             foreach( var values in series.Values )
             {
                // construct the data points based on the attributes
-               var row = new TInfluxRow();
+               var dataPoint = new TInfluxRow();
 
                // if we implement IHaveMeasurementName, set the measurement name on the IInfluxRow as well
-               var seriesDataPoint = dataPoints as IHaveMeasurementName;
+               var seriesDataPoint = dataPoint as IHaveMeasurementName;
                if( seriesDataPoint != null )
                {
                   seriesDataPoint.MeasurementName = name;
@@ -200,25 +200,25 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      {
                         if( property.Key == InfluxConstants.TimeColumn )
                         {
-                           property.SetValue( row, timestampParser.ToTimestamp( options.Precision, value ) );
+                           property.SetValue( dataPoint, timestampParser.ToTimestamp( options.Precision, value ) );
                         }
                         else if( property.IsDateTime )
                         {
-                           property.SetValue( row, DateTime.Parse( (string)value, CultureInfo.InvariantCulture, OnlyUtcStyles ) );
+                           property.SetValue( dataPoint, DateTime.Parse( (string)value, CultureInfo.InvariantCulture, OnlyUtcStyles ) );
                         }
                         else if( property.IsEnum )
                         {
-                           property.SetValue( row, property.GetEnumValue( value ) );
+                           property.SetValue( dataPoint, property.GetEnumValue( value ) );
                         }
                         else
                         {
-                           property.SetValue( row, Convert.ChangeType( value, property.Type, CultureInfo.InvariantCulture ) );
+                           property.SetValue( dataPoint, Convert.ChangeType( value, property.Type, CultureInfo.InvariantCulture ) );
                         }
                      }
                   }
                }
 
-               dataPoints.Add( row );
+               dataPoints.Add( dataPoint );
             }
 
             influxSerie.Rows.AddRange( dataPoints );
@@ -387,7 +387,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                var dataPoint = new TInfluxRow();
 
                // if we implement IHaveMeasurementName, set the measurement name on the IInfluxRow as well
-               var seriesDataPoint = dataPoints as IHaveMeasurementName;
+               var seriesDataPoint = dataPoint as IHaveMeasurementName;
                if( seriesDataPoint != null )
                {
                   seriesDataPoint.MeasurementName = name;

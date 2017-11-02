@@ -132,6 +132,11 @@ namespace Vibrant.InfluxDB.Client.Rows
             result = Timestamp;
             return true;
          }
+         else if( binder.Name == "MeasurementName" )
+         {
+            result = MeasurementName;
+            return true;
+         }
 
          if( Fields.TryGetValue( binder.Name, out result ) )
          {

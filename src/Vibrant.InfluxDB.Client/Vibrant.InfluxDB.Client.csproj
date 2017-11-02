@@ -21,7 +21,7 @@
       <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
       <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-      <Version>3.4.0</Version>
+      <Version>3.4.1</Version>
    </PropertyGroup>
 
    <ItemGroup>

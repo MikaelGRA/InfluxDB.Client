@@ -29,6 +29,28 @@ namespace Vibrant.InfluxDB.Client.Tests
       public static readonly string[] Hosts = new[] { "ma-lt", "surface-book" };
       public static readonly TestEnum1?[] TestEnums = new TestEnum1?[] { null, TestEnum1.Value1, TestEnum1.Value2, TestEnum1.Value3 };
 
+      public static NamedComputerInfo[] CreateNamedTypedRowsStartingAt( string measurementName, DateTime start, int rows )
+      {
+         var rng = new Random();
+
+         var timestamp = start;
+         var infos = new NamedComputerInfo[ rows ];
+         for( int i = 0 ; i < rows ; i++ )
+         {
+            long ram = rng.Next( int.MaxValue );
+            double cpu = rng.NextDouble();
+            string region = Regions[ rng.Next( Regions.Length ) ];
+            string host = Hosts[ rng.Next( Hosts.Length ) ];
+
+            var info = new NamedComputerInfo { MeasurementName = measurementName, Timestamp = timestamp, CPU = cpu, RAM = ram, Host = host, Region = region };
+            infos[ i ] = info;
+
+            timestamp = timestamp.AddSeconds( 1 );
+         }
+
+         return infos;
+      }
+
       public static ComputerInfo[] CreateTypedRowsStartingAt( DateTime start, int rows, bool includeNulls )
       {
          var rng = new Random();
@@ -106,6 +128,34 @@ namespace Vibrant.InfluxDB.Client.Tests
             timestamp = timestamp.AddSeconds( 1 );
          }
 
+         return infos;
+      }
+
+      public static NamedDynamicInfluxRow[] CreateNamedDynamicRowsStartingAt( string measurementName, DateTime start, int rows )
+      {
+         var rng = new Random();
+
+         var timestamp = start;
+         var infos = new NamedDynamicInfluxRow[ rows ];
+         for( int i = 0 ; i < rows ; i++ )
+         {
+            long ram = rng.Next( int.MaxValue );
+            double cpu = rng.NextDouble();
+            string region = Regions[ rng.Next( Regions.Length ) ];
+            string host = Hosts[ rng.Next( Hosts.Length ) ];
+
+            var info = new NamedDynamicInfluxRow();
+            info.MeasurementName = measurementName;
+            info.Fields.Add( "cpu", cpu );
+            info.Fields.Add( "ram", ram );
+            info.Tags.Add( "host", host );
+            info.Tags.Add( "region", region );
+            info.Timestamp = timestamp;
+
+            infos[ i ] = info;
+
+            timestamp = timestamp.AddSeconds( 1 );
+         }
          return infos;
       }
 

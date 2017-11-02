@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Vibrant.InfluxDB.Client.Rows;
 
 namespace Vibrant.InfluxDB.Client.Tests
 {
@@ -41,7 +42,27 @@ namespace Vibrant.InfluxDB.Client.Tests
       [InfluxField( "ram" )]
       internal long RAM { get; set; }
    }
-   
+
+   public class NamedComputerInfo : IHaveMeasurementName
+   {
+      public string MeasurementName { get; set; }
+
+      [InfluxTimestamp]
+      internal DateTime Timestamp { get; set; }
+
+      [InfluxTag( "host" )]
+      internal string Host { get; set; }
+
+      [InfluxTag( "region" )]
+      internal string Region { get; set; }
+
+      [InfluxField( "cpu" )]
+      internal double? CPU { get; set; }
+
+      [InfluxField( "ram" )]
+      internal long RAM { get; set; }
+   }
+
    public class ComputedComputerInfo
    {
       [InfluxTimestamp]
