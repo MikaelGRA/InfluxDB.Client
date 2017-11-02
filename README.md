@@ -24,6 +24,8 @@ Or you can simply grab it in one of the github releases.
 The library exposes all HTTP operations on InfluxDB (1.0+) and can be used for reading/writing data to/from in two primary ways:
  * Using your own POCO classes.
  * Using dynamic classes.
+ 
+A simple example of how to use the library is available [here](https://github.com/MikaelGRA/InfluxDB.Client/blob/master/samples/Vibrant.InfluxDB.Client.SimpleSample/Program.cs).
 
 ### Using your own POCO classes
 
@@ -87,7 +89,7 @@ public async Task Should_Write_Typed_Rows_To_Database()
 {
    var client = new InfluxClient( new Uri( "http://localhost:8086" ) );
    var infos = CreateTypedRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 500 );
-   await _client.WriteAsync( "mydb", "myMeasurementName", infos );
+   await client.WriteAsync( "mydb", "myMeasurementName", infos );
 }
 ```
 
@@ -95,7 +97,7 @@ Here's how to query from the database:
 ```c#
 public async Task Should_Query_Typed_Data()
 {
-   var resultSet = await _client.ReadAsync<ComputerInfo>( "mydb", "SELECT * FROM myMeasurementName" );
+   var resultSet = await client.ReadAsync<ComputerInfo>( "mydb", "SELECT * FROM myMeasurementName" );
    
    // resultSet will contain 1 result in the Results collection (or multiple if you execute multiple queries at once)
    var result = resultSet.Results[ 0 ];
@@ -156,7 +158,7 @@ public async Task Should_Write_Dynamic_Rows_To_Database()
 {
    var client = new InfluxClient( new Uri( "http://localhost:8086" ) );
    var infos = CreateDynamicRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 500 );
-   await _client.WriteAsync( "mydb", "myMeasurementName", infos );
+   await client.WriteAsync( "mydb", "myMeasurementName", infos );
 }
 ```
 
@@ -169,7 +171,7 @@ Here's how to query from the database:
 ```c#
 public async Task Should_Query_Dynamic_Data()
 {
-   var resultSet = await _client.ReadAsync<DynamicInfluxRow>( "mydb", "SELECT * FROM myMeasurementName" );
+   var resultSet = await client.ReadAsync<DynamicInfluxRow>( "mydb", "SELECT * FROM myMeasurementName" );
    
    // resultSet will contain 1 result in the Results collection (or multiple if you execute multiple queries at once)
    var result = resultSet.Results[ 0 ];
@@ -214,10 +216,10 @@ public async Task Should_Write_And_Query_Deferred_Grouped_Data_With_Multi_Query(
 {
    var start = new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc );
    var infos = InfluxClientFixture.CreateTypedRowsStartingAt( start, 5000, false );
-   await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo4", infos );
-   await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo5", infos );
+   await client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo4", infos );
+   await client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedComputerInfo5", infos );
 
-   var chunkedResultSet = await _client.ReadChunkedAsync<ComputerInfo>( 
+   var chunkedResultSet = await client.ReadChunkedAsync<ComputerInfo>( 
       InfluxClientFixture.DatabaseName, 
       $"SELECT * FROM groupedComputerInfo4 GROUP BY region;SELECT * FROM groupedComputerInfo5 GROUP BY region", 
       new InfluxQueryOptions { ChunkSize = 200 } );
