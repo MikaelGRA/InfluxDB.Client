@@ -296,7 +296,7 @@ public interface ITimestampParser<TTimestamp>
 
 Often you may want to write to multiple measurements with different measurement names by executing a single call. 
 
-This can be achieved by implemented the following inteface on your POCO classes:
+This can be achieved by implemented the following interface on your POCO classes:
 
 ```C#
 
