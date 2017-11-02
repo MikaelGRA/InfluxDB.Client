@@ -292,7 +292,7 @@ public interface ITimestampParser<TTimestamp>
 }
 ```
 
-## Writing to multiple measurements at once
+## Writing to different measurement names in single call
 
 Often you may want to write to multiple measurements with different measurement names by executing a single call. 
 
