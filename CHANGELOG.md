@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.4.1
+ * Added documentation for IHaveMeasurementNname
+ * Added NamedDynamicInfluxRow that implement IHaveMeasurementName
+ * Fixed bug that caused MeasurementName not to be written into classes implementing IHaveMeasurementName when querying
+
 ## 3.4.0
  * Added support for custom timestamps and preserving timestamp offsets #20
 
