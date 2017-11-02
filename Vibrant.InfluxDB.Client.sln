@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.0
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{026FE852-A7D4-4337-A135-9BFCD67F101B}"
 EndProject
@@ -14,6 +14,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vibrant.InfluxDB.Client.Tests", "test\Vibrant.InfluxDB.Client.Tests\Vibrant.InfluxDB.Client.Tests.csproj", "{E3BEA4A7-87D7-4E09-B2C0-04E7EA11FF43}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vibrant.InfluxDB.Client.ConsoleApp", "test\Vibrant.InfluxDB.Client.ConsoleApp\Vibrant.InfluxDB.Client.ConsoleApp.csproj", "{6924A02F-A83D-4DA5-B800-FCBFC7A97C7E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{F02BF63C-126E-461F-8120-036E88E94111}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vibrant.InfluxDB.Client.SimpleSample", "samples\Vibrant.InfluxDB.Client.SimpleSample\Vibrant.InfluxDB.Client.SimpleSample.csproj", "{361E4B1B-F56C-4F9D-864F-B282177A0740}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,10 @@ Global
 		{6924A02F-A83D-4DA5-B800-FCBFC7A97C7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6924A02F-A83D-4DA5-B800-FCBFC7A97C7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6924A02F-A83D-4DA5-B800-FCBFC7A97C7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{361E4B1B-F56C-4F9D-864F-B282177A0740}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{361E4B1B-F56C-4F9D-864F-B282177A0740}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{361E4B1B-F56C-4F9D-864F-B282177A0740}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{361E4B1B-F56C-4F9D-864F-B282177A0740}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -41,5 +49,9 @@ Global
 		{85CA1A00-439F-4BA7-B024-6C8D62F2216D} = {026FE852-A7D4-4337-A135-9BFCD67F101B}
 		{E3BEA4A7-87D7-4E09-B2C0-04E7EA11FF43} = {ADF0BC7C-6CC0-468F-B64D-0FFCCDA39C73}
 		{6924A02F-A83D-4DA5-B800-FCBFC7A97C7E} = {ADF0BC7C-6CC0-468F-B64D-0FFCCDA39C73}
+		{361E4B1B-F56C-4F9D-864F-B282177A0740} = {F02BF63C-126E-461F-8120-036E88E94111}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CE35042F-73E2-46AD-9CF0-F919E4CF60A9}
 	EndGlobalSection
 EndGlobal
