@@ -353,7 +353,6 @@ namespace Vibrant.InfluxDB.Client.Parsers
             // Get metadata information about the measurement we are querying, as we dont know
             // which columns are tags/fields otherwise
 
-            // PROBLEM: Should NOT always be called!
             DatabaseMeasurementInfo meta = null;
             if( allowMetadataQuerying )
             {
