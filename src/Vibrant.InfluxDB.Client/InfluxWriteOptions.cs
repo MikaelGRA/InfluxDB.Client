@@ -18,7 +18,7 @@ namespace Vibrant.InfluxDB.Client
       {
          Consistency = Consistency.All;
          Precision = TimestampPrecision.Nanosecond;
-         UseGzip = true;
+         UseGzip = false;
       }
 
       /// <summary>
