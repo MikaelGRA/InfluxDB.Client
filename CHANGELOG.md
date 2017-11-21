@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.5.0
+ * Added support for more primitive types #23
+ * Added support for (optional) gzip during write operation #24
+
 ## 3.4.1
  * Added documentation for IHaveMeasurementNname
  * Added NamedDynamicInfluxRow that implement IHaveMeasurementName
