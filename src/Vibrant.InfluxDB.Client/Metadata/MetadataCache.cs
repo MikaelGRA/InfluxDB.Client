@@ -11,7 +11,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
    {
       private static readonly object _sync = new object();
       private static readonly Dictionary<Type, object> _typeCache = new Dictionary<Type, object>();
-      private static readonly HashSet<Type> _validFieldTypes = new HashSet<Type> { typeof( string ), typeof( double ), typeof( long ), typeof( bool ), typeof( DateTime ) };
+      private static readonly HashSet<Type> _validFieldTypes = new HashSet<Type> { typeof( string ), typeof( double ), typeof( long ), typeof( int ), typeof( short ), typeof( byte ), typeof( ulong ), typeof( uint ), typeof( ushort ), typeof( sbyte ), typeof( bool ), typeof( DateTime ) };
 
       internal static InfluxRowTypeInfo<TInfluxRow> GetOrCreate<TInfluxRow>()
          where TInfluxRow : new()
@@ -47,7 +47,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
 
                   if ( timestampAttribute != null )
                   {
-                     timestamp = new PropertyExpressionInfo<TInfluxRow>( "time", propertyInfo );
+                     timestamp = new PropertyExpressionInfo<TInfluxRow>( InfluxConstants.TimeColumn, propertyInfo );
 
                      all.Add( timestamp );
                   }

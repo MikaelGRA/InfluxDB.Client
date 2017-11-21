@@ -212,6 +212,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                         }
                         else
                         {
+                           // will throw exception if types does not match up
                            property.SetValue( dataPoint, Convert.ChangeType( value, property.Type, CultureInfo.InvariantCulture ) );
                         }
                      }

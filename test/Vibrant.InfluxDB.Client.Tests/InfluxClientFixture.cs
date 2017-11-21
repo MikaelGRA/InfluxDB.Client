@@ -12,7 +12,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       private bool _disposed;
 
       public const string DatabaseName = "unittestdb";
-      public static readonly string InfluxHost = "http://ipv4.fiddler:8086";
+      public static readonly string InfluxHost = "http://localhost:8086"; // "http://ipv4.fiddler:8086";
 
       public InfluxClient Client { get; set; }
 

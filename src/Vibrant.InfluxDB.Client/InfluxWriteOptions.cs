@@ -18,6 +18,7 @@ namespace Vibrant.InfluxDB.Client
       {
          Consistency = Consistency.All;
          Precision = TimestampPrecision.Nanosecond;
+         UseGzip = true;
       }
 
       /// <summary>
@@ -33,6 +34,11 @@ namespace Vibrant.InfluxDB.Client
       /// <summary>
       /// Gets or sets the retention policy to write. If omitted (null, default), writes go to database's default RP.
       /// </summary>
-      public string RetentionPolicy { get; set; } 
+      public string RetentionPolicy { get; set; }
+
+      /// <summary>
+      /// Gets or sets a bool indicating if gzip compression should be used for write operations.
+      /// </summary>
+      public bool UseGzip { get; set; }
    }
 }

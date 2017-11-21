@@ -9,7 +9,7 @@ namespace Vibrant.InfluxDB.Client.SimpleSample
 
       static async Task MainAsync( string[] args )
       {
-         const string influxHost = "http://localhost:8086";
+         const string influxHost = "http://ipv4.fiddler:8086"; // "http://localhost:8086";
          const string databaseName = "mydb";
 
          var client = new InfluxClient( new Uri( influxHost ) );

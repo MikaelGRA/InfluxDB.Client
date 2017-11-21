@@ -15,7 +15,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
 
       internal static string EscapeFieldValue( object valueAsObject )
       {
-         if ( valueAsObject is long || valueAsObject is int )
+         if ( valueAsObject is long || valueAsObject is int || valueAsObject is short || valueAsObject is byte || valueAsObject is ulong || valueAsObject is uint || valueAsObject is ushort || valueAsObject is sbyte )
          {
             return valueAsObject.ToString() + 'i';
          }

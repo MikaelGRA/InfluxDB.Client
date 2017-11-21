@@ -769,7 +769,12 @@ namespace Vibrant.InfluxDB.Client
 
          Type influxRowContent = typeof( InfluxRowContent<,> ).MakeGenericType( new[] { typeof( TInfluxRow ), genericTimestampParameter } );
          var ctor = influxRowContent.GetConstructors( BindingFlags.NonPublic | BindingFlags.Instance )[ 0 ];
-         return PostInternalIgnoreResultAsync( CreateWriteUrl( db, options ), (HttpContent)ctor.Invoke( new object[] { this, interfaceType != null, rows, getMeasurementName, options } ) );
+         var content = (HttpContent)ctor.Invoke( new object[] { this, interfaceType != null, rows, getMeasurementName, options } );
+         if( options.UseGzip )
+         {
+            content = new GzipContent( content );
+         }
+         return PostInternalIgnoreResultAsync( CreateWriteUrl( db, options ), content );
       }
 
       /// <summary>
