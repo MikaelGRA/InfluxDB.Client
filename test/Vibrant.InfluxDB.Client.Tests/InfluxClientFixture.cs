@@ -186,6 +186,33 @@ namespace Vibrant.InfluxDB.Client.Tests
          return infos;
       }
 
+      public static DynamicInfluxRow[] CreateSpecialTypedDynamicRowsStartingAt( DateTime start, int rows )
+      {
+         var rng = new Random();
+
+         var timestamp = start;
+         var infos = new DynamicInfluxRow[ rows ];
+         for( int i = 0 ; i < rows ; i++ )
+         {
+            int ram = rng.Next( int.MaxValue );
+            float cpu = (float)rng.NextDouble();
+            string region = Regions[ rng.Next( Regions.Length ) ];
+            string host = Hosts[ rng.Next( Hosts.Length ) ];
+
+            var info = new DynamicInfluxRow();
+            info.Fields.Add( "cpu", cpu );
+            info.Fields.Add( "ram", ram );
+            info.Tags.Add( "host", host );
+            info.Tags.Add( "region", region );
+            info.Timestamp = timestamp;
+
+            infos[ i ] = info;
+
+            timestamp = timestamp.AddSeconds( 1 );
+         }
+         return infos;
+      }
+
       public static DynamicInfluxRow<DateTimeOffset>[] CreateDynamicRowsStartingAtWithOffset( DateTime start, TimeSpan offset, int rows )
       {
          var rng = new Random();

@@ -15,7 +15,11 @@ namespace Vibrant.InfluxDB.Client.Parsers
 
       internal static string EscapeFieldValue( object valueAsObject )
       {
-         if ( valueAsObject is long || valueAsObject is int || valueAsObject is short || valueAsObject is byte || valueAsObject is ulong || valueAsObject is uint || valueAsObject is ushort || valueAsObject is sbyte )
+         if( valueAsObject is double )
+         {
+            return ( (double)valueAsObject ).ToString( CultureInfo.InvariantCulture );
+         }
+         else if ( valueAsObject is long || valueAsObject is int || valueAsObject is short || valueAsObject is byte || valueAsObject is ulong || valueAsObject is uint || valueAsObject is ushort || valueAsObject is sbyte )
          {
             return valueAsObject.ToString() + 'i';
          }
@@ -26,6 +30,10 @@ namespace Vibrant.InfluxDB.Client.Parsers
          else if ( valueAsObject is bool )
          {
             return ( (bool)valueAsObject ) ? InfluxConstants.True : InfluxConstants.False;
+         }
+         else if( valueAsObject is float )
+         {
+            return ( (float)valueAsObject ).ToString( CultureInfo.InvariantCulture );
          }
          else if ( valueAsObject is DateTime )
          {

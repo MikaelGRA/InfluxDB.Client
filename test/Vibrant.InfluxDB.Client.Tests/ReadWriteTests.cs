@@ -76,6 +76,14 @@ namespace Vibrant.InfluxDB.Client.Tests
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo4", infos );
       }
 
+      [Theory]
+      [InlineData( 500, 2011 )]
+      public async Task Should_Write_Special_Dynamic_Rows_To_Database( int rows, int startYear )
+      {
+         var infos = InfluxClientFixture.CreateSpecialTypedDynamicRowsStartingAt( new DateTime( startYear, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "specialComputerInfo1", infos );
+      }
+
       [Fact]
       public async Task Should_Write_Named_Dynamic_Rows_To_Database()
       {
@@ -125,6 +133,9 @@ namespace Vibrant.InfluxDB.Client.Tests
          {
             Timestamp = new DateTime( 2013, 1, 1, 1, 1, 1, DateTimeKind.Utc ),
             Count = 1337,
+            Floaty = 13.36f,
+            Shorty = 23005,
+            SbytyMcByteFace = 42,
             Indicator = true,
             Message = "Hello, there\nWhat's up? ==",
             Percent = 0.37,

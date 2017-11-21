@@ -38,6 +38,15 @@ namespace Vibrant.InfluxDB.Client.Tests
       [InfluxField( "categoryField that is nullable" )]
       public TestEnum1? CategoryNullable { get; set; }
 
+      [InfluxField( "shorty" )]
+      public short Shorty { get; set; }
+
+      [InfluxField( "floaty" )]
+      public float Floaty { get; set; }
+
+      [InfluxField( "SbytyMcByteFace" )]
+      public sbyte SbytyMcByteFace { get; set; }
+
       // override object.Equals
       public override bool Equals( object obj )
       {
@@ -54,7 +63,10 @@ namespace Vibrant.InfluxDB.Client.Tests
             && Indicator == other.Indicator
             && OtherTimestamp == other.OtherTimestamp
             && Category == other.Category
-            && CategoryNullable == other.CategoryNullable;
+            && CategoryNullable == other.CategoryNullable
+            && Shorty == other.Shorty
+            && Floaty == other.Floaty
+            && SbytyMcByteFace == other.SbytyMcByteFace;
       }
 
       // override object.GetHashCode
