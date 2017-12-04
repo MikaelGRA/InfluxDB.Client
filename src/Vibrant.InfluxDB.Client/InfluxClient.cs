@@ -71,6 +71,21 @@ namespace Vibrant.InfluxDB.Client
       }
 
       /// <summary>
+      /// Gets or sets the timeout for all requests made.
+      /// </summary>
+      public TimeSpan Timeout
+      {
+         get
+         {
+            return _client.Timeout;
+         }
+         set
+         {
+            _client.Timeout = value;
+         }
+      }
+
+      /// <summary>
       /// Gets the default write options.
       /// </summary>
       public InfluxWriteOptions DefaultWriteOptions { get; private set; }

@@ -57,6 +57,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       }
 
       [Theory]
+      [InlineData( 0, 2010 )]
       [InlineData( 500, 2011 )]
       [InlineData( 1000, 2012 )]
       [InlineData( 20000, 2013 )]
@@ -67,6 +68,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       }
 
       [Theory]
+      [InlineData( 0, 2010 )]
       [InlineData( 500, 2011 )]
       [InlineData( 1000, 2012 )]
       [InlineData( 20000, 2013 )]
