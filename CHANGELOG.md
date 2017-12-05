@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.5.1
+ * Added support for custom Timeout #26
+
 ## 3.5.0
  * Added support for more primitive types #23
  * Added support for (optional) gzip during write operation #24
