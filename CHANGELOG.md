@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.5.2
+ * Added overload of constructor to InfluxClient that takes HttpClient #27
+
 ## 3.5.1
  * Added support for custom Timeout #26
 
