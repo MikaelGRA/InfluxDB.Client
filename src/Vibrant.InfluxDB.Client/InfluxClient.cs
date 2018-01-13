@@ -26,25 +26,19 @@ namespace Vibrant.InfluxDB.Client
    public sealed class InfluxClient : IDisposable
    {
       private readonly Dictionary<DatabaseMeasurementInfoKey, DatabaseMeasurementInfo> _seriesMetaCache;
+      private readonly AuthenticationHeaderValue _authzHeader;
       private readonly HttpClient _client;
-      private readonly HttpClientHandler _handler;
+      private readonly Uri _endpoint;
+
       private bool _disposed;
+      private bool _disposeHttpClientHandler;
 
-      /// <summary>
-      /// Constructs an InfluxClient that uses the specified credentials.
-      /// </summary>
-      /// <param name="endpoint"></param>
-      /// <param name="username"></param>
-      /// <param name="password"></param>
-      public InfluxClient( Uri endpoint, string username, string password )
+      private InfluxClient( Uri endpoint, string username, string password, HttpClient client, bool disposeHttpClient )
       {
-         _handler = new HttpClientHandler();
-         _handler.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
-
-         _client = new HttpClient( _handler, false );
-         _client.BaseAddress = endpoint;
-
+         _disposeHttpClientHandler = disposeHttpClient;
          _seriesMetaCache = new Dictionary<DatabaseMeasurementInfoKey, DatabaseMeasurementInfo>();
+         _endpoint = endpoint;
+         _client = client;
 
          DefaultWriteOptions = new InfluxWriteOptions();
          DefaultQueryOptions = new InfluxQueryOptions();
@@ -56,8 +50,32 @@ namespace Vibrant.InfluxDB.Client
             var credentials = username + ":" + password;
             var encodedCredentialBytes = encoding.GetBytes( credentials );
             var encodedCredentials = Convert.ToBase64String( encodedCredentialBytes );
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue( "Basic", encodedCredentials );
+            _authzHeader = new AuthenticationHeaderValue( "Basic", encodedCredentials );
          }
+      }
+
+      /// <summary>
+      /// Constructs an InfluxClient that uses the specified credentials and HttpClient.
+      /// </summary>
+      /// <param name="endpoint"></param>
+      /// <param name="username"></param>
+      /// <param name="password"></param>
+      /// <param name="client"></param>
+      public InfluxClient( Uri endpoint, string username, string password, HttpClient client )
+         : this( endpoint, username, password, client, false )
+      {
+
+      }
+
+      /// <summary>
+      /// Constructs an InfluxClient that uses the specified credentials.
+      /// </summary>
+      /// <param name="endpoint"></param>
+      /// <param name="username"></param>
+      /// <param name="password"></param>
+      public InfluxClient( Uri endpoint, string username, string password )
+         : this( endpoint, username, password, new HttpClient( new HttpClientHandler { AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip }, true ), true )
+      {
       }
 
       /// <summary>
@@ -944,7 +962,7 @@ namespace Vibrant.InfluxDB.Client
       {
          var url = $"write?db={UriHelper.SafeEscapeDataString( db )}&precision={options.Precision.GetQueryParameter()}&consistency={options.Consistency.GetQueryParameter()}";
          if( !string.IsNullOrEmpty( options.RetentionPolicy ) ) url += $"&rp={options.RetentionPolicy}";
-         return url;
+         return new Uri( _endpoint, url ).ToString();
       }
 
       private LongFormUrlEncodedContent CreateQueryPostContent( string commandOrQuery, string db, bool isTimeSeriesQuery, InfluxQueryOptions options )
@@ -1008,18 +1026,18 @@ namespace Vibrant.InfluxDB.Client
             }
          }
 
-         return query;
+         return new Uri( _endpoint, query ).ToString();
       }
 
       private string CreatePingUrl( int? secondsToWaitForLeader )
       {
          if( secondsToWaitForLeader.HasValue )
          {
-            return $"ping?wait_for_leader={secondsToWaitForLeader.Value}s";
+            return new Uri( _endpoint, $"ping?wait_for_leader={secondsToWaitForLeader.Value}s" ).ToString();
          }
          else
          {
-            return "ping";
+            return new Uri( _endpoint, "ping" ).ToString();
          }
       }
 
@@ -1049,7 +1067,7 @@ namespace Vibrant.InfluxDB.Client
          ContextualQueryResultIterator<TInfluxRow> iterator;
          if( options.UsePost )
          {
-            iterator = await ExecuteHttpAsync<TInfluxRow>( HttpMethod.Post, "query", db, options, CreateQueryPostContent( query, db, isTimeSeriesQuery, options ) ).ConfigureAwait( false );
+            iterator = await ExecuteHttpAsync<TInfluxRow>( HttpMethod.Post, new Uri( _endpoint, "query" ).ToString(), db, options, CreateQueryPostContent( query, db, isTimeSeriesQuery, options ) ).ConfigureAwait( false );
          }
          else
          {
@@ -1071,7 +1089,7 @@ namespace Vibrant.InfluxDB.Client
          List<QueryResult> queryResults;
          if( options.UsePost )
          {
-            queryResults = await ExecuteHttpAsync( HttpMethod.Post, "query", CreateQueryPostContent( query, db, isTimeSeriesQuery, options ) ).ConfigureAwait( false );
+            queryResults = await ExecuteHttpAsync( HttpMethod.Post, new Uri( _endpoint, "query" ).ToString(), CreateQueryPostContent( query, db, isTimeSeriesQuery, options ) ).ConfigureAwait( false );
          }
          else
          {
@@ -1093,10 +1111,14 @@ namespace Vibrant.InfluxDB.Client
          try
          {
             using( var request = new HttpRequestMessage( method, url ) { Content = ( method == HttpMethod.Get ? null : ( content == null ? new StringContent( "" ) : content ) ) } )
-            using( var response = await _client.SendAsync( request ).ConfigureAwait( false ) )
             {
-               await EnsureSuccessCode( response ).ConfigureAwait( false );
-               return await response.Content.ReadMultipleAsJsonAsync<QueryResult>().ConfigureAwait( false );
+               request.Headers.Authorization = _authzHeader;
+
+               using( var response = await _client.SendAsync( request ).ConfigureAwait( false ) )
+               {
+                  await EnsureSuccessCode( response ).ConfigureAwait( false );
+                  return await response.Content.ReadMultipleAsJsonAsync<QueryResult>().ConfigureAwait( false );
+               }
             }
          }
          catch( HttpRequestException e )
@@ -1112,6 +1134,8 @@ namespace Vibrant.InfluxDB.Client
          {
             using( var request = new HttpRequestMessage( method, url ) { Content = ( method == HttpMethod.Get ? null : ( content == null ? new StringContent( "" ) : content ) ) } )
             {
+               request.Headers.Authorization = _authzHeader;
+
                var response = await _client.SendAsync( request, HttpCompletionOption.ResponseHeadersRead ).ConfigureAwait( false );
                await EnsureSuccessCode( response ).ConfigureAwait( false );
 
@@ -1137,12 +1161,16 @@ namespace Vibrant.InfluxDB.Client
          try
          {
             using( var request = new HttpRequestMessage( HttpMethod.Head, url ) )
-            using( var response = await _client.SendAsync( request ).ConfigureAwait( false ) )
             {
-               await EnsureSuccessCode( response ).ConfigureAwait( false );
-               IEnumerable<string> version = null;
-               response.Headers.TryGetValues( "X-Influxdb-Version", out version );
-               return new InfluxPingResult { Version = version?.FirstOrDefault() ?? "unknown" };
+               request.Headers.Authorization = _authzHeader;
+
+               using( var response = await _client.SendAsync( request ).ConfigureAwait( false ) )
+               {
+                  await EnsureSuccessCode( response ).ConfigureAwait( false );
+                  IEnumerable<string> version = null;
+                  response.Headers.TryGetValues( "X-Influxdb-Version", out version );
+                  return new InfluxPingResult { Version = version?.FirstOrDefault() ?? "unknown" };
+               }
             }
          }
          catch( HttpRequestException e )
@@ -1156,9 +1184,13 @@ namespace Vibrant.InfluxDB.Client
          try
          {
             using( var request = new HttpRequestMessage( HttpMethod.Post, url ) { Content = content } )
-            using( var response = await _client.SendAsync( request ).ConfigureAwait( false ) )
             {
-               await EnsureSuccessCode( response ).ConfigureAwait( false );
+               request.Headers.Authorization = _authzHeader;
+
+               using( var response = await _client.SendAsync( request ).ConfigureAwait( false ) )
+               {
+                  await EnsureSuccessCode( response ).ConfigureAwait( false );
+               }
             }
          }
          catch( HttpRequestException e )
@@ -1217,8 +1249,10 @@ namespace Vibrant.InfluxDB.Client
       {
          if( disposing )
          {
-            _client.Dispose();
-            _handler.Dispose();
+            if( _disposeHttpClientHandler )
+            {
+               _client.Dispose();
+            }
          }
       }
 
