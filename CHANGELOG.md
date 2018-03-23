@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.6.0
+ * Fixed proper escaping of measurement names
+ * Added support for primitive types as tags
+
 ## 3.5.2
  * Added overload of constructor to InfluxClient that takes HttpClient #27
 
