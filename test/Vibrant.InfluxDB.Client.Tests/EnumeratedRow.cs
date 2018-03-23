@@ -16,5 +16,8 @@ namespace Vibrant.InfluxDB.Client.Tests
 
       [InfluxTag( "type" )]
       public TestEnum1? Type { get; set; }
+
+      [InfluxTag( "intType" )]
+      public int IntType { get; set; }
    }
 }

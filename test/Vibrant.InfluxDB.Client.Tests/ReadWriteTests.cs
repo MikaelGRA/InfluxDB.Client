@@ -139,11 +139,14 @@ namespace Vibrant.InfluxDB.Client.Tests
             Shorty = 23005,
             SbytyMcByteFace = 42,
             Indicator = true,
-            Message = "Hello, there\nWhat's up? ==",
+            Message = "Hello, \\athere\nWhat's up? ==",
             Percent = 0.37,
             Type = "tag, =Value",
             Category = TestEnum1.Value2,
             CategoryTag = TestEnum2.Value3,
+            CategoryNullable = TestEnum1.Value2,
+            DoubleTag = 1.123,
+            IntType = 42,
             OtherTimestamp = new DateTime( 2011, 4, 23, 1, 23, 54, DateTimeKind.Utc ),
          };
 
@@ -430,15 +433,19 @@ namespace Vibrant.InfluxDB.Client.Tests
          var infos = InfluxClientFixture.CreateEnumeratedRowsStartingAt( start, 5000 );
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "groupedEnumeratedRows", infos );
 
-         var resultSet = await _client.ReadAsync<EnumeratedRow>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedEnumeratedRows GROUP BY type" );
+         var resultSet = await _client.ReadAsync<EnumeratedRow>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedEnumeratedRows GROUP BY type, intType" );
          Assert.Equal( 1, resultSet.Results.Count );
 
          var result = resultSet.Results[ 0 ];
          foreach( var type in InfluxClientFixture.TestEnums )
          {
-            var kvp = new KeyValuePair<string, object>( "type", type );
-            var group = result.FindGroup( "groupedEnumeratedRows", new[] { kvp } );
-            Assert.NotNull( group );
+            for( int i = 0 ; i < 5 ; i++ )
+            {
+               var typeValue = new KeyValuePair<string, object>( "type", type );
+               var intTypeValue = new KeyValuePair<string, object>( "intType", i );
+               var group = result.FindGroup( "groupedEnumeratedRows", new[] { typeValue, intTypeValue } );
+               Assert.NotNull( group );
+            }
          }
       }
 

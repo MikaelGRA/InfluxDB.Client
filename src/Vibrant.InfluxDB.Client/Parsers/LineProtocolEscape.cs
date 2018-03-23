@@ -90,5 +90,29 @@ namespace Vibrant.InfluxDB.Client.Parsers
          }
          return builder.ToString();
       }
+
+      public static string EscapeMeasurementName( string value )
+      {
+         // https://docs.influxdata.com/influxdb/v1.2/write_protocols/line_protocol_tutorial/#special-characters-and-keywords
+
+         StringBuilder builder = new StringBuilder( value.Length );
+         for( int i = 0 ; i < value.Length ; i++ )
+         {
+            var c = value[ i ];
+            switch( c )
+            {
+               case ',':
+                  builder.Append( "\\," );
+                  break;
+               case ' ':
+                  builder.Append( "\\ " );
+                  break;
+               default:
+                  builder.Append( c );
+                  break;
+            }
+         }
+         return builder.ToString();
+      }
    }
 }

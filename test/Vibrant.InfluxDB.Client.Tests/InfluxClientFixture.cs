@@ -122,7 +122,7 @@ namespace Vibrant.InfluxDB.Client.Tests
             var value = rng.NextDouble();
             var type = TestEnums[ rng.Next( TestEnums.Length ) ];
 
-            var info = new EnumeratedRow { Timestamp = timestamp, Value = value, Type = type };
+            var info = new EnumeratedRow { Timestamp = timestamp, Value = value, Type = type, IntType = rng.Next( 5 ) };
             infos[ i ] = info;
 
             timestamp = timestamp.AddSeconds( 1 );

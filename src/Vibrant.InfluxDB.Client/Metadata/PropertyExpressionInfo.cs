@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -119,7 +120,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
          return valueAsEnum;
       }
 
-      internal string GetStringValue( object value )
+      internal string GetFieldString( object value )
       {
          var valueAsString = value as string;
          if( valueAsString != null )
@@ -140,5 +141,32 @@ namespace Vibrant.InfluxDB.Client.Metadata
 
          return valueAsString;
       }
+
+      internal string GetTagString( object value )
+      {
+         var valueAsString = value as string;
+         if( valueAsString != null )
+         {
+            return valueAsString;
+         }
+
+         var valueAsEnum = value as Enum;
+         if( valueAsEnum != null )
+         {
+            if( !EnumToString.TryGetValue( valueAsEnum, out valueAsString ) )
+            {
+               throw new InfluxException( string.Format( Errors.CountNotConvertEnumToString, value.ToString(), Property.Name, typeof( TInfluxRow ).Name ) );
+            }
+
+            return valueAsString;
+         }
+
+         // otherwise, simply convert it (this will not work for GUID)
+         return Convert.ToString( value, CultureInfo.InvariantCulture );
+      }
+
+      // WRITING
+      // READING
+      // CHECKING
    }
 }

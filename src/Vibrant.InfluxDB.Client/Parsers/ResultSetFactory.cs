@@ -258,7 +258,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      else
                      {
                         // since kvp.Value is just a string, so go for it
-                        value = kvp.Value;
+                        value = Convert.ChangeType( kvp.Value, property.Type, CultureInfo.InvariantCulture );
                      }
                   }
                   else

@@ -70,7 +70,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
                   else if ( tagAttribute != null )
                   {
                      var expression = new PropertyExpressionInfo<TInfluxRow>( tagAttribute.Name, propertyInfo );
-                     if ( expression.Type != typeof( string ) && !expression.Type.GetTypeInfo().IsEnum )
+                     if ( !_validFieldTypes.Contains( expression.Type ) && !expression.Type.GetTypeInfo().IsEnum )
                      {
                         throw new InfluxException( string.Format( Errors.InvalidTagType, propertyInfo.Name, type.Name ) );
                      }

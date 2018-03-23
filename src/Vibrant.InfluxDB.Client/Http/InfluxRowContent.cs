@@ -49,7 +49,7 @@ namespace Vibrant.InfluxDB.Client.Http
             foreach ( IInfluxRow<TTimestamp> dp in _dataPoints )
             {
                // write measurement name
-               writer.Write( getMeasurementName( (TInfluxRow)dp ) );
+               writer.Write( LineProtocolEscape.EscapeMeasurementName( getMeasurementName( (TInfluxRow)dp ) ) ); // FIXME: Escape?
 
                // write all tags
                foreach ( var kvp in dp.GetAllTags() ) // Ensure tags are in correct order?
@@ -130,7 +130,7 @@ namespace Vibrant.InfluxDB.Client.Http
             foreach ( var dp in _dataPoints )
             {
                // write measurement name
-               writer.Write( getMeasurementName( dp ) );
+               writer.Write( LineProtocolEscape.EscapeMeasurementName( getMeasurementName( dp ) ) );
 
                // write all tags
                if ( tags.Count > 0 )
@@ -143,7 +143,7 @@ namespace Vibrant.InfluxDB.Client.Http
                         writer.Write( ',' );
                         writer.Write( tagProperty.LineProtocolEscapedKey );
                         writer.Write( '=' );
-                        writer.Write( LineProtocolEscape.EscapeTagValue( tagProperty.GetStringValue( value ) ) );
+                        writer.Write( LineProtocolEscape.EscapeTagValue( tagProperty.GetTagString( value ) ) );
                      }
                   }
                }
@@ -173,7 +173,7 @@ namespace Vibrant.InfluxDB.Client.Http
                      writer.Write( '=' );
                      if ( property.IsEnum )
                      {
-                        writer.Write( LineProtocolEscape.EscapeFieldValue( property.GetStringValue( value ) ) );
+                        writer.Write( LineProtocolEscape.EscapeFieldValue( property.GetFieldString( value ) ) );
                      }
                      else
                      {

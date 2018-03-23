@@ -11,13 +11,19 @@ namespace Vibrant.InfluxDB.Client.Tests
       [InfluxTimestamp]
       public DateTime Timestamp { get; set; }
 
-      [InfluxTag( "type= odd, name" )]
+      [InfluxTag( "type= od\\d, name" )]
       public string Type { get; set; }
 
       [InfluxTag( "categoryTag" )]
       public TestEnum2 CategoryTag { get; set; }
 
-      [InfluxField( "mes,sa=ge" )]
+      [InfluxTag( "typeIntTag" )]
+      public int IntType { get; set; }
+
+      [InfluxTag( "doubleTag" )]
+      public double DoubleTag { get; set; }
+
+      [InfluxField( "m\\es,sa=ge" )]
       public string Message { get; set; }
 
       [InfluxField( "count" )]
@@ -56,6 +62,8 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          return Timestamp == other.Timestamp
             && Type == other.Type
+            && IntType == other.IntType
+            && DoubleTag == other.DoubleTag
             && CategoryTag == other.CategoryTag
             && Message == other.Message
             && Count == other.Count
