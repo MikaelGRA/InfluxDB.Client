@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.6.1
+ * Added support for InfluxMeasurementAttribute. #30
+ * Fixed a bug where if different types of rows were specified in the Write method, the operation would fail.
+
 ## 3.6.0
  * Fixed proper escaping of measurement names
  * Added support for primitive types as tags #29
