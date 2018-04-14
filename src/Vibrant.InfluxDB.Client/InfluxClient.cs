@@ -740,7 +740,7 @@ namespace Vibrant.InfluxDB.Client
       public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows )
          where TInfluxRow : new()
       {
-         return WriteAsync( db, x => measurementName, rows, DefaultWriteOptions );
+         return WriteAsync( db, CreateGetMeasurementNameFunction<TInfluxRow>( measurementName ), rows, DefaultWriteOptions );
       }
 
       /// <summary>
@@ -755,7 +755,7 @@ namespace Vibrant.InfluxDB.Client
       public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
          where TInfluxRow : new()
       {
-         return WriteAsync( db, x => measurementName, rows, options );
+         return WriteAsync( db, CreateGetMeasurementNameFunction<TInfluxRow>( measurementName ), rows, options );
       }
 
       /// <summary>
@@ -766,9 +766,9 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="rows"></param>
       /// <returns></returns>
       public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows )
-         where TInfluxRow : IHaveMeasurementName, new()
+         where TInfluxRow : new()
       {
-         return WriteAsync( db, x => x.MeasurementName, rows, DefaultWriteOptions );
+         return WriteAsync( db, CreateGetMeasurementNameFunction<TInfluxRow>( null ), rows, DefaultWriteOptions );
       }
 
       /// <summary>
@@ -780,34 +780,47 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="options"></param>
       /// <returns></returns>
       public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
-         where TInfluxRow : IHaveMeasurementName, new()
+         where TInfluxRow : new()
       {
-         return WriteAsync( db, x => x.MeasurementName, rows, options );
+         return WriteAsync( db, CreateGetMeasurementNameFunction<TInfluxRow>( null ), rows, options );
       }
 
       private Task WriteAsync<TInfluxRow>( string db, Func<TInfluxRow, string> getMeasurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
          where TInfluxRow : new()
       {
-         Type genericTimestampParameter;
+         List<HttpContent> contents = new List<HttpContent>();
+         foreach( var groupOfRows in rows.GroupBy( x => x.GetType() ) )
+         {
+            var info = MetadataCache.GetOrCreate( groupOfRows.Key );
 
-         var interfaceType = ResultSetFactory.GetGenericTypeDefinitionForImplementedInfluxInterface<TInfluxRow>();
-         if( interfaceType != null )
-         {
-            genericTimestampParameter = interfaceType.GetGenericArguments()[ 0 ];
-         }
-         else
-         {
-            genericTimestampParameter = MetadataCache.GetOrCreate<TInfluxRow>().GetTimestampType();
+            var c = info.CreateHttpContentFor( this, groupOfRows, getMeasurementName, options );
+            contents.Add( c );
          }
 
-         Type influxRowContent = typeof( InfluxRowContent<,> ).MakeGenericType( new[] { typeof( TInfluxRow ), genericTimestampParameter } );
-         var ctor = influxRowContent.GetConstructors( BindingFlags.NonPublic | BindingFlags.Instance )[ 0 ];
-         var content = (HttpContent)ctor.Invoke( new object[] { this, interfaceType != null, rows, getMeasurementName, options } );
+         if( contents.Count == 0 ) return TaskHelpers.CompletedTask;
+         var content = contents.Count == 1 ? contents[ 0 ] : new MultiContent( contents );
+
+
          if( options.UseGzip )
          {
             content = new GzipContent( content );
          }
          return PostInternalIgnoreResultAsync( CreateWriteUrl( db, options ), content );
+      }
+
+      private Func<TInfluxRow, string> CreateGetMeasurementNameFunction<TInfluxRow>( string measurementName )
+         where TInfluxRow : new()
+      {
+         if( measurementName != null )
+         {
+            return row => measurementName;
+         }
+         else
+         {
+            // otherwise, let's look at metadata
+            var info = MetadataCache.GetOrCreate<TInfluxRow>();
+            return row => info.GetFallbackMeasurementName( row ) ?? throw new InfluxException( Errors.CouldNotDetermineMeasurementName );
+         }
       }
 
       /// <summary>

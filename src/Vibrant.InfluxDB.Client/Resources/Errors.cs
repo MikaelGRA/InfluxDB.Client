@@ -25,5 +25,7 @@ namespace Vibrant.InfluxDB.Client.Resources
       internal static readonly string CouldNotFindTimestampParser = "Could not find a registered timestamp parser for the type '{0}'.";
       internal static readonly string CouldNotParseTimestamp = "Could not parse the timestamp '{0}'.";
       internal static readonly string MissingOffsetInEpochTime = "Cannot parse an epoch time to a DateTimeOffset. Consider not specifying a TimestampPrecision in the InfluxQueryOptions when using DateTimeOffset.";
+      internal static readonly string InvalidMeasurementNameType = "The property {0} on the type {1} which is used as an InfluxMeasurement must be a string.";
+      internal static readonly string CouldNotDetermineMeasurementName = "Could not determine the measurement name to use while inserting.";
    }
 }

@@ -450,6 +450,28 @@ namespace Vibrant.InfluxDB.Client.Tests
       }
 
       [Theory]
+      [InlineData( 500, 2011, "differentTypesOfRows" )]
+      public async Task Should_Write_Different_Types_Of_Rows_To_Database( int rows, int startYear, string tableName )
+      {
+         var start1 = new DateTime( startYear, 1, 1, 1, 1, 1, DateTimeKind.Utc );
+         var typedInfos = InfluxClientFixture.CreateTypedRowsStartingAt( start1, rows, false );
+         var start2 = start1.AddYears( 1 );
+         var dynamicInfos = InfluxClientFixture.CreateDynamicRowsStartingAt( start1, rows );
+
+         List<object> items = new List<object>();
+         foreach( var t in typedInfos )
+         {
+            items.Add( t );
+         }
+         foreach( var d in dynamicInfos )
+         {
+            items.Add( d );
+         }
+
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, tableName, items );
+      }
+
+      [Theory]
       [InlineData( 100, 'A' )]
       [InlineData( 200, 'B' )]
       [InlineData( 5000, 'C' )]

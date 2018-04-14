@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Vibrant.InfluxDB.Client.Metadata;
@@ -21,12 +22,12 @@ namespace Vibrant.InfluxDB.Client.Http
       private static readonly MediaTypeHeaderValue TextMediaType = new MediaTypeHeaderValue( "text/plain" ) { CharSet = "utf-8" };
       private static readonly Encoding UTF8 = new UTF8Encoding( false );
       private readonly bool _isBasedOnInterface;
-      private readonly IEnumerable<TInfluxRow> _dataPoints;
+      private readonly IEnumerable _dataPoints;
       private readonly Func<TInfluxRow, string> _getMeasurementName;
       private readonly InfluxWriteOptions _options;
       private readonly ITimestampParser<TTimestamp> _timestampParser;
 
-      internal InfluxRowContent( InfluxClient client, bool isBasedOnInterface, IEnumerable<TInfluxRow> dataPoints, Func<TInfluxRow, string> getMeasurementName, InfluxWriteOptions options )
+      internal InfluxRowContent( InfluxClient client, bool isBasedOnInterface, IEnumerable dataPoints, Func<TInfluxRow, string> getMeasurementName, InfluxWriteOptions options )
       {
          _isBasedOnInterface = isBasedOnInterface;
          _dataPoints = dataPoints;
@@ -127,7 +128,7 @@ namespace Vibrant.InfluxDB.Client.Http
             var fields = cache.Fields;
             var timestamp = cache.Timestamp;
 
-            foreach ( var dp in _dataPoints )
+            foreach ( TInfluxRow dp in _dataPoints )
             {
                // write measurement name
                writer.Write( LineProtocolEscape.EscapeMeasurementName( getMeasurementName( dp ) ) );

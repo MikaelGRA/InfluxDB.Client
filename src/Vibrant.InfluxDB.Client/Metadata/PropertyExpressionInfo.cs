@@ -21,17 +21,21 @@ namespace Vibrant.InfluxDB.Client.Metadata
       internal readonly Dictionary<string, Enum> StringToEnum;
       internal readonly PropertyInfo Property;
       internal readonly string LineProtocolEscapedKey;
-      //internal readonly string QueryProtocolEscapedKey;
       internal readonly string Key;
-      //internal readonly bool IsTimestampColumn;
       internal readonly bool IsDateTime;
       internal readonly bool IsEnum;
+      internal readonly bool IsMeasurementNameProperty;
 
       internal PropertyExpressionInfo( string key, PropertyInfo property )
       {
-         if( key.Contains( "\n" ) )
+         if( key != null )
          {
-            throw new InfluxException( Errors.InvalidTagOrFieldName );
+            if( key.Contains( "\n" ) )
+            {
+               throw new InfluxException( Errors.InvalidTagOrFieldName );
+            }
+            LineProtocolEscapedKey = LineProtocolEscape.EscapeKey( key );
+            Key = key;
          }
 
          Property = property;
@@ -44,15 +48,16 @@ namespace Vibrant.InfluxDB.Client.Metadata
 
          // instance.Property 
          MemberExpression getProperty = Expression.Property( instanceParam, property );
-
-         // instance.Property = row[property] 
-         BinaryExpression assignProperty = Expression.Assign( getProperty, Expression.Convert( valueParam, property.PropertyType ) );
-
          var getterLambda = Expression.Lambda<Func<TInfluxRow, object>>( Expression.Convert( getProperty, typeof( object ) ), true, instanceParam );
          GetValue = getterLambda.Compile();
 
-         var setterLambda = Expression.Lambda<Action<TInfluxRow, object>>( assignProperty, true, instanceParam, valueParam );
-         SetValue = setterLambda.Compile();
+         // instance.Property = row[property] 
+         if( property.CanWrite )
+         {
+            BinaryExpression assignProperty = Expression.Assign( getProperty, Expression.Convert( valueParam, property.PropertyType ) );
+            var setterLambda = Expression.Lambda<Action<TInfluxRow, object>>( assignProperty, true, instanceParam, valueParam );
+            SetValue = setterLambda.Compile();
+         }
 
          var type = property.PropertyType;
          RawType = type;
@@ -66,13 +71,9 @@ namespace Vibrant.InfluxDB.Client.Metadata
          {
             Type = type;
          }
-
-         //IsTimestampColumn = key == "time";
+         
          IsEnum = Type.GetTypeInfo().IsEnum;
          IsDateTime = Type == typeof( DateTime );
-         LineProtocolEscapedKey = LineProtocolEscape.EscapeKey( key );
-         //QueryProtocolEscapedKey = QueryEscape.EscapeKey( key );
-         Key = key;
 
          // ensure we can convert between string/enum
          if( IsEnum )
@@ -99,6 +100,11 @@ namespace Vibrant.InfluxDB.Client.Metadata
             }
          }
 
+         var attr = Property.GetCustomAttribute<InfluxMeasurementAttribute>();
+         if( attr != null )
+         {
+            IsMeasurementNameProperty = true;
+         }
       }
 
       internal Enum GetEnumValue( object value )
