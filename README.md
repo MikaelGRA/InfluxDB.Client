@@ -296,7 +296,7 @@ public interface ITimestampParser<TTimestamp>
 
 Often you may want to write to multiple measurements with different measurement names by executing a single call. 
 
-This can be achieved by implemented the following interface on your POCO classes:
+This can be achieved by either implementing the following interface on your POCO classes:
 
 ```C#
 
@@ -313,7 +313,43 @@ This can be achieved by implemented the following interface on your POCO classes
    
 ```
 
-And using one of the overloads of the WriteAsync method that does not take a measurementName as argument:
+Or by putting the [InfluxMeasurement] attribute on your class or property definitions of your POCO class.
+
+When using it on a class you must specify a name, like so:
+
+```C#
+
+   [InfluxMeasurement( "MyTableName" )]
+   public class ClassWithMeasurementName
+   {
+      [InfluxTimestamp]
+      internal DateTime Timestamp { get; set; }
+
+      [InfluxField( "cpu" )]
+      internal double? CPU { get; set; }
+   }
+
+```
+
+When using it on a property, don't specify a name. It will use the property value (which must be a string):
+
+```C#
+
+   public class ClassWithMeasurementName
+   {
+      [InfluxTimestamp]
+      internal DateTime Timestamp { get; set; }
+
+      [InfluxField( "cpu" )]
+      internal double? CPU { get; set; }
+
+      [InfluxMeasurement]
+      public string TableName { get; set; }
+   }
+
+```
+
+When using one of these approaches you can then use the following overloads WriteAsync method, which don't take a measurementName as an argument:
 
 ```C#
 
@@ -323,7 +359,15 @@ And using one of the overloads of the WriteAsync method that does not take a mea
       
 ```
 
-In case you want to do this with dynamic classes, you can simply use the NamedDynamicInfluxRow (which implements this interface) or implement a class that implements both IInfluxRow and IHaveMeasurementName yourself.
+In case you want to do this with dynamic classes, you can simply use the NamedDynamicInfluxRow (which implements the IHaveMeasurementName interface).
+
+The following priority is used when determine which measurement to write a record to in case multiple approaches are used:
+ * The name provided in the WriteAsync method.
+ * The name provided by the IHaveMeasurementName interface
+ * The name provided by the property annotated with the InfluxMeasurementAttribute.
+ * The name provided in the class annotated with the InfluxMeasurementAttribute.
+ 
+In case you use the IHaveMeasurementName or a property with the InfluxMeasurementAttribute, the measurement name will be written to that property during read operations.
 
 ## Other operations
 
