@@ -129,6 +129,79 @@ namespace Vibrant.InfluxDB.Client.Tests
       }
 
       [Fact]
+      public async Task Should_Write_By_InfluxMeasurementAttribute()
+      {
+         var row = new ClassWithMeasurementName
+         {
+            Timestamp = new DateTime( 2013, 1, 1, 1, 1, 1, DateTimeKind.Utc ),
+            CPU = 1.337
+         };
+
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, new[] { row } );
+
+         var resultSet = await _client.ReadAsync<ClassWithMeasurementName>( InfluxClientFixture.DatabaseName, "SELECT * FROM MyTableName" );
+         Assert.Equal( 1, resultSet.Results.Count );
+
+         var result = resultSet.Results[ 0 ];
+         Assert.Equal( 1, result.Series.Count );
+
+         var series = result.Series[ 0 ];
+         Assert.Equal( 1, series.Rows.Count );
+
+         Assert.Equal( row.CPU, series.Rows[ 0 ].CPU );
+         Assert.Equal( "MyTableName", series.Rows[ 0 ].TableName );
+      }
+
+      [Fact]
+      public async Task Should_Write_By_MeasurementName_Over_InfluxMeasurementAttribute()
+      {
+         var row = new ClassWithMeasurementName
+         {
+            Timestamp = new DateTime( 2013, 1, 1, 1, 1, 1, DateTimeKind.Utc ),
+            CPU = 1.337
+         };
+
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "attrTest1", new[] { row } );
+
+         var resultSet = await _client.ReadAsync<ClassWithMeasurementName>( InfluxClientFixture.DatabaseName, "SELECT * FROM attrTest1" );
+         Assert.Equal( 1, resultSet.Results.Count );
+
+         var result = resultSet.Results[ 0 ];
+         Assert.Equal( 1, result.Series.Count );
+
+         var series = result.Series[ 0 ];
+         Assert.Equal( 1, series.Rows.Count );
+
+         Assert.Equal( row.CPU, series.Rows[ 0 ].CPU );
+         Assert.Equal( "attrTest1", series.Rows[ 0 ].TableName );
+      }
+
+      [Fact]
+      public async Task Should_Write_By_InfluxMeasurementAttribute_On_Property()
+      {
+         var row = new ClassWithMeasurementName
+         {
+            Timestamp = new DateTime( 2013, 1, 1, 1, 1, 1, DateTimeKind.Utc ),
+            CPU = 1.337,
+            TableName = "attrTest2"
+         };
+
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, new[] { row } );
+
+         var resultSet = await _client.ReadAsync<ClassWithMeasurementName>( InfluxClientFixture.DatabaseName, "SELECT * FROM attrTest2" );
+         Assert.Equal( 1, resultSet.Results.Count );
+
+         var result = resultSet.Results[ 0 ];
+         Assert.Equal( 1, result.Series.Count );
+
+         var series = result.Series[ 0 ];
+         Assert.Equal( 1, series.Rows.Count );
+
+         Assert.Equal( row.CPU, series.Rows[ 0 ].CPU );
+         Assert.Equal( "attrTest2", series.Rows[ 0 ].TableName );
+      }
+
+      [Fact]
       public async Task Should_Write_All_Field_Types_To_Database()
       {
          var row = new VariationRow

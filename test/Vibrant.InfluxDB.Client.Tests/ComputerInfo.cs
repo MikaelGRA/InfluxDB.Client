@@ -83,4 +83,17 @@ namespace Vibrant.InfluxDB.Client.Tests
       [InfluxField( "region" )]
       internal string Region { get; set; }
    }
+
+   [InfluxMeasurement( "MyTableName" )]
+   public class ClassWithMeasurementName
+   {
+      [InfluxTimestamp]
+      internal DateTime Timestamp { get; set; }
+
+      [InfluxField( "cpu" )]
+      internal double? CPU { get; set; }
+
+      [InfluxMeasurement]
+      public string TableName { get; set; }
+   }
 }
