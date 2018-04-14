@@ -19,9 +19,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
 
       public abstract bool IsBasedOnInterface();
 
-      public abstract Delegate CreateGetMeasurementNameFunction( string measurementName );
-
-      public abstract HttpContent CreateHttpContentFor( InfluxClient client, IEnumerable rows, Delegate getMeasurementName, InfluxWriteOptions options );
+      public abstract HttpContent CreateHttpContentFor( InfluxClient client, IEnumerable rows, string measurementName, InfluxWriteOptions options );
    }
 
    internal abstract class InfluxRowTypeInfo<TInfluxRow> : InfluxRowTypeInfo
@@ -100,7 +98,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
          }
       }
 
-      public override Delegate CreateGetMeasurementNameFunction( string measurementName )
+      public Func<TInfluxRow, string> CreateGetMeasurementNameFunction( string measurementName )
       {
          if( measurementName != null )
          {
@@ -123,9 +121,9 @@ namespace Vibrant.InfluxDB.Client.Metadata
          _isBasedOnInterface = isBasedOnInterface;
       }
 
-      public override HttpContent CreateHttpContentFor( InfluxClient client, IEnumerable rows, Delegate getMeasurementName, InfluxWriteOptions options )
+      public override HttpContent CreateHttpContentFor( InfluxClient client, IEnumerable rows, string measurementName, InfluxWriteOptions options )
       {
-         return new InfluxRowContent<TInfluxRow, TTimestamp>( client, _isBasedOnInterface, rows, (Func<TInfluxRow, string>)getMeasurementName, options );
+         return new InfluxRowContent<TInfluxRow, TTimestamp>( client, _isBasedOnInterface, rows, CreateGetMeasurementNameFunction( measurementName ), options );
       }
 
       public override bool IsBasedOnInterface()

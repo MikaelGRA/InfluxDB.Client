@@ -793,7 +793,7 @@ namespace Vibrant.InfluxDB.Client
          {
             var info = MetadataCache.GetOrCreate( groupOfRows.Key );
 
-            var c = info.CreateHttpContentFor( this, groupOfRows, info.CreateGetMeasurementNameFunction( measurementName ), options );
+            var c = info.CreateHttpContentFor( this, groupOfRows, measurementName, options );
             contents.Add( c );
          }
 
