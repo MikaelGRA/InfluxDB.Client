@@ -740,7 +740,7 @@ namespace Vibrant.InfluxDB.Client
       public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows )
          where TInfluxRow : new()
       {
-         return WriteAsync( db, CreateGetMeasurementNameFunction<TInfluxRow>( measurementName ), rows, DefaultWriteOptions );
+         return WriteInternalAsync( db, measurementName, rows, DefaultWriteOptions );
       }
 
       /// <summary>
@@ -755,7 +755,7 @@ namespace Vibrant.InfluxDB.Client
       public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
          where TInfluxRow : new()
       {
-         return WriteAsync( db, CreateGetMeasurementNameFunction<TInfluxRow>( measurementName ), rows, options );
+         return WriteInternalAsync( db, measurementName, rows, options );
       }
 
       /// <summary>
@@ -768,7 +768,7 @@ namespace Vibrant.InfluxDB.Client
       public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows )
          where TInfluxRow : new()
       {
-         return WriteAsync( db, CreateGetMeasurementNameFunction<TInfluxRow>( null ), rows, DefaultWriteOptions );
+         return WriteInternalAsync( db, null, rows, DefaultWriteOptions );
       }
 
       /// <summary>
@@ -782,10 +782,10 @@ namespace Vibrant.InfluxDB.Client
       public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
          where TInfluxRow : new()
       {
-         return WriteAsync( db, CreateGetMeasurementNameFunction<TInfluxRow>( null ), rows, options );
+         return WriteInternalAsync( db, null, rows, options );
       }
 
-      private Task WriteAsync<TInfluxRow>( string db, Func<TInfluxRow, string> getMeasurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
+      private Task WriteInternalAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
          where TInfluxRow : new()
       {
          List<HttpContent> contents = new List<HttpContent>();
@@ -793,7 +793,7 @@ namespace Vibrant.InfluxDB.Client
          {
             var info = MetadataCache.GetOrCreate( groupOfRows.Key );
 
-            var c = info.CreateHttpContentFor( this, groupOfRows, getMeasurementName, options );
+            var c = info.CreateHttpContentFor( this, groupOfRows, info.CreateGetMeasurementNameFunction( measurementName ), options );
             contents.Add( c );
          }
 
@@ -806,21 +806,6 @@ namespace Vibrant.InfluxDB.Client
             content = new GzipContent( content );
          }
          return PostInternalIgnoreResultAsync( CreateWriteUrl( db, options ), content );
-      }
-
-      private Func<TInfluxRow, string> CreateGetMeasurementNameFunction<TInfluxRow>( string measurementName )
-         where TInfluxRow : new()
-      {
-         if( measurementName != null )
-         {
-            return row => measurementName;
-         }
-         else
-         {
-            // otherwise, let's look at metadata
-            var info = MetadataCache.GetOrCreate<TInfluxRow>();
-            return row => info.GetFallbackMeasurementName( row ) ?? throw new InfluxException( Errors.CouldNotDetermineMeasurementName );
-         }
       }
 
       /// <summary>

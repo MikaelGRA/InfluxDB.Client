@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Vibrant.InfluxDB.Client.Http;
+using Vibrant.InfluxDB.Client.Resources;
 using Vibrant.InfluxDB.Client.Rows;
 
 namespace Vibrant.InfluxDB.Client.Metadata
@@ -17,6 +18,8 @@ namespace Vibrant.InfluxDB.Client.Metadata
       public abstract Type GetTimestampType();
 
       public abstract bool IsBasedOnInterface();
+
+      public abstract Delegate CreateGetMeasurementNameFunction( string measurementName );
 
       public abstract HttpContent CreateHttpContentFor( InfluxClient client, IEnumerable rows, Delegate getMeasurementName, InfluxWriteOptions options );
    }
@@ -94,6 +97,18 @@ namespace Vibrant.InfluxDB.Client.Metadata
          if( InfluxMeasurement?.SetValue != null )
          {
             InfluxMeasurement.SetValue( row, measurementName );
+         }
+      }
+
+      public override Delegate CreateGetMeasurementNameFunction( string measurementName )
+      {
+         if( measurementName != null )
+         {
+            return new Func<TInfluxRow, string>( row => measurementName );
+         }
+         else
+         {
+            return new Func<TInfluxRow, string>( row => GetFallbackMeasurementName( row ) ?? throw new InfluxException( Errors.CouldNotDetermineMeasurementName ) );
          }
       }
    }
