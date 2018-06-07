@@ -23,7 +23,7 @@ namespace Vibrant.InfluxDB.Client
 
       public void AddOrReplace<TTimestamp, TTimestampParser>( TTimestampParser timestampParser ) where TTimestampParser : ITimestampParser<TTimestamp>
       {
-         _timestampParsers.Add( typeof( TTimestamp ), timestampParser );
+         _timestampParsers[ typeof( TTimestamp ) ] = timestampParser;
       }
 
       public bool Contains<TTimestamp>()
