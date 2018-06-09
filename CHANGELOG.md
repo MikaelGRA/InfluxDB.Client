@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.6.2
+ * Support for replacing existings timestamp parsers in DefaultTimestampParserRegistry
+
 ## 3.6.1
  * Added support for InfluxMeasurementAttribute. #30
  * Fixed a bug where if different types of rows were specified in the Write method, the operation would fail.
