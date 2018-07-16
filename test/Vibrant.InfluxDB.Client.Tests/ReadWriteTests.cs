@@ -545,17 +545,26 @@ namespace Vibrant.InfluxDB.Client.Tests
       }
 
       [Theory]
-      [InlineData( 100, 'A' )]
-      [InlineData( 200, 'B' )]
-      [InlineData( 5000, 'C' )]
-      public async Task Should_Write_And_Query_Deferred_Grouped_Data_With_Multi_Query( int count, char c )
+      [InlineData( 100, 'A', false )]
+      [InlineData( 200, 'B', false )]
+      [InlineData( 5000, 'C', false )]
+      [InlineData( 50000, 'D', true )]
+      public async Task Should_Write_And_Query_Deferred_Grouped_Data_With_Multi_Query( int count, char c, bool useDefaultOptions )
       {
          var start = new DateTime( 2011, 1, 1, 1, 1, 1, DateTimeKind.Utc );
          var infos = InfluxClientFixture.CreateTypedRowsStartingAt( start, count, false );
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, $"groupedComputerInfo4{c}", infos );
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, $"groupedComputerInfo5{c}", infos );
 
-         var chunkedResultSet = await _client.ReadChunkedAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedComputerInfo4{c} GROUP BY region;SELECT * FROM groupedComputerInfo5{c} GROUP BY region", new InfluxQueryOptions { ChunkSize = 200 } );
+         InfluxChunkedResultSet<ComputerInfo> chunkedResultSet;
+         if( useDefaultOptions )
+         {
+            chunkedResultSet = await _client.ReadChunkedAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedComputerInfo4{c} GROUP BY region;SELECT * FROM groupedComputerInfo5{c} GROUP BY region" );
+         }
+         else
+         {
+            chunkedResultSet = await _client.ReadChunkedAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM groupedComputerInfo4{c} GROUP BY region;SELECT * FROM groupedComputerInfo5{c} GROUP BY region", new InfluxQueryOptions { ChunkSize = 200 } );
+         }
 
          InfluxChunkedResult<ComputerInfo> currentResult;
          InfluxChunkedSeries<ComputerInfo> currentSerie;

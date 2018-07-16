@@ -963,7 +963,7 @@ namespace Vibrant.InfluxDB.Client
          return new Uri( _endpoint, url ).ToString();
       }
 
-      private LongFormUrlEncodedContent CreateQueryPostContent( string commandOrQuery, string db, bool isTimeSeriesQuery, InfluxQueryOptions options )
+      private LongFormUrlEncodedContent CreateQueryPostContent( string commandOrQuery, string db, bool isTimeSeriesQuery, bool requireChunking, InfluxQueryOptions options )
       {
          List<KeyValuePair<string, string>> param = new List<KeyValuePair<string, string>>( 5 );
 
@@ -989,10 +989,16 @@ namespace Vibrant.InfluxDB.Client
             }
          }
 
+         // add chunking if it is not already set
+         if( requireChunking && options?.ChunkSize.HasValue == false )
+         {
+            param.Add( new KeyValuePair<string, string>( "chunked", "true" ) );
+         }
+
          return new LongFormUrlEncodedContent( param );
       }
 
-      private string CreateQueryUrl( string commandOrQuery, string db, bool isTimeSeriesQuery, InfluxQueryOptions options )
+      private string CreateQueryUrl( string commandOrQuery, string db, bool isTimeSeriesQuery, bool requireChunking, InfluxQueryOptions options )
       {
          var query = "query";
          char seperator = '?';
@@ -1024,6 +1030,12 @@ namespace Vibrant.InfluxDB.Client
             }
          }
 
+         // add chunking if it is not already set
+         if( requireChunking && options?.ChunkSize.HasValue == false )
+         {
+            query += $"{seperator}chunked=true";
+         }
+
          return new Uri( _endpoint, query ).ToString();
       }
 
@@ -1042,62 +1054,62 @@ namespace Vibrant.InfluxDB.Client
       private async Task<InfluxChunkedResultSet<TInfluxRow>> ExecuteQueryByObjectIteratorInternalAsync<TInfluxRow>( string query, string db, bool isTimeSeriesQuery, bool forcePost, InfluxQueryOptions options )
          where TInfluxRow : new()
       {
-         var iterator = await PerformQueryInternal<TInfluxRow>( query, db, forcePost, isTimeSeriesQuery, options ).ConfigureAwait( false );
+         var iterator = await PerformQueryInternal<TInfluxRow>( query, db, forcePost, isTimeSeriesQuery, true, options ).ConfigureAwait( false );
          return new InfluxChunkedResultSet<TInfluxRow>( iterator, this, options, db );
       }
 
       private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db, bool isTimeSeriesQuery, bool forcePost, InfluxQueryOptions options )
          where TInfluxRow : new()
       {
-         List<QueryResult> queryResults = await PerformQueryInternal( query, db, forcePost, isTimeSeriesQuery, options ).ConfigureAwait( false );
+         List<QueryResult> queryResults = await PerformQueryInternal( query, db, forcePost, isTimeSeriesQuery, false, options ).ConfigureAwait( false );
          return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResults, db, isTimeSeriesQuery, options ).ConfigureAwait( false );
       }
 
       private async Task<InfluxResultSet> ExecuteQueryInternalAsync( string query, string db, bool forcePost, InfluxQueryOptions options )
       {
-         List<QueryResult> queryResults = await PerformQueryInternal( query, db, forcePost, false, options ).ConfigureAwait( false );
+         List<QueryResult> queryResults = await PerformQueryInternal( query, db, forcePost, false, false, options ).ConfigureAwait( false );
          return ResultSetFactory.Create( queryResults );
       }
 
-      private async Task<ContextualQueryResultIterator<TInfluxRow>> PerformQueryInternal<TInfluxRow>( string query, string db, bool forcePost, bool isTimeSeriesQuery, InfluxQueryOptions options )
+      private async Task<ContextualQueryResultIterator<TInfluxRow>> PerformQueryInternal<TInfluxRow>( string query, string db, bool forcePost, bool isTimeSeriesQuery, bool requireChunking, InfluxQueryOptions options )
          where TInfluxRow : new()
       {
          ContextualQueryResultIterator<TInfluxRow> iterator;
          if( options.UsePost )
          {
-            iterator = await ExecuteHttpAsync<TInfluxRow>( HttpMethod.Post, new Uri( _endpoint, "query" ).ToString(), db, options, CreateQueryPostContent( query, db, isTimeSeriesQuery, options ) ).ConfigureAwait( false );
+            iterator = await ExecuteHttpAsync<TInfluxRow>( HttpMethod.Post, new Uri( _endpoint, "query" ).ToString(), db, options, CreateQueryPostContent( query, db, isTimeSeriesQuery, requireChunking, options ) ).ConfigureAwait( false );
          }
          else
          {
             if( forcePost )
             {
-               iterator = await ExecuteHttpAsync<TInfluxRow>( HttpMethod.Post, CreateQueryUrl( query, db, isTimeSeriesQuery, options ), db, options ).ConfigureAwait( false );
+               iterator = await ExecuteHttpAsync<TInfluxRow>( HttpMethod.Post, CreateQueryUrl( query, db, isTimeSeriesQuery, requireChunking, options ), db, options ).ConfigureAwait( false );
             }
             else
             {
-               iterator = await ExecuteHttpAsync<TInfluxRow>( HttpMethod.Get, CreateQueryUrl( query, db, isTimeSeriesQuery, options ), db, options ).ConfigureAwait( false );
+               iterator = await ExecuteHttpAsync<TInfluxRow>( HttpMethod.Get, CreateQueryUrl( query, db, isTimeSeriesQuery, requireChunking, options ), db, options ).ConfigureAwait( false );
             }
          }
 
          return iterator;
       }
 
-      private async Task<List<QueryResult>> PerformQueryInternal( string query, string db, bool forcePost, bool isTimeSeriesQuery, InfluxQueryOptions options )
+      private async Task<List<QueryResult>> PerformQueryInternal( string query, string db, bool forcePost, bool isTimeSeriesQuery, bool requireChunking, InfluxQueryOptions options )
       {
          List<QueryResult> queryResults;
          if( options.UsePost )
          {
-            queryResults = await ExecuteHttpAsync( HttpMethod.Post, new Uri( _endpoint, "query" ).ToString(), CreateQueryPostContent( query, db, isTimeSeriesQuery, options ) ).ConfigureAwait( false );
+            queryResults = await ExecuteHttpAsync( HttpMethod.Post, new Uri( _endpoint, "query" ).ToString(), CreateQueryPostContent( query, db, isTimeSeriesQuery, requireChunking, options ) ).ConfigureAwait( false );
          }
          else
          {
             if( forcePost )
             {
-               queryResults = await ExecuteHttpAsync( HttpMethod.Post, CreateQueryUrl( query, db, isTimeSeriesQuery, options ) ).ConfigureAwait( false );
+               queryResults = await ExecuteHttpAsync( HttpMethod.Post, CreateQueryUrl( query, db, isTimeSeriesQuery, requireChunking, options ) ).ConfigureAwait( false );
             }
             else
             {
-               queryResults = await ExecuteHttpAsync( HttpMethod.Get, CreateQueryUrl( query, db, isTimeSeriesQuery, options ) ).ConfigureAwait( false );
+               queryResults = await ExecuteHttpAsync( HttpMethod.Get, CreateQueryUrl( query, db, isTimeSeriesQuery, requireChunking, options ) ).ConfigureAwait( false );
             }
          }
 
