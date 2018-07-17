@@ -990,7 +990,7 @@ namespace Vibrant.InfluxDB.Client
          }
 
          // add chunking if it is not already set
-         if( requireChunking && options?.ChunkSize.HasValue == false )
+         if( requireChunking && options?.ChunkSize.HasValue != true )
          {
             param.Add( new KeyValuePair<string, string>( "chunked", "true" ) );
          }
@@ -1031,7 +1031,7 @@ namespace Vibrant.InfluxDB.Client
          }
 
          // add chunking if it is not already set
-         if( requireChunking && options?.ChunkSize.HasValue == false )
+         if( requireChunking && options?.ChunkSize.HasValue != true )
          {
             query += $"{seperator}chunked=true";
          }
