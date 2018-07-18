@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.6.3
+ * Fixed #35, default "chunked" parameter to true when using ReadChunkedAsync method to query data.
+
 ## 3.6.2
  * Support for replacing existings timestamp parsers in DefaultTimestampParserRegistry
 
