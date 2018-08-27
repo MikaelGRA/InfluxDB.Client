@@ -3,7 +3,7 @@
    <PropertyGroup>
       <Title>InfluxDB Client for .NET</Title>
       <Description>An easy-to-use client for InfluxDB that supports simple query to object mapping.</Description>
-      <Copyright>Copyright (c) 2015-2016 MikaelGRA</Copyright>
+      <Copyright>Copyright (c) 2015-2018 MikaelGRA</Copyright>
       <AssemblyTitle>InfluxDB Client for .NET</AssemblyTitle>
       <Authors>MikaelGRA</Authors>
       <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
@@ -21,7 +21,7 @@
       <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
       <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-      <Version>3.6.3</Version>
+      <Version>3.6.4</Version>
    </PropertyGroup>
 
    <ItemGroup>

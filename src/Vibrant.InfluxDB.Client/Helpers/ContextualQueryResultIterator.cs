@@ -4,13 +4,6 @@ using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client.Helpers
 {
-   internal enum AllowedCalls
-   {
-      ConsumeNextResultAsync = 0b001,
-      ConsumeNextSerieAsync = 0b010,
-      GetNextBatchAsync = 0b100
-   }
-
    internal class ContextualQueryResultIterator<TInfluxRow> : IDisposable
       where TInfluxRow : new()
    {
@@ -21,18 +14,13 @@ namespace Vibrant.InfluxDB.Client.Helpers
       private int? _currentStatementId;
       private bool _consumeCurrentResultNextTime;
 
-      //private bool? _consumedNextResult_Result;
-
       private InfluxSeries<TInfluxRow> _currentSerie;
       private InfluxSeries<TInfluxRow> _capturedSerie;
       private IReadOnlyDictionary<string, object> _currentTags;
       private bool _consumeCurrentSerieNextTime;
 
-      //private bool? _consumedNextSerie_Result;
-
       private List<TInfluxRow> _currentBatch;
       private List<TInfluxRow> _capturedBatch;
-      //private bool _hasConsumedCurrentBatch = true;
 
       private bool _disposed = false;
 
@@ -214,111 +202,6 @@ namespace Vibrant.InfluxDB.Client.Helpers
             return false;
          }
       }
-
-
-
-      //public async Task<bool> ConsumeNextResultAsync()
-      //{
-      //   // throw invalid operation if not called correctly!
-
-      //   if( _consumedNextResult_Result.HasValue )
-      //   {
-      //      var resultOfPreviousCall = _consumedNextResult_Result.Value;
-      //      _consumedNextResult_Result = null;
-      //      return resultOfPreviousCall;
-      //   }
-
-      //   bool hasMore = await _resultIterator.ConsumeNextResultAsync().ConfigureAwait( false );
-      //   if( !hasMore )
-      //   {
-      //      _currentResult = null;
-      //      return false;
-      //   }
-
-      //   _currentResult = _resultIterator.CurrentResult;
-      //   return true;
-      //}
-
-
-      //public async Task<bool> ConsumeNextSerieAsync()
-      //{
-      //   // throw invalid operation if not called correctly!
-
-      //   if( _consumedNextSerie_Result.HasValue )
-      //   {
-      //      var resultOfPreviousCall = _consumedNextSerie_Result.Value;
-      //      _consumedNextSerie_Result = null;
-      //      return resultOfPreviousCall;
-      //   }
-
-      //   bool hasMore = await _resultIterator.ConsumeNextSerieAsync().ConfigureAwait( false );
-      //   if( !hasMore ) // 'next' serie might be in next result, which means we should still return true
-      //   {
-      //      // in which case we might consume a result, we might not use here
-      //      _consumedNextResult_Result = await _resultIterator.ConsumeNextResultAsync().ConfigureAwait( false );
-      //      if( _consumedNextResult_Result == true )
-      //      {
-      //         var previousResult = _currentResult;
-      //         _currentResult = _resultIterator.CurrentResult;
-
-      //         if( previousResult.StatementId == _currentResult.StatementId )
-      //         {
-      //            hasMore = await _resultIterator.ConsumeNextSerieAsync().ConfigureAwait( false );
-      //            if( hasMore )
-      //            {
-      //               _currentSerie = _resultIterator.CurrentSerie;
-      //               return true;
-      //            }
-
-      //            _consumedNextResult_Result = null; // still the same statement, so we consumed it
-      //         }
-      //      }
-      //      else
-      //      {
-      //         _currentResult = null;
-      //      }
-
-      //      _currentSerie = null;
-      //      return false;
-      //   }
-
-      //   _currentSerie = _resultIterator.CurrentSerie;
-      //   return true;
-      //}
-
-      //public async Task<List<TInfluxRow>> GetNextBatchAsync()
-      //{
-      //   // throw invalid operation if not called correctly!
-
-      //   if( hasConsumedCurrentBatch )
-      //   {
-      //      var previousSerie = _currentSerie;
-      //      _consumedNextSerie_Result = await ConsumeNextSerieAsync().ConfigureAwait( false );
-      //      if( !_consumedNextSerie_Result.Value )
-      //      {
-      //         hasConsumedCurrentBatch = false;
-      //         return null;
-      //      }
-
-      //      if( previousSerie == null || InfluxSeriesComparer.Compare( previousSerie, _currentSerie ) )
-      //      {
-      //         _consumedNextSerie_Result = null;
-      //         hasConsumedCurrentBatch = true;
-      //         return _currentSerie.Rows;
-      //      }
-
-      //      // might return null
-      //      hasConsumedCurrentBatch = false;
-      //      return null;
-      //   }
-      //   else
-      //   {
-      //      hasConsumedCurrentBatch = true;
-      //      return _currentSerie.Rows;
-      //   }
-
-      //   // need to consume to next serie, and check if it is the same serie in the same statement(?)
-      //}
 
       public InfluxResult<TInfluxRow> CurrentResult
       {

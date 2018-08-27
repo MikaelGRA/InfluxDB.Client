@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.6.4
+ * Fixed #36, Added interface (IInfluxClient) for all public methods on InfluxClient.
+
 ## 3.6.3
  * Fixed #35, default "chunked" parameter to true when using ReadChunkedAsync method to query data.
 

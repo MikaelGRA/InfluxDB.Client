@@ -23,7 +23,7 @@ namespace Vibrant.InfluxDB.Client
    /// <summary>
    /// An InfluxClient exposes all HTTP operations on InfluxDB.
    /// </summary>
-   public sealed class InfluxClient : IDisposable
+   public sealed class InfluxClient : IDisposable, IInfluxClient
    {
       private readonly Dictionary<DatabaseMeasurementInfoKey, DatabaseMeasurementInfo> _seriesMetaCache;
       private readonly AuthenticationHeaderValue _authzHeader;
