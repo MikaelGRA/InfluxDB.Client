@@ -375,6 +375,8 @@ The InfluxClient also supports parameter binding to support the prevention of sq
 
 To use this, simply use the methods that takes the parameter "object parameters". This can be an anonymous object, dictionary or any object that supports JSON serialization through Newtonsoft.Json.
 
+When parameterizing values in the object or dictionary, do not prefix the names with $, like the names are in the actual query.
+
 ## Other operations
 
 The InfluxClient also defines a host of other management operations. That can be divided up into two categories.
