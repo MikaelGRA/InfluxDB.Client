@@ -39,6 +39,60 @@ namespace Vibrant.InfluxDB.Client.Tests
       }
 
       [Theory]
+      [InlineData( 500, 2011, "bindings1_500" )]
+      public async Task Should_Write_Query_With_Integer_Binding( int rows, int startYear, string tableName )
+      {
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( startYear, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows, false );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, tableName, infos );
+
+         var secondResultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"select * from {tableName} where $ram < ram", new { ram = 50000 } );
+
+         var result = secondResultSet.Results[ 0 ];
+         Assert.Equal( 1, result.Series.Count );
+      }
+
+      [Theory]
+      [InlineData( 500, 2011, "bindings2_500" )]
+      public async Task Should_Write_Query_With_Double_Binding( int rows, int startYear, string tableName )
+      {
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( startYear, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows, false );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, tableName, infos );
+
+         var secondResultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"select * from {tableName} where $cpu < cpu", new { cpu = 0.2 } );
+
+         var result = secondResultSet.Results[ 0 ];
+         Assert.Equal( 1, result.Series.Count );
+      }
+
+      [Theory]
+      [InlineData( 500, 2011, "bindings3_500" )]
+      public async Task Should_Write_Query_With_String_Binding( int rows, int startYear, string tableName )
+      {
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( startYear, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows, false );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, tableName, infos );
+
+         var secondResultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"select * from {tableName} where host = $host", new { host = InfluxClientFixture.Hosts[ 0 ] } );
+
+         var result = secondResultSet.Results[ 0 ];
+         Assert.Equal( 1, result.Series.Count );
+      }
+
+      [Theory]
+      [InlineData( 500, 2011, "bindings4_500" )]
+      public async Task Should_Write_Query_With_String_In_Dictionary_Binding( int rows, int startYear, string tableName )
+      {
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( startYear, 1, 1, 1, 1, 1, DateTimeKind.Utc ), rows, false );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, tableName, infos );
+
+         var secondResultSet = await _client.ReadAsync<ComputerInfo>( 
+            InfluxClientFixture.DatabaseName, $"select * from {tableName} where host = $host", 
+            new Dictionary<string, object> { { "host", InfluxClientFixture.Hosts[ 0 ] } } );
+
+         var result = secondResultSet.Results[ 0 ];
+         Assert.Equal( 1, result.Series.Count );
+      }
+
+      [Theory]
       [InlineData( 500, 2011, "computerInfo2_500" )]
       [InlineData( 1000, 2012, "computerInfo2_1000" )]
       [InlineData( 20000, 2013, "computerInfo2_20000" )]
@@ -225,7 +279,11 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "variation", new[] { row } );
 
-         var resultSet = await _client.ReadAsync<VariationRow>( InfluxClientFixture.DatabaseName, "SELECT * FROM variation" );
+         var resultSet = await _client.ReadAsync<VariationRow>( 
+            InfluxClientFixture.DatabaseName,
+            "SELECT * FROM variation WHERE indicator = $indicator AND categoryTag = $categoryTag AND category = $category", 
+            new { indicator = true, categoryTag = TestEnum2.Value3, category = TestEnum1.Value2 } );
+
          Assert.Equal( 1, resultSet.Results.Count );
 
          var result = resultSet.Results[ 0 ];

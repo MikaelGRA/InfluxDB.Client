@@ -34,9 +34,24 @@ namespace Vibrant.InfluxDB.Client
       /// Executes an arbitrary command that does not return a table.
       /// </summary>
       /// <param name="commandOrQuery"></param>
+      /// <param name="parameters"></param>
+      /// <returns></returns>
+      Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery, object parameters );
+      /// <summary>
+      /// Executes an arbitrary command that does not return a table.
+      /// </summary>
+      /// <param name="commandOrQuery"></param>
       /// <param name="db"></param>
       /// <returns></returns>
       Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery, string db );
+      /// <summary>
+      /// Executes an arbitrary command that does not return a table.
+      /// </summary>
+      /// <param name="commandOrQuery"></param>
+      /// <param name="db"></param>
+      /// <param name="parameters"></param>
+      /// <returns></returns>
+      Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery, string db, object parameters );
       /// <summary>
       /// Executes an arbitrary command or query that returns a table as a result.
       /// </summary>
@@ -45,6 +60,14 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery ) where TInfluxRow : new();
       /// <summary>
+      /// Executes an arbitrary command or query that returns a table as a result.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="commandOrQuery"></param>
+      /// <param name="parameters"></param>
+      /// <returns></returns>
+      Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery, object parameters ) where TInfluxRow : new();
+      /// <summary>
       /// Executes an arbitrary command that returns a table as a result.
       /// </summary>
       /// <typeparam name="TInfluxRow"></typeparam>
@@ -52,6 +75,15 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <returns></returns>
       Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery, string db ) where TInfluxRow : new();
+      /// <summary>
+      /// Executes an arbitrary command that returns a table as a result.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="commandOrQuery"></param>
+      /// <param name="db"></param>
+      /// <param name="parameters"></param>
+      /// <returns></returns>
+      Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery, string db, object parameters ) where TInfluxRow : new();
 
       /// <summary>
       /// Modify retention policies with ALTER RETENTION POLICY
@@ -361,6 +393,15 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query ) where TInfluxRow : new();
       /// <summary>
+      /// Executes the query and returns the result with the default query options.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="query"></param>
+      /// <param name="db"></param>
+      /// <param name="parameters"></param>
+      /// <returns></returns>
+      Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query, object parameters ) where TInfluxRow : new();
+      /// <summary>
       /// Executes the query and returns the result with the specified query options.
       /// </summary>
       /// <typeparam name="TInfluxRow"></typeparam>
@@ -369,6 +410,16 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="options"></param>
       /// <returns></returns>
       Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query, InfluxQueryOptions options ) where TInfluxRow : new();
+      /// <summary>
+      /// Executes the query and returns the result with the specified query options.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="query"></param>
+      /// <param name="db"></param>
+      /// <param name="options"></param>
+      /// <param name="parameters"></param>
+      /// <returns></returns>
+      Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query, object parameters, InfluxQueryOptions options ) where TInfluxRow : new();
       /// <summary>
       /// Executes the query and returns a deferred result that can be iterated over as they
       /// are returned by the database.
@@ -391,9 +442,36 @@ namespace Vibrant.InfluxDB.Client
       /// <typeparam name="TInfluxRow"></typeparam>
       /// <param name="db"></param>
       /// <param name="query"></param>
+      /// <param name="parameters"></param>
+      /// <returns></returns>
+      Task<InfluxChunkedResultSet<TInfluxRow>> ReadChunkedAsync<TInfluxRow>( string db, string query, object parameters ) where TInfluxRow : new();
+      /// <summary>
+      /// Executes the query and returns a deferred result that can be iterated over as they
+      /// are returned by the database.
+      /// 
+      /// It does not make sense to use this method unless you are returning a big payload and
+      /// have enabled chunking through InfluxQueryOptions.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="query"></param>
       /// <param name="options"></param>
       /// <returns></returns>
       Task<InfluxChunkedResultSet<TInfluxRow>> ReadChunkedAsync<TInfluxRow>( string db, string query, InfluxQueryOptions options ) where TInfluxRow : new();
+      /// <summary>
+      /// Executes the query and returns a deferred result that can be iterated over as they
+      /// are returned by the database.
+      /// 
+      /// It does not make sense to use this method unless you are returning a big payload and
+      /// have enabled chunking through InfluxQueryOptions.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="query"></param>
+      /// <param name="options"></param>
+      /// <param name="parameters"></param>
+      /// <returns></returns>
+      Task<InfluxChunkedResultSet<TInfluxRow>> ReadChunkedAsync<TInfluxRow>( string db, string query, object parameters, InfluxQueryOptions options ) where TInfluxRow : new();
       /// <summary>
       /// Writes the rows with default write options.
       /// </summary>
@@ -437,6 +515,14 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="deleteQuery"></param>
       /// <returns></returns>
       Task<InfluxResult> DeleteAsync( string db, string deleteQuery );
+      /// <summary>
+      /// Deletes data in accordance with the specified query
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="deleteQuery"></param>
+      /// <param name="parameters"></param>
+      /// <returns></returns>
+      Task<InfluxResult> DeleteAsync( string db, string deleteQuery, object parameters );
       /// <summary>
       /// Deletes all data older than the specified timestamp.
       /// </summary>

@@ -20,8 +20,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       {
          Client = new InfluxClient( new Uri( InfluxHost ), "root", "root" );
          //Client.DefaultQueryOptions.UsePost = true;
-         //Client.DefaultQueryOptions.Precision = TimestampPrecision.Nanosecond;
-         //Client.DefaultQueryOptions.AllowLocalTimestamps = true;
+         //Client.DefaultQueryOptions.Precision = TimestampPrecision.Microsecond;
          Client.CreateDatabaseAsync( DatabaseName ).Wait();
       }
 
