@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.7.0
+ * Support parameter binding #37
+
 ## 3.6.4
  * Fixed #36, Added interface (IInfluxClient) for all public methods on InfluxClient.
 
