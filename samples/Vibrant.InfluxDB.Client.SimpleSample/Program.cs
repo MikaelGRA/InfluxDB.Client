@@ -18,6 +18,7 @@ namespace Vibrant.InfluxDB.Client.SimpleSample
 
          await Should_Write_Typed_Rows_To_Database( databaseName, client );
          await Should_Query_And_Display_Typed_Data( databaseName, client );
+         await Should_Query_With_Parameters_And_Display_Typed_Data( databaseName, client );
 
          await client.DropDatabaseAsync( databaseName );
 
@@ -34,6 +35,28 @@ namespace Vibrant.InfluxDB.Client.SimpleSample
       public static async Task Should_Query_And_Display_Typed_Data( string db, InfluxClient client )
       {
          var resultSet = await client.ReadAsync<ComputerInfo>( db, "SELECT * FROM myMeasurementName" );
+
+         // resultSet will contain 1 result in the Results collection (or multiple if you execute multiple queries at once)
+         var result = resultSet.Results[ 0 ];
+
+         // result will contain 1 series in the Series collection (or potentially multiple if you specify a GROUP BY clause)
+         var series = result.Series[ 0 ];
+
+         Console.WriteLine( $"{"Timestamp",10}{"Region",15}{"Host",20}{"CPU",20}{"RAM",15}" );
+
+         // series.Rows will be the list of ComputerInfo that you queried for
+         foreach( var row in series.Rows )
+         {
+            Console.WriteLine( $"{row.Timestamp,10}{row.Region,15}{row.Host,20}{row.CPU,20}{row.RAM,15}" );
+         }
+      }
+
+      public static async Task Should_Query_With_Parameters_And_Display_Typed_Data( string db, InfluxClient client )
+      {
+         var resultSet = await client.ReadAsync<ComputerInfo>( 
+            db,
+            "SELECT * FROM myMeasurementName WHERE time >= $myParam", 
+            new { myParam = new DateTime( 2010, 1, 1, 1, 1, 3, DateTimeKind.Utc ) } );
 
          // resultSet will contain 1 result in the Results collection (or multiple if you execute multiple queries at once)
          var result = resultSet.Results[ 0 ];

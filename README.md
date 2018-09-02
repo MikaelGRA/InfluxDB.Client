@@ -377,6 +377,17 @@ To use this, simply use the methods that takes the parameter "object parameters"
 
 When parameterizing values in the object or dictionary, do not prefix the names with $, like the names are in the actual query.
 
+Here's an example of what that might look like:
+
+```C#
+var resultSet = await client.ReadAsync<ComputerInfo>( 
+   db,
+   "SELECT * FROM myMeasurementName WHERE time >= $myParam", 
+   new { myParam = new DateTime( 2010, 1, 1, 1, 1, 3, DateTimeKind.Utc ) } );
+```
+
+Any type that you would usually use through this client library can be used as a parameter.
+
 ## Other operations
 
 The InfluxClient also defines a host of other management operations. That can be divided up into two categories.
