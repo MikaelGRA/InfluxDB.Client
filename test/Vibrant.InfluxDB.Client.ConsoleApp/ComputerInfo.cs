@@ -1,35 +1,49 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Vibrant.InfluxDB.Client.ConsoleApp
 {
+   [Table("computerInfo1")]
    public class ComputerInfo
+   {
+      [Key]
+      internal DateTime Timestamp { get; set; }
+
+      [Column("cpu")]
+      internal double? CPU { get; set; }
+
+      [Column("ram")]
+      internal long RAM { get; set; }
+
+      [NotMapped]
+      internal long PrivateData { get; set; }
+   }
+
+   public class ComputerInfoResult
    {
       [InfluxTimestamp]
       internal DateTime Timestamp { get; set; }
 
-      [InfluxTag( "host" )]
+      [InfluxTag("Host")]
       internal string Host { get; set; }
 
-      [InfluxTag( "region" )]
+      [InfluxTag("Region")]
       internal string Region { get; set; }
 
-      [InfluxField( "cpu" )]
+      [Column("cpu")]
       internal double? CPU { get; set; }
 
-      [InfluxField( "ram" )]
+      [InfluxField("ram")]
       internal long RAM { get; set; }
    }
 
    public class ComputerInfoMeta
    {
-      [InfluxField( "host" )]
+      [InfluxField("host")]
       internal string Host { get; set; }
 
-      [InfluxField( "region" )]
+      [InfluxField("region")]
       internal string Region { get; set; }
    }
 }

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Vibrant.InfluxDB.Client.Metadata;
@@ -65,7 +63,7 @@ namespace Vibrant.InfluxDB.Client.Http
                   }
                }
 
-               // write tag to field seperator
+               // write tag to field separator
                writer.Write( ' ' );
 
                // write all fields
@@ -149,7 +147,22 @@ namespace Vibrant.InfluxDB.Client.Http
                   }
                }
 
-               // write tag to fields seperator
+                if (_options.DefaultTags.Count > 0)
+                {
+                    foreach (var tag in _options.DefaultTags.OrderBy(x => x.Key, StringComparer.Ordinal))
+                    {
+                        var value = tag.Value;
+                        if (value != null)
+                        {
+                            writer.Write(',');
+                            writer.Write(LineProtocolEscape.EscapeKey(tag.Key));
+                            writer.Write('=');
+                            writer.Write(LineProtocolEscape.EscapeTagValue(value));
+                        }
+                    }
+                }
+
+               // write tag to fields separator
                writer.Write( ' ' );
 
                // write all fields

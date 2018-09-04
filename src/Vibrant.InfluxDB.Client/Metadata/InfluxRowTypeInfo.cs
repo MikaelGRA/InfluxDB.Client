@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
@@ -55,14 +56,22 @@ namespace Vibrant.InfluxDB.Client.Metadata
          var newLambda = Expression.Lambda<Func<TInfluxRow>>( Expression.New( typeof( TInfluxRow ) ), true );
          New = newLambda.Compile();
 
-         ImplementsIHaveMeasurementName = typeof( TInfluxRow ).GetInterfaces().Any( x => x == typeof( IHaveMeasurementName ) );
-         var attr = typeof( TInfluxRow ).GetTypeInfo().GetCustomAttribute<InfluxMeasurementAttribute>();
-         if( attr != null )
+         var tableAttr = typeof( TInfluxRow ).GetTypeInfo().GetCustomAttribute<TableAttribute>();
+         if (tableAttr != null)
          {
-            ImplicitMeasurementName = attr.Name;
+             ImplicitMeasurementName = /*!string.IsNullOrEmpty(tableAttr.Schema) ? $"{tableAttr.Schema}.{tableAttr.Name}" :*/ tableAttr.Name;
+         }
+         else
+         {
+             var attr = typeof( TInfluxRow ).GetTypeInfo().GetCustomAttribute<InfluxMeasurementAttribute>();
+             if (attr != null)
+             {
+                 ImplicitMeasurementName = attr.Name;
+             }
          }
 
          // interface
+         ImplementsIHaveMeasurementName = typeof( TInfluxRow ).GetInterfaces().Any( x => x == typeof(IHaveMeasurementName) );
          Func<TInfluxRow, string> try1 = null;
          if( ImplementsIHaveMeasurementName )
          {
@@ -92,22 +101,18 @@ namespace Vibrant.InfluxDB.Client.Metadata
          {
             ( (IHaveMeasurementName)row ).MeasurementName = measurementName;
          }
-         if( InfluxMeasurement?.SetValue != null )
-         {
-            InfluxMeasurement.SetValue( row, measurementName );
-         }
+
+          InfluxMeasurement?.SetValue?.Invoke( row, measurementName );
       }
 
       public Func<TInfluxRow, string> CreateGetMeasurementNameFunction( string measurementName )
       {
          if( measurementName != null )
          {
-            return new Func<TInfluxRow, string>( row => measurementName );
+            return row => measurementName;
          }
-         else
-         {
-            return new Func<TInfluxRow, string>( row => GetFallbackMeasurementName( row ) ?? throw new InfluxException( Errors.CouldNotDetermineMeasurementName ) );
-         }
+
+         return row => GetFallbackMeasurementName( row ) ?? throw new InfluxException( Errors.CouldNotDetermineMeasurementName );
       }
    }
 
@@ -116,7 +121,15 @@ namespace Vibrant.InfluxDB.Client.Metadata
    {
       private bool _isBasedOnInterface;
 
-      internal InfluxRowTypeInfo( bool isBasedOnInterface, PropertyExpressionInfo<TInfluxRow> timestamp, List<PropertyExpressionInfo<TInfluxRow>> tags, List<PropertyExpressionInfo<TInfluxRow>> fields, List<PropertyExpressionInfo<TInfluxRow>> computed, List<PropertyExpressionInfo<TInfluxRow>> all, PropertyExpressionInfo<TInfluxRow> influxMeasurement ) : base( timestamp, tags, fields, computed, all, influxMeasurement )
+      internal InfluxRowTypeInfo( bool isBasedOnInterface, 
+          PropertyExpressionInfo<TInfluxRow> timestamp, 
+          List<PropertyExpressionInfo<TInfluxRow>> tags, 
+          List<PropertyExpressionInfo<TInfluxRow>> fields, 
+          List<PropertyExpressionInfo<TInfluxRow>> computed, 
+          List<PropertyExpressionInfo<TInfluxRow>> all, 
+          PropertyExpressionInfo<TInfluxRow> influxMeasurement ) 
+          : 
+          base( timestamp, tags, fields, computed, all, influxMeasurement )
       {
          _isBasedOnInterface = isBasedOnInterface;
       }

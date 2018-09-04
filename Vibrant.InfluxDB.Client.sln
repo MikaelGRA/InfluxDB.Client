@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vibrant.InfluxDB.Client.Con
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{F02BF63C-126E-461F-8120-036E88E94111}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vibrant.InfluxDB.Client.SimpleSample", "samples\Vibrant.InfluxDB.Client.SimpleSample\Vibrant.InfluxDB.Client.SimpleSample.csproj", "{361E4B1B-F56C-4F9D-864F-B282177A0740}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vibrant.InfluxDB.Client.SimpleSample", "samples\Vibrant.InfluxDB.Client.SimpleSample\Vibrant.InfluxDB.Client.SimpleSample.csproj", "{361E4B1B-F56C-4F9D-864F-B282177A0740}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

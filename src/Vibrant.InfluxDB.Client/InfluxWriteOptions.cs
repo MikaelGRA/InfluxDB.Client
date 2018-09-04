@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Vibrant.InfluxDB.Client
 {
@@ -19,6 +15,7 @@ namespace Vibrant.InfluxDB.Client
          Consistency = Consistency.All;
          Precision = TimestampPrecision.Nanosecond;
          UseGzip = false;
+         DefaultTags = new Dictionary<string, string>();
       }
 
       /// <summary>
@@ -40,5 +37,7 @@ namespace Vibrant.InfluxDB.Client
       /// Gets or sets a bool indicating if gzip compression should be used for write operations.
       /// </summary>
       public bool UseGzip { get; set; }
+
+      public Dictionary<string, string> DefaultTags;
    }
 }

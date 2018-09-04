@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <TargetFramework>net471</TargetFramework>
     <AssemblyName>Vibrant.InfluxDB.Client.ConsoleApp</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>Vibrant.InfluxDB.Client.ConsoleApp</PackageId>
@@ -13,10 +13,19 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NETStandard.Library" Version="2.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\Vibrant.InfluxDB.Client\Vibrant.InfluxDB.Client.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
   </ItemGroup>
 
 </Project>

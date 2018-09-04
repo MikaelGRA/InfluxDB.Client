@@ -151,7 +151,7 @@ namespace Vibrant.InfluxDB.Client
                   sb.Append( w ).Append( "w" );
                   if( hasDigits && requireSingleUnit )
                   {
-                     throw new NotSupportedException( "The specfied timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
+                     throw new NotSupportedException( "The specified timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
                   }
                   hasDigits = true;
                }
@@ -164,7 +164,7 @@ namespace Vibrant.InfluxDB.Client
                sb.Append( d ).Append( "d" );
                if( hasDigits && requireSingleUnit )
                {
-                  throw new NotSupportedException( "The specfied timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
+                  throw new NotSupportedException( "The specified timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
                }
                hasDigits = true;
             }
@@ -176,7 +176,7 @@ namespace Vibrant.InfluxDB.Client
             sb.Append( h ).Append( "h" );
             if( hasDigits && requireSingleUnit )
             {
-               throw new NotSupportedException( "The specfied timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
+               throw new NotSupportedException( "The specified timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
             }
             hasDigits = true;
          }
@@ -187,7 +187,7 @@ namespace Vibrant.InfluxDB.Client
             sb.Append( m ).Append( "m" );
             if( hasDigits && requireSingleUnit )
             {
-               throw new NotSupportedException( "The specfied timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
+               throw new NotSupportedException( "The specified timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
             }
             hasDigits = true;
          }
@@ -198,7 +198,7 @@ namespace Vibrant.InfluxDB.Client
             sb.Append( s ).Append( "s" );
             if( hasDigits && requireSingleUnit )
             {
-               throw new NotSupportedException( "The specfied timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
+               throw new NotSupportedException( "The specified timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
             }
             hasDigits = true;
          }
@@ -209,7 +209,7 @@ namespace Vibrant.InfluxDB.Client
             sb.Append( u ).Append( "u" );
             if( hasDigits && requireSingleUnit )
             {
-               throw new NotSupportedException( "The specfied timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
+               throw new NotSupportedException( "The specified timespan must resolve to a single full unit (week, day, minute, second and microsecond)." );
             }
             hasDigits = true;
          }

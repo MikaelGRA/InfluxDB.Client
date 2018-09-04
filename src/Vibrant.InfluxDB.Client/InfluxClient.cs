@@ -109,7 +109,7 @@ namespace Vibrant.InfluxDB.Client
       public InfluxWriteOptions DefaultWriteOptions { get; private set; }
 
       /// <summary>
-      /// Gets the default query optionns.
+      /// Gets the default query options.
       /// </summary>
       public InfluxQueryOptions DefaultQueryOptions { get; private set; }
 
