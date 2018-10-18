@@ -324,6 +324,50 @@ namespace Vibrant.InfluxDB.Client.Tests
          result = resultSet.Results[ 0 ];
          Assert.Equal( 0, result.Series.Count );
       }
+      
+      [Fact]
+      public async Task Should_Read_Parameterized_Query()
+      {
+         var start = new DateTime( 2013, 1, 1, 1, 1, 1, DateTimeKind.Utc );
+
+         var data = new List<ComputerInfo>
+         {
+            new ComputerInfo {Timestamp = start, RAM = 100, Region = "west-eu"},
+            new ComputerInfo {Timestamp = start.AddSeconds(1), RAM = 150, Region = "west-eu"},
+            new ComputerInfo {Timestamp = start.AddSeconds(2), RAM = 200, Region = "north-eu"}
+         };
+         
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo5", data );
+
+         var from = start;
+         var to = from.AddSeconds( 250 );
+         
+         var parameterizedResultSet = await _client.ReadAsync<ComputerInfo>(
+            InfluxClientFixture.DatabaseName,
+            $"SELECT * FROM computerInfo5 WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}' AND \"region\" = $Region",
+            new
+            {
+               Region = "west-eu"
+            });
+
+         var parameterizedResult = parameterizedResultSet.Results[0];
+         // Error will be thrown if the region tag is not correctly parsed
+         Assert.True(
+            string.IsNullOrEmpty(parameterizedResult.ErrorMessage),
+            $"InfluxDB error message unexpectedly encountered: {parameterizedResult.ErrorMessage}");
+
+         var parameterizedSeries = parameterizedResult.Series[0];
+         Assert.Equal(2, parameterizedSeries.Rows.Count);
+
+         // attempt deletion
+         await _client.DeleteRangeAsync( InfluxClientFixture.DatabaseName, "computerInfo5", from, to );
+
+         var deletedResultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM computerInfo5 WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'" );
+         Assert.Equal( 1, deletedResultSet.Results.Count );
+
+         var deletedResult = deletedResultSet.Results[ 0 ];
+         Assert.Equal( 0, deletedResult.Series.Count );
+      }
 
       [Fact]
       public async Task Should_Write_Read_And_Delete_Typed_Data()
