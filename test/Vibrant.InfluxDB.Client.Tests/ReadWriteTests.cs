@@ -337,14 +337,14 @@ namespace Vibrant.InfluxDB.Client.Tests
             new ComputerInfo {Timestamp = start.AddSeconds(2), RAM = 200, Region = "north-eu"}
          };
          
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo5", data );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "computerInfo6", data );
 
          var from = start;
          var to = from.AddSeconds( 250 );
          
          var parameterizedResultSet = await _client.ReadAsync<ComputerInfo>(
             InfluxClientFixture.DatabaseName,
-            $"SELECT * FROM computerInfo5 WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}' AND \"region\" = $Region",
+            $"SELECT * FROM computerInfo6 WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}' AND \"region\" = $Region",
             new
             {
                Region = "west-eu"
@@ -360,9 +360,9 @@ namespace Vibrant.InfluxDB.Client.Tests
          Assert.Equal(2, parameterizedSeries.Rows.Count);
 
          // attempt deletion
-         await _client.DeleteRangeAsync( InfluxClientFixture.DatabaseName, "computerInfo5", from, to );
+         await _client.DeleteRangeAsync( InfluxClientFixture.DatabaseName, "computerInfo6", from, to );
 
-         var deletedResultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM computerInfo5 WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'" );
+         var deletedResultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM computerInfo6 WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}'" );
          Assert.Equal( 1, deletedResultSet.Results.Count );
 
          var deletedResult = deletedResultSet.Results[ 0 ];
