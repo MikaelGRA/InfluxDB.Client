@@ -40,6 +40,6 @@ namespace Vibrant.InfluxDB.Client.Rows
       /// Gets the shard group duration for the retention policy
       /// </summary>
       [InfluxField("shardgroupduration")]
-      public bool ShardGroupDuration { get; private set; }
+      public string ShardGroupDuration { get; private set; }
     }
 }

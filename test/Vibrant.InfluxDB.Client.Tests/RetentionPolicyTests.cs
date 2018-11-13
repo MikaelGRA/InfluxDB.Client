@@ -70,15 +70,16 @@ namespace Vibrant.InfluxDB.Client.Tests
            var rpSeries = rps.Series[0];
            Assert.Equal(2, rpSeries.Rows.Count);
 
-           var policy = rpSeries.Rows.FirstOrDefault(row => row.Name == RpName);
+           var policy = rpSeries.Rows.FirstOrDefault(row => row.Name == RpWithShardGroupName);
            Assert.NotNull(policy);
-           Assert.Equal("2h2m0s", policy.Duration);
+           Assert.Equal("1d", policy.Duration);
+           Assert.Equal("1h", policy.ShardGroupDuration);
 
-           var infos = InfluxClientFixture.CreateTypedRowsStartingAt(DateTime.UtcNow.AddHours(-2), 2 * 60 * 60, false);
+            var infos = InfluxClientFixture.CreateTypedRowsStartingAt(DateTime.UtcNow.AddHours(-2), 2 * 60 * 60, false);
 
            var options = new InfluxWriteOptions
            {
-               RetentionPolicy = RpName
+               RetentionPolicy = RpWithShardGroupName
            };
 
            _client.WriteAsync(InfluxClientFixture.DatabaseName, MeasurementName, infos, options).Wait();
