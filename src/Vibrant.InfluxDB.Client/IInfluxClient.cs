@@ -93,8 +93,9 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="duration"></param>
       /// <param name="replicationLevel"></param>
       /// <param name="isDefault"></param>
+      /// <param name="shardGroupDuration"></param>
       /// <returns></returns>
-      Task<InfluxResult> AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault );
+      Task<InfluxResult> AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault, string shardGroupDuration = null );
       /// <summary>
       /// CREATE a new admin user.
       /// </summary>
@@ -116,6 +117,7 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <returns></returns>
       Task<InfluxResult> CreateDatabaseAsync( string db );
+
       /// <summary>
       /// Create retention policies with CREATE RETENTION POLICY
       /// </summary>
@@ -124,8 +126,9 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="duration"></param>
       /// <param name="replicationLevel"></param>
       /// <param name="isDefault"></param>
+      /// <param name="shardGroupDuration"></param>
       /// <returns></returns>
-      Task<InfluxResult> CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault );
+      Task<InfluxResult> CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault, string shardGroupDuration = null );
       /// <summary>
       /// CREATE a new non-admin user.
       /// </summary>

@@ -35,5 +35,12 @@ namespace Vibrant.InfluxDB.Client.Rows
       /// </summary>
       [InfluxField( "default" )]
       public bool Default { get; private set; }
-   }
+
+      /// <summary>
+      /// Gets an indication of whether or not this is the default retention policy
+      /// for the database.
+      /// </summary>
+      [InfluxField("shardgroupduration")]
+      public bool ShardGroupDuration { get; private set; }
+    }
 }
