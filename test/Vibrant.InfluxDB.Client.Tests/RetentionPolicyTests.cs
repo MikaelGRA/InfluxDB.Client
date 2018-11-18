@@ -35,7 +35,7 @@ namespace Vibrant.InfluxDB.Client.Tests
          var policy = rpSeries.Rows.FirstOrDefault( row => row.Name == RpName );
          Assert.NotNull( policy );
          Assert.Equal( "2h2m0s", policy.Duration );
-         
+
          var infos = InfluxClientFixture.CreateTypedRowsStartingAt( DateTime.UtcNow.AddHours( -2 ), 2 * 60 * 60, false );
 
          var options = new InfluxWriteOptions
@@ -55,46 +55,50 @@ namespace Vibrant.InfluxDB.Client.Tests
          var series = result.Series[ 0 ];
          Assert.Equal( 2 * 60 * 60, series.Rows.Count );
 
-         await _client.DropRetentionPolicyAsync(InfluxClientFixture.DatabaseName, RpName);
+         await _client.DropRetentionPolicyAsync( InfluxClientFixture.DatabaseName, RpName );
       }
 
-       [Fact]
-       public async Task Should_Write_And_Read_Data_From_Non_Default_RP_With_ShardGroupDuration()
-       {
-           _client.CreateRetentionPolicyAsync(InfluxClientFixture.DatabaseName, RpWithShardGroupName, "1d", 1, false, "1h").Wait();
-           var rps = await _client.ShowRetentionPoliciesAsync(InfluxClientFixture.DatabaseName);
+      [Fact]
+      public async Task Should_Write_And_Read_Data_From_Non_Default_RP_With_ShardGroupDuration()
+      {
+         _client.CreateRetentionPolicyAsync( InfluxClientFixture.DatabaseName, RpWithShardGroupName, "1d", 1, false, "1h" ).Wait();
+         var rps = await _client.ShowRetentionPoliciesAsync( InfluxClientFixture.DatabaseName );
 
-           Assert.True(rps.Succeeded);
-           Assert.Equal(1, rps.Series.Count);
+         Assert.True( rps.Succeeded );
+         Assert.Equal( 1, rps.Series.Count );
 
-           var rpSeries = rps.Series[0];
-           Assert.Equal(2, rpSeries.Rows.Count);
+         var rpSeries = rps.Series[ 0 ];
+         Assert.Equal( 2, rpSeries.Rows.Count );
 
-           var policy = rpSeries.Rows.FirstOrDefault(row => row.Name == RpWithShardGroupName);
-           Assert.NotNull(policy);
-           Assert.Equal("1d", policy.Duration);
-           Assert.Equal("1h", policy.ShardGroupDuration);
+         var policy = rpSeries.Rows.FirstOrDefault( row => row.Name == RpWithShardGroupName );
+         Assert.NotNull( policy );
 
-            var infos = InfluxClientFixture.CreateTypedRowsStartingAt(DateTime.UtcNow.AddHours(-2), 2 * 60 * 60, false);
+         if( !( policy.Duration == "1d" || policy.Duration == "24h0m0s" ) ) Assert.True( false ); 
+         //Assert.Equal( "1d", policy.Duration );
 
-           var options = new InfluxWriteOptions
-           {
-               RetentionPolicy = RpWithShardGroupName
-           };
+         if( !( policy.ShardGroupDuration == "1h" || policy.ShardGroupDuration == "1h0m0s" ) ) Assert.True( false );
+         //Assert.Equal( "1h", policy.ShardGroupDuration );
 
-           _client.WriteAsync(InfluxClientFixture.DatabaseName, MeasurementName, infos, options).Wait();
+         var infos = InfluxClientFixture.CreateTypedRowsStartingAt( DateTime.UtcNow.AddHours( -2 ), 2 * 60 * 60, false );
+
+         var options = new InfluxWriteOptions
+         {
+            RetentionPolicy = RpWithShardGroupName
+         };
+
+         _client.WriteAsync( InfluxClientFixture.DatabaseName, MeasurementName, infos, options ).Wait();
 
 
-           var resultSet = await _client.ReadAsync<ComputerInfo>(InfluxClientFixture.DatabaseName, $"SELECT * FROM {RpWithShardGroupName}.{MeasurementName}");
-           Assert.Equal(1, resultSet.Results.Count);
+         var resultSet = await _client.ReadAsync<ComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM {RpWithShardGroupName}.{MeasurementName}" );
+         Assert.Equal( 1, resultSet.Results.Count );
 
-           var result = resultSet.Results[0];
-           Assert.Equal(1, result.Series.Count);
+         var result = resultSet.Results[ 0 ];
+         Assert.Equal( 1, result.Series.Count );
 
-           var series = result.Series[0];
-           Assert.Equal(2 * 60 * 60, series.Rows.Count);
+         var series = result.Series[ 0 ];
+         Assert.Equal( 2 * 60 * 60, series.Rows.Count );
 
-           await _client.DropRetentionPolicyAsync(InfluxClientFixture.DatabaseName, RpWithShardGroupName);
-        }
-    }
+         await _client.DropRetentionPolicyAsync( InfluxClientFixture.DatabaseName, RpWithShardGroupName );
+      }
+   }
 }

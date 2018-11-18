@@ -14,7 +14,7 @@ namespace Vibrant.InfluxDB.Client.Rows
       /// <summary>
       /// Gets the name of the retention policy.
       /// </summary>
-      [InfluxField("name")]
+      [InfluxField( "name" )]
       public string Name { get; private set; }
 
       /// <summary>
@@ -39,7 +39,7 @@ namespace Vibrant.InfluxDB.Client.Rows
       /// <summary>
       /// Gets the shard group duration for the retention policy
       /// </summary>
-      [InfluxField("shardgroupduration")]
+      [InfluxField( "shardGroupDuration" )]
       public string ShardGroupDuration { get; private set; }
-    }
+   }
 }

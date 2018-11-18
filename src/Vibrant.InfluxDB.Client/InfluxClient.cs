@@ -474,35 +474,35 @@ namespace Vibrant.InfluxDB.Client
          return resultSet.Results.FirstOrDefault();
       }
 
-       /// <summary>
-       /// Create retention policies with CREATE RETENTION POLICY
-       /// </summary>
-       /// <param name="policyName"></param>
-       /// <param name="db"></param>
-       /// <param name="duration"></param>
-       /// <param name="replicationLevel"></param>
-       /// <param name="isDefault"></param>
-       /// <param name="shardGroupDuration"></param>
-       /// <returns></returns>
-       public async Task<InfluxResult> CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault, string shardGroupDuration = null )
+      /// <summary>
+      /// Create retention policies with CREATE RETENTION POLICY
+      /// </summary>
+      /// <param name="policyName"></param>
+      /// <param name="db"></param>
+      /// <param name="duration"></param>
+      /// <param name="replicationLevel"></param>
+      /// <param name="isDefault"></param>
+      /// <param name="shardGroupDuration"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault, string shardGroupDuration = null )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"CREATE RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetShardGroupDuration(shardGroupDuration)} {GetDefault( isDefault )}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteQueryInternalAsync( $"CREATE RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetShardGroupDuration( shardGroupDuration )} {GetDefault( isDefault )}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
-       /// <summary>
-       /// Modify retention policies with ALTER RETENTION POLICY
-       /// </summary>
-       /// <param name="policyName"></param>
-       /// <param name="db"></param>
-       /// <param name="duration"></param>
-       /// <param name="replicationLevel"></param>
-       /// <param name="isDefault"></param>
-       /// <param name="shardGroupDuration"></param>
-       /// <returns></returns>
-       public async Task<InfluxResult> AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault, string shardGroupDuration = null)
-        {
-         var resultSet = await ExecuteQueryInternalAsync( $"ALTER RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetShardGroupDuration(shardGroupDuration)} {GetDefault( isDefault )}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+      /// <summary>
+      /// Modify retention policies with ALTER RETENTION POLICY
+      /// </summary>
+      /// <param name="policyName"></param>
+      /// <param name="db"></param>
+      /// <param name="duration"></param>
+      /// <param name="replicationLevel"></param>
+      /// <param name="isDefault"></param>
+      /// <param name="shardGroupDuration"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault, string shardGroupDuration = null )
+      {
+         var resultSet = await ExecuteQueryInternalAsync( $"ALTER RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetShardGroupDuration( shardGroupDuration )} {GetDefault( isDefault )}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -523,21 +523,21 @@ namespace Vibrant.InfluxDB.Client
          return isDefault ? "DEFAULT" : string.Empty;
       }
 
-       private string GetShardGroupDuration(string shardGroupDuration)
-       {
-           return string.IsNullOrWhiteSpace(shardGroupDuration) ? string.Empty : $"SHARD DURATION {shardGroupDuration}";
-       }
+      private string GetShardGroupDuration( string shardGroupDuration )
+      {
+         return string.IsNullOrWhiteSpace( shardGroupDuration ) ? string.Empty : $"SHARD DURATION {shardGroupDuration}";
+      }
 
-        #endregion
+      #endregion
 
-        #region Continous Queries
+      #region Continous Queries
 
-        /// <summary>
-        /// To see the continuous queries you have defined, query SHOW CONTINUOUS QUERIES and InfluxDB will return the name and query for each continuous query in the database.
-        /// </summary>
-        /// <param name="db"></param>
-        /// <returns></returns>
-        public async Task<InfluxResult<ContinuousQueryRow>> ShowContinuousQueries( string db )
+      /// <summary>
+      /// To see the continuous queries you have defined, query SHOW CONTINUOUS QUERIES and InfluxDB will return the name and query for each continuous query in the database.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult<ContinuousQueryRow>> ShowContinuousQueries( string db )
       {
          var parserResult = await ExecuteQueryInternalAsync<ContinuousQueryRow>( "SHOW CONTINUOUS QUERIES", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
          return parserResult.Results.First();
