@@ -93,9 +93,21 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="duration"></param>
       /// <param name="replicationLevel"></param>
       /// <param name="isDefault"></param>
-      /// <param name="shardGroupDuration"></param>
       /// <returns></returns>
-      Task<InfluxResult> AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault, string shardGroupDuration = null );
+      Task<InfluxResult> AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault );
+
+      /// <summary>
+      /// Modify retention policies with ALTER RETENTION POLICY
+      /// </summary>
+      /// <param name="policyName"></param>
+      /// <param name="db"></param>
+      /// <param name="duration"></param>
+      /// <param name="replicationLevel"></param>
+      /// <param name="shardGroupDuration"></param>
+      /// <param name="isDefault"></param>
+      /// <returns></returns>
+      Task<InfluxResult> AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, string shardGroupDuration, bool isDefault );
+
       /// <summary>
       /// CREATE a new admin user.
       /// </summary>
@@ -126,9 +138,21 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="duration"></param>
       /// <param name="replicationLevel"></param>
       /// <param name="isDefault"></param>
-      /// <param name="shardGroupDuration"></param>
       /// <returns></returns>
-      Task<InfluxResult> CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault, string shardGroupDuration = null );
+      Task<InfluxResult> CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault );
+
+      /// <summary>
+      /// Create retention policies with CREATE RETENTION POLICY
+      /// </summary>
+      /// <param name="policyName"></param>
+      /// <param name="db"></param>
+      /// <param name="duration"></param>
+      /// <param name="replicationLevel"></param>
+      /// <param name="shardGroupDuration"></param>
+      /// <param name="isDefault"></param>
+      /// <returns></returns>
+      Task<InfluxResult> CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, string shardGroupDuration, bool isDefault );
+
       /// <summary>
       /// CREATE a new non-admin user.
       /// </summary>

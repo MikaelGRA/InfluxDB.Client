@@ -61,7 +61,7 @@ namespace Vibrant.InfluxDB.Client.Tests
       [Fact]
       public async Task Should_Write_And_Read_Data_From_Non_Default_RP_With_ShardGroupDuration()
       {
-         _client.CreateRetentionPolicyAsync( InfluxClientFixture.DatabaseName, RpWithShardGroupName, "1d", 1, false, "1h" ).Wait();
+         _client.CreateRetentionPolicyAsync( InfluxClientFixture.DatabaseName, RpWithShardGroupName, "1d", 1, "1h", false ).Wait();
          var rps = await _client.ShowRetentionPoliciesAsync( InfluxClientFixture.DatabaseName );
 
          Assert.True( rps.Succeeded );

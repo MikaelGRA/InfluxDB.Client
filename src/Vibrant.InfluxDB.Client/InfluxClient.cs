@@ -482,9 +482,24 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="duration"></param>
       /// <param name="replicationLevel"></param>
       /// <param name="isDefault"></param>
-      /// <param name="shardGroupDuration"></param>
       /// <returns></returns>
-      public async Task<InfluxResult> CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault, string shardGroupDuration = null )
+      public async Task<InfluxResult> CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault )
+      {
+         var resultSet = await ExecuteQueryInternalAsync( $"CREATE RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetDefault( isDefault )}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         return resultSet.Results.FirstOrDefault();
+      }
+
+      /// <summary>
+      /// Create retention policies with CREATE RETENTION POLICY
+      /// </summary>
+      /// <param name="policyName"></param>
+      /// <param name="db"></param>
+      /// <param name="duration"></param>
+      /// <param name="replicationLevel"></param>
+      /// <param name="shardGroupDuration"></param>
+      /// <param name="isDefault"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, string shardGroupDuration, bool isDefault )
       {
          var resultSet = await ExecuteQueryInternalAsync( $"CREATE RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetShardGroupDuration( shardGroupDuration )} {GetDefault( isDefault )}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
@@ -498,9 +513,24 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="duration"></param>
       /// <param name="replicationLevel"></param>
       /// <param name="isDefault"></param>
-      /// <param name="shardGroupDuration"></param>
       /// <returns></returns>
-      public async Task<InfluxResult> AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault, string shardGroupDuration = null )
+      public async Task<InfluxResult> AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault )
+      {
+         var resultSet = await ExecuteQueryInternalAsync( $"ALTER RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetDefault( isDefault )}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         return resultSet.Results.FirstOrDefault();
+      }
+
+      /// <summary>
+      /// Modify retention policies with ALTER RETENTION POLICY
+      /// </summary>
+      /// <param name="policyName"></param>
+      /// <param name="db"></param>
+      /// <param name="duration"></param>
+      /// <param name="replicationLevel"></param>
+      /// <param name="shardGroupDuration"></param>
+      /// <param name="isDefault"></param>
+      /// <returns></returns>
+      public async Task<InfluxResult> AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, string shardGroupDuration, bool isDefault )
       {
          var resultSet = await ExecuteQueryInternalAsync( $"ALTER RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetShardGroupDuration( shardGroupDuration )} {GetDefault( isDefault )}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
