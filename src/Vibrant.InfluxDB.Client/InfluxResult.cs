@@ -88,25 +88,6 @@ namespace Vibrant.InfluxDB.Client
       public List<InfluxSeries<TInfluxRow>> Series { get; set; }
 
       /// <summary>
-      /// Finds the serie that can be identified by the specified tags. 
-      /// This method is obsolete and will be removed in the next major upcoming release. 
-      /// Use the overload that requires a name instead.
-      /// </summary>
-      /// <param name="tags"></param>
-      /// <returns></returns>
-      [Obsolete( "Method will be removed in next major release. Use overload that requires a name." )]
-      public InfluxSeries<TInfluxRow> FindGroup( IEnumerable<KeyValuePair<string, object>> tags )
-      {
-         if( tags == null )
-            throw new ArgumentNullException( nameof( tags ) );
-
-         if( Series.Any( x => x.GroupedTags == null ) )
-            throw new InvalidOperationException( "This query result set is not grouped." );
-
-         return FindGroupInternal( null, tags, false );
-      }
-
-      /// <summary>
       /// Finds the serie that can be identified by the specified tags and name.
       /// </summary>
       /// <param name="seriesName"></param>

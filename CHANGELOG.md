@@ -1,7 +1,9 @@
 # Changelog
 
 ## 4.0.0
- * All common management operation now uses POST method even if it is operations that does not change anything, such as "SHOW STATS".
+ * All common management operation now uses POST method even if it is operations that does not change anything, such as "SHOW STATS"
+ * Changed most methods on InfluxClient to extension methods
+ * StrongNaming for nuget package
 
 ## 3.7.0
  * Support parameter binding #37
