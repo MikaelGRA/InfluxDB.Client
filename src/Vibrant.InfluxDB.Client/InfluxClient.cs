@@ -251,7 +251,7 @@ namespace Vibrant.InfluxDB.Client
       public async Task<InfluxResult<TInfluxRow>> ShowStatsAsync<TInfluxRow>()
          where TInfluxRow : IInfluxRow, new()
       {
-         var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW STATS", null, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<TInfluxRow>( $"SHOW STATS" ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -263,7 +263,7 @@ namespace Vibrant.InfluxDB.Client
       public async Task<InfluxResult<TInfluxRow>> ShowDiagnosticsAsync<TInfluxRow>()
          where TInfluxRow : IInfluxRow, new()
       {
-         var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW DIAGNOSTICS", null, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<TInfluxRow>( $"SHOW DIAGNOSTICS" ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -273,7 +273,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<ShardRow>> ShowShards()
       {
-         var parserResult = await ExecuteQueryInternalAsync<ShardRow>( $"SHOW SHARDS", null, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<ShardRow>( $"SHOW SHARDS" ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -289,7 +289,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public Task<InfluxResultSet> CreateAdminUserAsync( string username, string password )
       {
-         return ExecuteQueryInternalAsync( $"CREATE USER {username} WITH PASSWORD '{password}' WITH ALL PRIVILEGES", null, true, null, DefaultQueryOptions );
+         return ExecuteOperationAsync( $"CREATE USER {username} WITH PASSWORD '{password}' WITH ALL PRIVILEGES" );
       }
 
       /// <summary>
@@ -300,7 +300,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> CreateUserAsync( string username, string password )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"CREATE USER {username} WITH PASSWORD '{password}'", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"CREATE USER {username} WITH PASSWORD '{password}'" ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -311,7 +311,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> GrantAdminPrivilegesAsync( string username )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"GRANT ALL PRIVILEGES TO {username}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"GRANT ALL PRIVILEGES TO {username}" ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -324,7 +324,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> GrantPrivilegeAsync( string db, DatabasePriviledge privilege, string username )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"GRANT {GetPrivilege( privilege )} ON \"{db}\" TO {username}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"GRANT {GetPrivilege( privilege )} ON \"{db}\" TO {username}" ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -335,7 +335,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> RevokeAdminPrivilegesAsync( string username )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"REVOKE ALL PRIVILEGES FROM {username}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"REVOKE ALL PRIVILEGES FROM {username}" ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -348,7 +348,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> RevokePrivilegeAsync( string db, DatabasePriviledge privilege, string username )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"REVOKE {GetPrivilege( privilege )} ON \"{db}\" FROM {username}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"REVOKE {GetPrivilege( privilege )} ON \"{db}\" FROM {username}" ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -360,7 +360,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> SetPasswordAsync( string username, string password )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"SET PASSWORD FOR {username} = '{password}'", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"SET PASSWORD FOR {username} = '{password}'" ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -371,7 +371,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> DropUserAsync( string username )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"DROP USER {username}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"DROP USER {username}" ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -381,7 +381,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<UserRow>> ShowUsersAsync()
       {
-         var parserResult = await ExecuteQueryInternalAsync<UserRow>( $"SHOW USERS", null, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<UserRow>( $"SHOW USERS" ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -392,7 +392,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<GrantsRow>> ShowGrantsAsync( string username )
       {
-         var parserResult = await ExecuteQueryInternalAsync<GrantsRow>( $"SHOW GRANTS FOR {username}", null, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<GrantsRow>( $"SHOW GRANTS FOR {username}" ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -422,7 +422,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> CreateDatabaseAsync( string db )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"CREATE DATABASE \"{db}\"", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"CREATE DATABASE \"{db}\"" ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -433,7 +433,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> DropDatabaseAsync( string db )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"DROP DATABASE \"{db}\"", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"DROP DATABASE \"{db}\"" ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -445,7 +445,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> DropSeries( string db, string measurementName )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"DROP SERIES FROM \"{measurementName}\"", db, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"DROP SERIES FROM \"{measurementName}\"", db ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -458,7 +458,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> DropSeries( string db, string measurementName, string where )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"DROP SERIES FROM \"{measurementName}\" WHERE {where}", db, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"DROP SERIES FROM \"{measurementName}\" WHERE {where}", db ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -470,7 +470,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> DropMeasurementAsync( string db, string measurementName )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"DROP MEASUREMENT \"{measurementName}\"", db, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"DROP MEASUREMENT \"{measurementName}\"", db ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -485,7 +485,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"CREATE RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetDefault( isDefault )}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"CREATE RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetDefault( isDefault )}" ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -501,7 +501,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> CreateRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, string shardGroupDuration, bool isDefault )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"CREATE RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetShardGroupDuration( shardGroupDuration )} {GetDefault( isDefault )}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"CREATE RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetShardGroupDuration( shardGroupDuration )} {GetDefault( isDefault )}" ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -516,7 +516,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, bool isDefault )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"ALTER RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetDefault( isDefault )}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"ALTER RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetDefault( isDefault )}" ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -532,7 +532,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> AlterRetentionPolicyAsync( string db, string policyName, string duration, int replicationLevel, string shardGroupDuration, bool isDefault )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"ALTER RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetShardGroupDuration( shardGroupDuration )} {GetDefault( isDefault )}", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"ALTER RETENTION POLICY \"{policyName}\" ON \"{db}\" DURATION {duration} REPLICATION {replicationLevel} {GetShardGroupDuration( shardGroupDuration )} {GetDefault( isDefault )}" ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -544,7 +544,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> DropRetentionPolicyAsync( string db, string policyName )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"DROP RETENTION POLICY \"{policyName}\" ON \"{db}\"", null, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"DROP RETENTION POLICY \"{policyName}\" ON \"{db}\"" ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -569,7 +569,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<ContinuousQueryRow>> ShowContinuousQueries( string db )
       {
-         var parserResult = await ExecuteQueryInternalAsync<ContinuousQueryRow>( "SHOW CONTINUOUS QUERIES", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<ContinuousQueryRow>( "SHOW CONTINUOUS QUERIES", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -582,7 +582,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> CreateContinuousQuery( string db, string name, string continuousQuery )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"CREATE CONTINUOUS QUERY \"{name}\" ON \"{db}\"\n{continuousQuery}", db, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"CREATE CONTINUOUS QUERY \"{name}\" ON \"{db}\"\n{continuousQuery}", db ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -594,7 +594,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult> DropContinuousQuery( string db, string name )
       {
-         var resultSet = await ExecuteQueryInternalAsync( $"DROP CONTINUOUS QUERY \"{name}\" ON \"{db}\"", db, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteOperationAsync( $"DROP CONTINUOUS QUERY \"{name}\" ON \"{db}\"", db ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -608,7 +608,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<DatabaseRow>> ShowDatabasesAsync()
       {
-         var parserResult = await ExecuteQueryInternalAsync<DatabaseRow>( $"SHOW DATABASES", null, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<DatabaseRow>( $"SHOW DATABASES" ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -619,7 +619,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<RetentionPolicyRow>> ShowRetentionPoliciesAsync( string db )
       {
-         var parserResult = await ExecuteQueryInternalAsync<RetentionPolicyRow>( $"SHOW RETENTION POLICIES ON \"{db}\"", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<RetentionPolicyRow>( $"SHOW RETENTION POLICIES ON \"{db}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -630,7 +630,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<ShowSeriesRow>> ShowSeriesAsync( string db )
       {
-         var parserResult = await ExecuteQueryInternalAsync<ShowSeriesRow>( $"SHOW SERIES", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<ShowSeriesRow>( $"SHOW SERIES", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -644,7 +644,7 @@ namespace Vibrant.InfluxDB.Client
       public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db, string measurementName )
          where TInfluxRow : new()
       {
-         var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW SERIES FROM \"{measurementName}\"", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<TInfluxRow>( $"SHOW SERIES FROM \"{measurementName}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -659,7 +659,7 @@ namespace Vibrant.InfluxDB.Client
       public async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( string db, string measurementName, string where )
          where TInfluxRow : new()
       {
-         var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW SERIES FROM \"{measurementName}\" WHERE {where}", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<TInfluxRow>( $"SHOW SERIES FROM \"{measurementName}\" WHERE {where}", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -670,7 +670,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db )
       {
-         var parserResult = await ExecuteQueryInternalAsync<MeasurementRow>( "SHOW MEASUREMENTS", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<MeasurementRow>( "SHOW MEASUREMENTS", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -682,7 +682,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsAsync( string db, string where )
       {
-         var parserResult = await ExecuteQueryInternalAsync<MeasurementRow>( $"SHOW MEASUREMENTS WHERE {where}", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<MeasurementRow>( $"SHOW MEASUREMENTS WHERE {where}", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -694,7 +694,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsWithMeasurementAsync( string db, string measurementRegex )
       {
-         var parserResult = await ExecuteQueryInternalAsync<MeasurementRow>( $"SHOW MEASUREMENTS WITH MEASUREMENT =~ {measurementRegex}", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<MeasurementRow>( $"SHOW MEASUREMENTS WITH MEASUREMENT =~ {measurementRegex}", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -707,7 +707,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<MeasurementRow>> ShowMeasurementsWithMeasurementAsync( string db, string measurementRegex, string where )
       {
-         var parserResult = await ExecuteQueryInternalAsync<MeasurementRow>( $"SHOW MEASUREMENTS WITH MEASUREMENT =~ {measurementRegex} WHERE {where}", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<MeasurementRow>( $"SHOW MEASUREMENTS WITH MEASUREMENT =~ {measurementRegex} WHERE {where}", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -718,7 +718,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( string db )
       {
-         var parserResult = await ExecuteQueryInternalAsync<TagKeyRow>( "SHOW TAG KEYS", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<TagKeyRow>( "SHOW TAG KEYS", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -730,7 +730,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( string db, string measurementName )
       {
-         var parserResult = await ExecuteQueryInternalAsync<TagKeyRow>( $"SHOW TAG KEYS FROM \"{measurementName}\"", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<TagKeyRow>( $"SHOW TAG KEYS FROM \"{measurementName}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -745,7 +745,7 @@ namespace Vibrant.InfluxDB.Client
       public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsAsync<TInfluxRow, TValue>( string db, string tagKey )
          where TInfluxRow : ITagValueRow<TValue>, new()
       {
-         var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW TAG VALUES WITH KEY = \"{tagKey}\"", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<TInfluxRow>( $"SHOW TAG VALUES WITH KEY = \"{tagKey}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -761,7 +761,7 @@ namespace Vibrant.InfluxDB.Client
       public async Task<InfluxResult<TInfluxRow>> ShowTagValuesAsAsync<TInfluxRow, TValue>( string db, string tagKey, string measurementName )
          where TInfluxRow : ITagValueRow<TValue>, new()
       {
-         var parserResult = await ExecuteQueryInternalAsync<TInfluxRow>( $"SHOW TAG VALUES FROM \"{measurementName}\" WITH KEY = \"{tagKey}\"", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<TInfluxRow>( $"SHOW TAG VALUES FROM \"{measurementName}\" WITH KEY = \"{tagKey}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -796,7 +796,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<FieldKeyRow>> ShowFieldKeysAsync( string db )
       {
-         var parserResult = await ExecuteQueryInternalAsync<FieldKeyRow>( $"SHOW FIELD KEYS", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<FieldKeyRow>( $"SHOW FIELD KEYS", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -808,7 +808,7 @@ namespace Vibrant.InfluxDB.Client
       /// <returns></returns>
       public async Task<InfluxResult<FieldKeyRow>> ShowFieldKeysAsync( string db, string measurementName )
       {
-         var parserResult = await ExecuteQueryInternalAsync<FieldKeyRow>( $"SHOW FIELD KEYS FROM \"{measurementName}\"", db, false, false, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var parserResult = await ExecuteOperationAsync<FieldKeyRow>( $"SHOW FIELD KEYS FROM \"{measurementName}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -827,7 +827,7 @@ namespace Vibrant.InfluxDB.Client
       public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows )
          where TInfluxRow : new()
       {
-         return WriteInternalAsync( db, measurementName, rows, DefaultWriteOptions );
+         return WriteAsync( db, measurementName, rows, DefaultWriteOptions );
       }
 
       /// <summary>
@@ -840,39 +840,6 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="options"></param>
       /// <returns></returns>
       public Task WriteAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
-         where TInfluxRow : new()
-      {
-         return WriteInternalAsync( db, measurementName, rows, options );
-      }
-
-      /// <summary>
-      /// Writes the rows with default write options.
-      /// </summary>
-      /// <typeparam name="TInfluxRow"></typeparam>
-      /// <param name="db"></param>
-      /// <param name="rows"></param>
-      /// <returns></returns>
-      public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows )
-         where TInfluxRow : new()
-      {
-         return WriteInternalAsync( db, null, rows, DefaultWriteOptions );
-      }
-
-      /// <summary>
-      /// Writes the rows with the specified write options.
-      /// </summary>
-      /// <typeparam name="TInfluxRow"></typeparam>
-      /// <param name="db"></param>
-      /// <param name="rows"></param>
-      /// <param name="options"></param>
-      /// <returns></returns>
-      public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
-         where TInfluxRow : new()
-      {
-         return WriteInternalAsync( db, null, rows, options );
-      }
-
-      private Task WriteInternalAsync<TInfluxRow>( string db, string measurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
          where TInfluxRow : new()
       {
          List<HttpContent> contents = new List<HttpContent>();
@@ -896,6 +863,33 @@ namespace Vibrant.InfluxDB.Client
       }
 
       /// <summary>
+      /// Writes the rows with default write options.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="rows"></param>
+      /// <returns></returns>
+      public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows )
+         where TInfluxRow : new()
+      {
+         return WriteAsync( db, null, rows, DefaultWriteOptions );
+      }
+
+      /// <summary>
+      /// Writes the rows with the specified write options.
+      /// </summary>
+      /// <typeparam name="TInfluxRow"></typeparam>
+      /// <param name="db"></param>
+      /// <param name="rows"></param>
+      /// <param name="options"></param>
+      /// <returns></returns>
+      public Task WriteAsync<TInfluxRow>( string db, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options )
+         where TInfluxRow : new()
+      {
+         return WriteAsync( db, null, rows, options );
+      }
+
+      /// <summary>
       /// Executes the query and returns the result with the default query options.
       /// </summary>
       /// <typeparam name="TInfluxRow"></typeparam>
@@ -905,7 +899,7 @@ namespace Vibrant.InfluxDB.Client
       public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query )
          where TInfluxRow : new()
       {
-         return ExecuteQueryInternalAsync<TInfluxRow>( query, db, true, false, null, DefaultQueryOptions );
+         return ReadAsync<TInfluxRow>( db, query, null, DefaultQueryOptions );
       }
 
       /// <summary>
@@ -919,7 +913,7 @@ namespace Vibrant.InfluxDB.Client
       public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query, object parameters )
          where TInfluxRow : new()
       {
-         return ExecuteQueryInternalAsync<TInfluxRow>( query, db, true, false, parameters, DefaultQueryOptions );
+         return ReadAsync<TInfluxRow>( db, query, parameters, DefaultQueryOptions );
       }
 
       /// <summary>
@@ -933,7 +927,7 @@ namespace Vibrant.InfluxDB.Client
       public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>( string db, string query, InfluxQueryOptions options )
          where TInfluxRow : new()
       {
-         return ExecuteQueryInternalAsync<TInfluxRow>( query, db, true, false, null, options );
+         return ReadAsync<TInfluxRow>( db, query, null, options );
       }
 
       /// <summary>
@@ -965,7 +959,7 @@ namespace Vibrant.InfluxDB.Client
       public Task<InfluxChunkedResultSet<TInfluxRow>> ReadChunkedAsync<TInfluxRow>( string db, string query )
          where TInfluxRow : new()
       {
-         return ExecuteQueryByObjectIteratorInternalAsync<TInfluxRow>( query, db, true, false, null, DefaultQueryOptions );
+         return ReadChunkedAsync<TInfluxRow>( db, query, null, DefaultQueryOptions );
       }
 
       /// <summary>
@@ -983,7 +977,7 @@ namespace Vibrant.InfluxDB.Client
       public Task<InfluxChunkedResultSet<TInfluxRow>> ReadChunkedAsync<TInfluxRow>( string db, string query, object parameters )
          where TInfluxRow : new()
       {
-         return ExecuteQueryByObjectIteratorInternalAsync<TInfluxRow>( query, db, true, false, parameters, DefaultQueryOptions );
+         return ReadChunkedAsync<TInfluxRow>( db, query, parameters, DefaultQueryOptions );
       }
 
       /// <summary>
@@ -1001,7 +995,7 @@ namespace Vibrant.InfluxDB.Client
       public Task<InfluxChunkedResultSet<TInfluxRow>> ReadChunkedAsync<TInfluxRow>( string db, string query, InfluxQueryOptions options )
          where TInfluxRow : new()
       {
-         return ExecuteQueryByObjectIteratorInternalAsync<TInfluxRow>( query, db, true, false, null, options );
+         return ReadChunkedAsync<TInfluxRow>( db, query, null, options );
       }
 
       /// <summary>
@@ -1028,10 +1022,11 @@ namespace Vibrant.InfluxDB.Client
       /// </summary>
       /// <param name="db"></param>
       /// <param name="deleteQuery"></param>
+      /// <param name="parameters"></param>
       /// <returns></returns>
-      public async Task<InfluxResult> DeleteAsync( string db, string deleteQuery )
+      public async Task<InfluxResult> DeleteAsync( string db, string deleteQuery, object parameters )
       {
-         var resultSet = await ExecuteQueryInternalAsync( deleteQuery, db, true, null, DefaultQueryOptions ).ConfigureAwait( false );
+         var resultSet = await ExecuteQueryInternalAsync( deleteQuery, db, true, parameters, DefaultQueryOptions ).ConfigureAwait( false );
          return resultSet.Results.FirstOrDefault();
       }
 
@@ -1040,12 +1035,10 @@ namespace Vibrant.InfluxDB.Client
       /// </summary>
       /// <param name="db"></param>
       /// <param name="deleteQuery"></param>
-      /// <param name="parameters"></param>
       /// <returns></returns>
-      public async Task<InfluxResult> DeleteAsync( string db, string deleteQuery, object parameters )
+      public Task<InfluxResult> DeleteAsync( string db, string deleteQuery )
       {
-         var resultSet = await ExecuteQueryInternalAsync( deleteQuery, db, true, parameters, DefaultQueryOptions ).ConfigureAwait( false );
-         return resultSet.Results.FirstOrDefault();
+         return DeleteAsync( db, deleteQuery, null );
       }
 
       /// <summary>
@@ -1129,7 +1122,7 @@ namespace Vibrant.InfluxDB.Client
          return new Uri( _endpoint, url ).ToString();
       }
 
-      private LongFormUrlEncodedContent CreateQueryPostContent( string commandOrQuery, string db, bool isTimeSeriesQuery, bool requireChunking, object @params, InfluxQueryOptions options )
+      private LongFormUrlEncodedContent CreateQueryPostContent( string commandOrQuery, string db, bool isTimeSeriesQuery, bool requireChunking, object parameters, InfluxQueryOptions options )
       {
          List<KeyValuePair<string, string>> param = new List<KeyValuePair<string, string>>( 5 );
 
@@ -1141,9 +1134,9 @@ namespace Vibrant.InfluxDB.Client
          {
             param.Add( new KeyValuePair<string, string>( "q", commandOrQuery ) );
          }
-         if( @params != null )
+         if( parameters != null )
          {
-            param.Add( new KeyValuePair<string, string>( "params", ParamsConverter.GetParams( @params ) ) );
+            param.Add( new KeyValuePair<string, string>( "params", ParamsConverter.GetParams( parameters ) ) );
          }
 
          if( options != null )
@@ -1168,7 +1161,7 @@ namespace Vibrant.InfluxDB.Client
          return new LongFormUrlEncodedContent( param );
       }
 
-      private string CreateQueryUrl( string commandOrQuery, string db, bool isTimeSeriesQuery, bool requireChunking, object @params, InfluxQueryOptions options )
+      private string CreateQueryUrl( string commandOrQuery, string db, bool isTimeSeriesQuery, bool requireChunking, object parameters, InfluxQueryOptions options )
       {
          var query = "query";
          char seperator = '?';
@@ -1184,9 +1177,9 @@ namespace Vibrant.InfluxDB.Client
             query += $"{seperator}q={UriHelper.SafeEscapeDataString( commandOrQuery )}";
             seperator = '&';
          }
-         if( @params != null )
+         if( parameters != null )
          {
-            query += $"{seperator}params={UriHelper.SafeEscapeDataString( ParamsConverter.GetParams( @params ) )}";
+            query += $"{seperator}params={UriHelper.SafeEscapeDataString( ParamsConverter.GetParams( parameters ) )}";
             seperator = '&';
          }
 
@@ -1226,65 +1219,65 @@ namespace Vibrant.InfluxDB.Client
          }
       }
 
-      private async Task<InfluxChunkedResultSet<TInfluxRow>> ExecuteQueryByObjectIteratorInternalAsync<TInfluxRow>( string query, string db, bool isTimeSeriesQuery, bool forcePost, object @params, InfluxQueryOptions options )
+      private async Task<InfluxChunkedResultSet<TInfluxRow>> ExecuteQueryByObjectIteratorInternalAsync<TInfluxRow>( string query, string db, bool isTimeSeriesQuery, bool forcePost, object parameters, InfluxQueryOptions options )
          where TInfluxRow : new()
       {
-         var iterator = await PerformQueryInternal<TInfluxRow>( query, db, forcePost, isTimeSeriesQuery, true, @params, options ).ConfigureAwait( false );
+         var iterator = await PerformQueryInternal<TInfluxRow>( query, db, forcePost, isTimeSeriesQuery, true, parameters, options ).ConfigureAwait( false );
          return new InfluxChunkedResultSet<TInfluxRow>( iterator, this, options, db );
       }
 
-      private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db, bool isTimeSeriesQuery, bool forcePost, object @params, InfluxQueryOptions options )
+      private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>( string query, string db, bool isTimeSeriesQuery, bool forcePost, object parameters, InfluxQueryOptions options )
          where TInfluxRow : new()
       {
-         List<QueryResult> queryResults = await PerformQueryInternal( query, db, forcePost, isTimeSeriesQuery, false, @params, options ).ConfigureAwait( false );
+         List<QueryResult> queryResults = await PerformQueryInternal( query, db, forcePost, isTimeSeriesQuery, false, parameters, options ).ConfigureAwait( false );
          return await ResultSetFactory.CreateAsync<TInfluxRow>( this, queryResults, db, isTimeSeriesQuery, options ).ConfigureAwait( false );
       }
 
-      private async Task<InfluxResultSet> ExecuteQueryInternalAsync( string query, string db, bool forcePost, object @params, InfluxQueryOptions options )
+      private async Task<InfluxResultSet> ExecuteQueryInternalAsync( string query, string db, bool forcePost, object parameters, InfluxQueryOptions options )
       {
-         List<QueryResult> queryResults = await PerformQueryInternal( query, db, forcePost, false, false, @params, options ).ConfigureAwait( false );
+         List<QueryResult> queryResults = await PerformQueryInternal( query, db, forcePost, false, false, parameters, options ).ConfigureAwait( false );
          return ResultSetFactory.Create( queryResults );
       }
 
-      private async Task<ContextualQueryResultIterator<TInfluxRow>> PerformQueryInternal<TInfluxRow>( string query, string db, bool forcePost, bool isTimeSeriesQuery, bool requireChunking, object @params, InfluxQueryOptions options )
+      private async Task<ContextualQueryResultIterator<TInfluxRow>> PerformQueryInternal<TInfluxRow>( string query, string db, bool forcePost, bool isTimeSeriesQuery, bool requireChunking, object parameters, InfluxQueryOptions options )
          where TInfluxRow : new()
       {
          ContextualQueryResultIterator<TInfluxRow> iterator;
          if( options.UsePost )
          {
-            iterator = await ExecuteHttpAsync<TInfluxRow>( HttpMethod.Post, new Uri( _endpoint, "query" ).ToString(), db, options, CreateQueryPostContent( query, db, isTimeSeriesQuery, requireChunking, @params, options ) ).ConfigureAwait( false );
+            iterator = await ExecuteHttpAsync<TInfluxRow>( HttpMethod.Post, new Uri( _endpoint, "query" ).ToString(), db, options, CreateQueryPostContent( query, db, isTimeSeriesQuery, requireChunking, parameters, options ) ).ConfigureAwait( false );
          }
          else
          {
             if( forcePost )
             {
-               iterator = await ExecuteHttpAsync<TInfluxRow>( HttpMethod.Post, CreateQueryUrl( query, db, isTimeSeriesQuery, requireChunking, @params, options ), db, options ).ConfigureAwait( false );
+               iterator = await ExecuteHttpAsync<TInfluxRow>( HttpMethod.Post, CreateQueryUrl( query, db, isTimeSeriesQuery, requireChunking, parameters, options ), db, options ).ConfigureAwait( false );
             }
             else
             {
-               iterator = await ExecuteHttpAsync<TInfluxRow>( HttpMethod.Get, CreateQueryUrl( query, db, isTimeSeriesQuery, requireChunking, @params, options ), db, options ).ConfigureAwait( false );
+               iterator = await ExecuteHttpAsync<TInfluxRow>( HttpMethod.Get, CreateQueryUrl( query, db, isTimeSeriesQuery, requireChunking, parameters, options ), db, options ).ConfigureAwait( false );
             }
          }
 
          return iterator;
       }
 
-      private async Task<List<QueryResult>> PerformQueryInternal( string query, string db, bool forcePost, bool isTimeSeriesQuery, bool requireChunking, object @params, InfluxQueryOptions options )
+      private async Task<List<QueryResult>> PerformQueryInternal( string query, string db, bool forcePost, bool isTimeSeriesQuery, bool requireChunking, object parameters, InfluxQueryOptions options )
       {
          List<QueryResult> queryResults;
          if( options.UsePost )
          {
-            queryResults = await ExecuteHttpAsync( HttpMethod.Post, new Uri( _endpoint, "query" ).ToString(), CreateQueryPostContent( query, db, isTimeSeriesQuery, requireChunking, @params, options ) ).ConfigureAwait( false );
+            queryResults = await ExecuteHttpAsync( HttpMethod.Post, new Uri( _endpoint, "query" ).ToString(), CreateQueryPostContent( query, db, isTimeSeriesQuery, requireChunking, parameters, options ) ).ConfigureAwait( false );
          }
          else
          {
             if( forcePost )
             {
-               queryResults = await ExecuteHttpAsync( HttpMethod.Post, CreateQueryUrl( query, db, isTimeSeriesQuery, requireChunking, @params, options ) ).ConfigureAwait( false );
+               queryResults = await ExecuteHttpAsync( HttpMethod.Post, CreateQueryUrl( query, db, isTimeSeriesQuery, requireChunking, parameters, options ) ).ConfigureAwait( false );
             }
             else
             {
-               queryResults = await ExecuteHttpAsync( HttpMethod.Get, CreateQueryUrl( query, db, isTimeSeriesQuery, requireChunking, @params, options ) ).ConfigureAwait( false );
+               queryResults = await ExecuteHttpAsync( HttpMethod.Get, CreateQueryUrl( query, db, isTimeSeriesQuery, requireChunking, parameters, options ) ).ConfigureAwait( false );
             }
          }
 
