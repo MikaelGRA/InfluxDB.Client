@@ -522,10 +522,9 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="db"></param>
       /// <param name="measurementName"></param>
       /// <returns></returns>
-      public static async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( this IInfluxClient client, string db, string measurementName )
-         where TInfluxRow : new()
+      public static async Task<InfluxResult<ShowSeriesRow>> ShowSeriesAsync( this IInfluxClient client, string db, string measurementName )
       {
-         var parserResult = await client.ExecuteOperationAsync<TInfluxRow>( $"SHOW SERIES FROM \"{measurementName}\"", db ).ConfigureAwait( false );
+         var parserResult = await client.ExecuteOperationAsync<ShowSeriesRow>( $"SHOW SERIES FROM \"{measurementName}\"", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
@@ -538,10 +537,9 @@ namespace Vibrant.InfluxDB.Client
       /// <param name="measurementName"></param>
       /// <param name="where"></param>
       /// <returns></returns>
-      public static async Task<InfluxResult<TInfluxRow>> ShowSeriesAsync<TInfluxRow>( this IInfluxClient client, string db, string measurementName, string where )
-         where TInfluxRow : new()
+      public static async Task<InfluxResult<ShowSeriesRow>> ShowSeriesAsync( this IInfluxClient client, string db, string measurementName, string where )
       {
-         var parserResult = await client.ExecuteOperationAsync<TInfluxRow>( $"SHOW SERIES FROM \"{measurementName}\" WHERE {where}", db ).ConfigureAwait( false );
+         var parserResult = await client.ExecuteOperationAsync<ShowSeriesRow>( $"SHOW SERIES FROM \"{measurementName}\" WHERE {where}", db ).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 

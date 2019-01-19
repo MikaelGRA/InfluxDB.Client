@@ -28,6 +28,26 @@ namespace Vibrant.InfluxDB.Client.Tests
       public static readonly string[] Hosts = new[] { "ma-lt", "surface-book" };
       public static readonly TestEnum1?[] TestEnums = new TestEnum1?[] { null, TestEnum1.Value1, TestEnum1.Value2, TestEnum1.Value3 };
 
+      public static List<string> GenerateShowSeriesKeysFor( string measurementName )
+      {
+         List<string> keys = new List<string>();
+
+         string key = measurementName;
+         foreach( var host in Hosts )
+         {
+            var hostedKey = key + ",host=" + host;
+
+            foreach( var region in Regions )
+            {
+               var regionHostedKey = hostedKey + ",region=" + region;
+
+               keys.Add( regionHostedKey );
+            }
+         }
+
+         return keys;
+      }
+
       public static NamedComputerInfo[] CreateNamedTypedRowsStartingAt( string measurementName, DateTime start, int rows )
       {
          var rng = new Random();

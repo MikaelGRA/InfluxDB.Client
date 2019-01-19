@@ -441,7 +441,7 @@ namespace Vibrant.InfluxDB.Client.Tests
          var infos = InfluxClientFixture.CreateTypedRowsStartingAtWithOffset( start, TimeSpan.FromHours( 5 ), 250, false );
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "otherData2", infos );
 
-         var from = start + TimeSpan.FromHours( 5 );
+         var from = start - TimeSpan.FromHours( 5 );
          var to = from.AddSeconds( 250 );
 
          var resultSet = await _client.ReadAsync<LocalizedComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM otherData2 WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}' tz('Europe/Copenhagen')" );
@@ -483,7 +483,7 @@ namespace Vibrant.InfluxDB.Client.Tests
          var infos = InfluxClientFixture.CreateDynamicRowsStartingAtWithOffset( start, TimeSpan.FromHours( 5 ), 250 );
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "otherData3", infos );
 
-         var from = start + TimeSpan.FromHours( 5 );
+         var from = start - TimeSpan.FromHours( 5 );
          var to = from.AddSeconds( 250 );
 
          var resultSet = await _client.ReadAsync<LocalizedComputerInfo>( InfluxClientFixture.DatabaseName, $"SELECT * FROM otherData3 WHERE '{from.ToIso8601()}' <= time AND time < '{to.ToIso8601()}' tz('Europe/Copenhagen')" );

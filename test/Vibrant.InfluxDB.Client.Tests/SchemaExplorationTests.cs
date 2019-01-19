@@ -24,11 +24,14 @@ namespace Vibrant.InfluxDB.Client.Tests
          var infos = InfluxClientFixture.CreateTypedRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 5000, false );
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "set1Measurement", infos );
 
-         var result = await _client.ShowSeriesAsync<ComputerInfoMeta>( InfluxClientFixture.DatabaseName, "set1Measurement" );
+         var result = await _client.ShowSeriesAsync( InfluxClientFixture.DatabaseName, "set1Measurement" );
          Assert.Equal( 1, result.Series.Count );
 
          var series = result.Series[ 0 ];
-         Assert.Equal( 10, series.Rows.Count );
+         foreach( var key in InfluxClientFixture.GenerateShowSeriesKeysFor( "set1Measurement" ) )
+         {
+            Assert.Contains( key, series.Rows.Select( x => x.Key ) );
+         }
       }
 
       [Fact]

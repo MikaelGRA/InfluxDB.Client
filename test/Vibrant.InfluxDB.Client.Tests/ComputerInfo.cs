@@ -75,15 +75,6 @@ namespace Vibrant.InfluxDB.Client.Tests
       internal long RAM { get; set; }
    }
 
-   public class ComputerInfoMeta
-   {
-      [InfluxField( "host" )]
-      internal string Host { get; set; }
-
-      [InfluxField( "region" )]
-      internal string Region { get; set; }
-   }
-
    [InfluxMeasurement( "MyTableName" )]
    public class ClassWithMeasurementName
    {
