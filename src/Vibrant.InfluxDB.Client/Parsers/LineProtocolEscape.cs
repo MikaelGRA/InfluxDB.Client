@@ -35,11 +35,17 @@ namespace Vibrant.InfluxDB.Client.Parsers
          {
             return ( (float)valueAsObject ).ToString( CultureInfo.InvariantCulture );
          }
-         else if ( valueAsObject is DateTime )
+         else if( valueAsObject is DateTime )
          {
             var valueAsDateTime = (DateTime)valueAsObject;
 
             return '\"' + valueAsDateTime.ToIso8601() + '\"';
+         }
+         else if( valueAsObject is DateTimeOffset )
+         {
+            var valueAsDateTimeOffset = (DateTimeOffset)valueAsObject;
+
+            return '\"' + valueAsDateTimeOffset.ToIso8601() + '\"';
          }
          else
          {

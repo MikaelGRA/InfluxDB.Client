@@ -15,7 +15,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
 
       private static readonly object Sync = new object();
       private static readonly Dictionary<Type, InfluxRowTypeInfo> TypeCache = new Dictionary<Type, InfluxRowTypeInfo>();
-      private static readonly HashSet<Type> ValidFieldTypes = new HashSet<Type> { typeof( string ), typeof( double ), typeof( float ), typeof( long ), typeof( int ), typeof( short ), typeof( byte ), typeof( ulong ), typeof( uint ), typeof( ushort ), typeof( sbyte ), typeof( bool ), typeof( DateTime ) };
+      private static readonly HashSet<Type> ValidFieldTypes = new HashSet<Type> { typeof( string ), typeof( double ), typeof( float ), typeof( long ), typeof( int ), typeof( short ), typeof( byte ), typeof( ulong ), typeof( uint ), typeof( ushort ), typeof( sbyte ), typeof( bool ), typeof( DateTime ), typeof( DateTimeOffset ), typeof( decimal ) };
       private static readonly ConcurrentDictionary<Type, Type> TypeDefinitionMap = new ConcurrentDictionary<Type, Type>();
       
       internal static Type GetGenericTypeDefinitionForImplementedInfluxInterface( Type type )

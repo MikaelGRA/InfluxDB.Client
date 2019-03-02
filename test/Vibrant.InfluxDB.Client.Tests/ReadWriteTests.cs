@@ -158,6 +158,11 @@ namespace Vibrant.InfluxDB.Client.Tests
          foreach( var row in series.Rows )
          {
             Assert.Equal( "namedComputerInfo", row.MeasurementName );
+
+            Assert.Equal( typeof( double ), row.GetField( "cpu" ).GetType() );
+            Assert.Equal( typeof( long ), row.GetField( "ram" ).GetType() );
+            Assert.Equal( typeof( double ), row.GetField( "cpuAsDecimal" ).GetType() );
+            Assert.Equal( typeof( string ), row.GetField( "timez" ).GetType() );
          }
       }
 
@@ -275,6 +280,16 @@ namespace Vibrant.InfluxDB.Client.Tests
             DoubleTag = 1.123,
             IntType = 42,
             OtherTimestamp = new DateTime( 2011, 4, 23, 1, 23, 54, DateTimeKind.Utc ),
+
+            Decimal1 = 23.53m,
+            Decimal2 = 13.97m,
+            Dto1 = new DateTimeOffset( 2011, 1, 1, 20, 32, 10, 53, TimeSpan.FromHours( 3 ) ),
+            Dto2 = new DateTimeOffset( 2010, 1, 1, 20, 32, 10, 0, TimeSpan.FromHours( -3 ) ),
+
+            Decimal3 = 23.53m,
+            Decimal4 = 13.97m,
+            Dto3 = new DateTimeOffset( 2011, 1, 1, 20, 32, 10, 53, TimeSpan.FromHours( 3 ) ),
+            Dto4 = new DateTimeOffset( 2010, 1, 1, 20, 32, 10, 0, TimeSpan.FromHours( -3 ) ),
          };
 
          await _client.WriteAsync( InfluxClientFixture.DatabaseName, "variation", new[] { row } );

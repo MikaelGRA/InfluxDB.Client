@@ -23,6 +23,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
       internal readonly string LineProtocolEscapedKey;
       internal readonly string Key;
       internal readonly bool IsDateTime;
+      internal readonly bool IsDateTimeOffset;
       internal readonly bool IsEnum;
       internal readonly bool IsMeasurementNameProperty;
 
@@ -74,6 +75,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
          
          IsEnum = Type.GetTypeInfo().IsEnum;
          IsDateTime = Type == typeof( DateTime );
+         IsDateTimeOffset = Type == typeof( DateTimeOffset );
 
          // ensure we can convert between string/enum
          if( IsEnum )

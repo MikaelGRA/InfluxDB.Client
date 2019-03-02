@@ -53,6 +53,34 @@ namespace Vibrant.InfluxDB.Client.Tests
       [InfluxField( "SbytyMcByteFace" )]
       public sbyte SbytyMcByteFace { get; set; }
 
+      [InfluxField( "decimal1" )]
+      public decimal Decimal1 { get; set; }
+
+      [InfluxField( "decimal2" )]
+      public decimal? Decimal2 { get; set; }
+
+      [InfluxField( "dto1" )]
+      public DateTimeOffset Dto1 { get; set; }
+
+      [InfluxField( "dto2" )]
+      public DateTimeOffset? Dto2 { get; set; }
+
+
+      [InfluxField( "decimal3" )]
+      public decimal Decimal3 { get; set; }
+
+      [InfluxField( "decimal4" )]
+      public decimal? Decimal4 { get; set; }
+
+      [InfluxField( "dto3" )]
+      public DateTimeOffset Dto3 { get; set; }
+
+      [InfluxField( "dto4" )]
+      public DateTimeOffset? Dto4 { get; set; }
+
+
+
+
       // override object.Equals
       public override bool Equals( object obj )
       {
@@ -74,7 +102,15 @@ namespace Vibrant.InfluxDB.Client.Tests
             && CategoryNullable == other.CategoryNullable
             && Shorty == other.Shorty
             && Floaty == other.Floaty
-            && SbytyMcByteFace == other.SbytyMcByteFace;
+            && SbytyMcByteFace == other.SbytyMcByteFace
+            && Decimal1 == other.Decimal1
+            && Decimal2 == other.Decimal2
+            && Dto1 == other.Dto1
+            && Dto2 == other.Dto2
+            && Decimal3 == other.Decimal3
+            && Decimal4 == other.Decimal4
+            && Dto3 == other.Dto3
+            && Dto4 == other.Dto4;
       }
 
       // override object.GetHashCode

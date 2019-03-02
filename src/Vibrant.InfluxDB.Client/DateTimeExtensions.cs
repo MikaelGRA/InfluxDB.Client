@@ -231,5 +231,15 @@ namespace Vibrant.InfluxDB.Client
 
          return that.ToString( "yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture );
       }
+
+      /// <summary>
+      /// Gets a string that can be used as part of a query to InfluxDB.
+      /// </summary>
+      /// <param name="that"></param>
+      /// <returns></returns>
+      public static string ToIso8601( this DateTimeOffset that )
+      {
+         return that.ToString( "yyyy-MM-ddTHH:mm:ss.fffffffzzz", CultureInfo.InvariantCulture );
+      }
    }
 }

@@ -167,6 +167,8 @@ namespace Vibrant.InfluxDB.Client.Tests
             info.MeasurementName = measurementName;
             info.Fields.Add( "cpu", cpu );
             info.Fields.Add( "ram", ram );
+            info.Fields.Add( "cpuAsDecimal", (decimal)cpu );
+            info.Fields.Add( "timez", new DateTimeOffset( DateTime.SpecifyKind( timestamp, DateTimeKind.Unspecified ), TimeSpan.FromHours( 3 ) ) );
             info.Tags.Add( "host", host );
             info.Tags.Add( "region", region );
             info.Timestamp = timestamp;

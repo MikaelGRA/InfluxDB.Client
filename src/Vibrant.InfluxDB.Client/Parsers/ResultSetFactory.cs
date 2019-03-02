@@ -171,6 +171,10 @@ namespace Vibrant.InfluxDB.Client.Parsers
                         {
                            property.SetValue( dataPoint, DateTime.Parse( (string)value, CultureInfo.InvariantCulture, OnlyUtcStyles ) );
                         }
+                        else if( property.IsDateTimeOffset )
+                        {
+                           property.SetValue( dataPoint, DateTimeOffset.Parse( (string)value, CultureInfo.InvariantCulture ) );
+                        }
                         else if( property.IsEnum )
                         {
                            property.SetValue( dataPoint, property.GetEnumValue( value ) );

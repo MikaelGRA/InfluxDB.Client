@@ -53,8 +53,8 @@ public class ComputerInfo
 
 On your POCO class you must specify these things:
  * 1 property with the type DateTime, DateTime?, DateTimeOffset or DateTimeOffset? as the timestamp used in InfluxDB by adding the [InfluxTimestamp] attribute.
- * 0-* properties with the type string, long, ulong, int, uint, short, ushort, byte, sbyte, double, float, bool, DateTime or a user-defined enum (nullables too) with the [InfluxTag] attribute that InfluxDB will use as indexed tags. Note that all tags in InfluxDB is still stored a string. The library will simply making the conversion to the specified type automatically.
- * 1-* properties with the type string, long, ulong, int, uint, short, ushort, byte, sbyte, double, float, bool, DateTime or a user-defined enum (nullables too) with the [InfluxField] attribute that InfluxDB will use as fields.
+ * 0-* properties with the type string, long, ulong, int, uint, short, ushort, byte, sbyte, double, float, bool, DateTime, DateTimeOffset, decimal or a user-defined enum (nullables too) with the [InfluxTag] attribute that InfluxDB will use as indexed tags. Note that all tags in InfluxDB is still stored a string. The library will simply making the conversion to the specified type automatically.
+ * 1-* properties with the type string, long, ulong, int, uint, short, ushort, byte, sbyte, double, float, bool, DateTime, DateTimeOffset, decimal or a user-defined enum (nullables too) with the [InfluxField] attribute that InfluxDB will use as fields.
 
 Once you've defined your class, you're ready to use the InfluxClient, which is the main entry point to the API:
 
