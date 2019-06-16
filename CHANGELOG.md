@@ -6,43 +6,43 @@
 ## 4.0.0
  * All common management operation now uses POST method even if it is operations that does not change anything, such as "SHOW STATS"
  * Changed most methods on InfluxClient to extension methods
- * StrongNaming for nuget package #43
+ * StrongNaming for nuget package [#43](https://github.com/MikaelGRA/InfluxDB.Client/issues/43)
  * Added Shard Group Duration to RETENTION POLICY operations
  * SourceLink-enabled
  * Changed framework dependency from netstandard1.3 to netstandard2.0 #46
- * Fixed #49
- * Fixed #48
+ * Fixed [#49](https://github.com/MikaelGRA/InfluxDB.Client/issues/49)
+ * Fixed [#48](https://github.com/MikaelGRA/InfluxDB.Client/issues/48)
 
 
 ## 3.7.0
- * Support parameter binding #37
+ * Support parameter binding [#37](https://github.com/MikaelGRA/InfluxDB.Client/issues/37)
 
 ## 3.6.4
- * Fixed #36, Added interface (IInfluxClient) for all public methods on InfluxClient.
+ * Fixed [#36](https://github.com/MikaelGRA/InfluxDB.Client/issues/36), Added interface (IInfluxClient) for all public methods on InfluxClient.
 
 ## 3.6.3
- * Fixed #35, default "chunked" parameter to true when using ReadChunkedAsync method to query data.
+ * Fixed [#35](https://github.com/MikaelGRA/InfluxDB.Client/issues/35), default "chunked" parameter to true when using ReadChunkedAsync method to query data.
 
 ## 3.6.2
  * Support for replacing existings timestamp parsers in DefaultTimestampParserRegistry
 
 ## 3.6.1
- * Added support for InfluxMeasurementAttribute. #30
+ * Added support for InfluxMeasurementAttribute. [#30](https://github.com/MikaelGRA/InfluxDB.Client/issues/30)
  * Fixed a bug where if different types of rows were specified in the Write method, the operation would fail.
 
 ## 3.6.0
  * Fixed proper escaping of measurement names
- * Added support for primitive types as tags #29
+ * Added support for primitive types as tags [#29](https://github.com/MikaelGRA/InfluxDB.Client/issues/29)
 
 ## 3.5.2
- * Added overload of constructor to InfluxClient that takes HttpClient #27
+ * Added overload of constructor to InfluxClient that takes HttpClient [#27](https://github.com/MikaelGRA/InfluxDB.Client/issues/27)
 
 ## 3.5.1
- * Added support for custom Timeout #26
+ * Added support for custom Timeout [#26](https://github.com/MikaelGRA/InfluxDB.Client/issues/26)
 
 ## 3.5.0
- * Added support for more primitive types #23
- * Added support for (optional) gzip during write operation #24
+ * Added support for more primitive types [#23](https://github.com/MikaelGRA/InfluxDB.Client/issues/23)
+ * Added support for (optional) gzip during write operation [#24](https://github.com/MikaelGRA/InfluxDB.Client/issues/24)
 
 ## 3.4.1
  * Added documentation for IHaveMeasurementNname
@@ -50,36 +50,36 @@
  * Fixed bug that caused MeasurementName not to be written into classes implementing IHaveMeasurementName when querying
 
 ## 3.4.0
- * Added support for custom timestamps and preserving timestamp offsets #20
+ * Added support for custom timestamps and preserving timestamp offsets [#20](https://github.com/MikaelGRA/InfluxDB.Client/issues/20)
 
 ## 3.3.1
- * Fixed #19
+ * Fixed [#19](https://github.com/MikaelGRA/InfluxDB.Client/issues/19)
 
 ## 3.3.0
- * Added feature #15 to support better reading of chunked data
+ * Added feature [#15](https://github.com/MikaelGRA/InfluxDB.Client/issues/15) to support better reading of chunked data
  * Fixed bug where "n" was being used to represent nanoseconds instead of "ns"
  * Changed behavior of InfluxSeries.GroupedTags to never be null, instead it will be an empty dictionary if no GROUP BY is specified
  
 ## 3.2.0
- * Fixed #17
+ * Fixed [#17](https://github.com/MikaelGRA/InfluxDB.Client/issues/17)
 
 ## 3.1.0
- * Fixed #14
+ * Fixed [#14](https://github.com/MikaelGRA/InfluxDB.Client/issues/14)
 
 ## 3.0.4
- * Fixed issue #12
+ * Fixed issue [#12](https://github.com/MikaelGRA/InfluxDB.Client/issues/12)
  * Fixed internal tests so they no longer collide
 
 ## 3.0.3
- * Fixed chunking support. #11 
+ * Fixed chunking support. [#11](https://github.com/MikaelGRA/InfluxDB.Client/issues/11) 
  * Changed newtonsoft json dependency to actually existing version.
  * Change InfluxException throwing behaviour such that they are only throw in case of non-200 status code or other internal exception
 
 ## 3.0.2 
- * Added support for RP in write operations. Issue #9.
+ * Added support for RP in write operations. Issue [#9](https://github.com/MikaelGRA/InfluxDB.Client/issues/9).
 
 ## 3.0.1
- * Fixed issue #7
+ * Fixed issue [#7](https://github.com/MikaelGRA/InfluxDB.Client/issues/7)
 
 ## 3.0.0
  * Added support for influxdb 1.0
