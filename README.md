@@ -31,7 +31,7 @@ A simple example of how to use the library is available [here](https://github.co
 
 Start by defining a class that represents a row in InfluxDB that you want to store.
 
-```c#
+```C#
 public class ComputerInfo
 {
    [InfluxTimestamp]
