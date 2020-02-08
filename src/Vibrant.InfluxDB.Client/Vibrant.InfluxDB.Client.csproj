@@ -14,7 +14,7 @@
       <PackageProjectUrl>https://github.com/MikaelGRA/InfluxDB.Client</PackageProjectUrl>
       <PackageLicenseUrl>https://github.com/MikaelGRA/InfluxDB.Client/blob/master/LICENSE</PackageLicenseUrl>
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-      <Version>4.0.1</Version>
+      <Version>4.0.2</Version>
       <SignAssembly>true</SignAssembly>
       <AssemblyOriginatorKeyFile>StrongNameKey.snk</AssemblyOriginatorKeyFile>
       <DelaySign>false</DelaySign>

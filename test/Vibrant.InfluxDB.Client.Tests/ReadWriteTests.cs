@@ -263,9 +263,37 @@ namespace Vibrant.InfluxDB.Client.Tests
       [Fact]
       public async Task Should_Write_All_Field_Types_To_Database()
       {
-         var row = new VariationRow
+         var row1 = new VariationRow
          {
             Timestamp = new DateTime( 2013, 1, 1, 1, 1, 1, DateTimeKind.Utc ),
+            Count = 1337,
+            Floaty = 13.36f,
+            Shorty = 23005,
+            SbytyMcByteFace = 42,
+            Indicator = true,
+            Message = null, //"Hello, \\athere\nWhat's up? ==",
+            Percent = 0.37,
+            Type = "tag, =Value",
+            Category = TestEnum1.Value2,
+            CategoryTag = TestEnum2.Value3,
+            CategoryNullable = TestEnum1.Value2,
+            DoubleTag = 1.123,
+            IntType = 42,
+            OtherTimestamp = new DateTime( 2011, 4, 23, 1, 23, 54, DateTimeKind.Utc ),
+
+            Decimal1 = 23.53m,
+            Decimal2 = 13.97m,
+            Dto1 = new DateTimeOffset( 2011, 1, 1, 20, 32, 10, 53, TimeSpan.FromHours( 3 ) ),
+            Dto2 = new DateTimeOffset( 2010, 1, 1, 20, 32, 10, 0, TimeSpan.FromHours( -3 ) ),
+
+            Decimal3 = 23.53m,
+            Decimal4 = 13.97m,
+            Dto3 = new DateTimeOffset( 2011, 1, 1, 20, 32, 10, 53, TimeSpan.FromHours( 3 ) ),
+            Dto4 = new DateTimeOffset( 2010, 1, 1, 20, 32, 10, 0, TimeSpan.FromHours( -3 ) ),
+         };
+         var row2 = new VariationRow
+         {
+            Timestamp = new DateTime( 2013, 1, 1, 2, 1, 1, DateTimeKind.Utc ),
             Count = 1337,
             Floaty = 13.36f,
             Shorty = 23005,
@@ -292,7 +320,7 @@ namespace Vibrant.InfluxDB.Client.Tests
             Dto4 = new DateTimeOffset( 2010, 1, 1, 20, 32, 10, 0, TimeSpan.FromHours( -3 ) ),
          };
 
-         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "variation", new[] { row } );
+         await _client.WriteAsync( InfluxClientFixture.DatabaseName, "variation", new[] { row1, row2 } );
 
          var resultSet = await _client.ReadAsync<VariationRow>( 
             InfluxClientFixture.DatabaseName,
@@ -305,9 +333,10 @@ namespace Vibrant.InfluxDB.Client.Tests
          Assert.Equal( 1, result.Series.Count );
 
          var series = result.Series[ 0 ];
-         Assert.Equal( 1, series.Rows.Count );
-
-         Assert.Equal( row, series.Rows[ 0 ] );
+         Assert.Equal( 2, series.Rows.Count );
+            
+         Assert.Equal( row1, series.Rows[ 0 ] );
+         Assert.Equal( row2, series.Rows[ 1 ] );
       }
 
       [Fact]

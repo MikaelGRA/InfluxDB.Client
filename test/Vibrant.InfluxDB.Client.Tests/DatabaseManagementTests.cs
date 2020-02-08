@@ -21,6 +21,12 @@ namespace Vibrant.InfluxDB.Client.Tests
       }
 
       [Fact]
+      public async Task Should_Show_Shards()
+      {
+         var result = await _client.ShowShards();
+      }
+
+      [Fact]
       public async Task Should_Show_Database()
       {
          var result = await _client.ShowDatabasesAsync();

@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.0.2
+ * Fixed a bug that could occur when parsing a an empty string in a field that should be interpreted as a null
+
 ## 4.0.1
  * Support decimals (stored as float point) and DateTimeOffsets (stored as string) as fields.
 

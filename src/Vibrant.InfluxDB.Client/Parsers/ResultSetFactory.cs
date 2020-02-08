@@ -155,7 +155,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
 
                for( int i = 0 ; i < values.Count ; i++ )
                {
-                  var value = values[ i ]; // TODO: What about NULL values? Are they treated as empty strings or actual nulls?
+                  var value = values[ i ];
                   var property = properties[ i ];
 
                   // set the value based on the property, if both the value and property is not null
@@ -181,8 +181,21 @@ namespace Vibrant.InfluxDB.Client.Parsers
                         }
                         else
                         {
-                           // will throw exception if types does not match up
-                           property.SetValue( dataPoint, Convert.ChangeType( value, property.Type, CultureInfo.InvariantCulture ) );
+                           if( value.GetType() == property.Type )
+                           {
+                              property.SetValue( dataPoint, value );
+                           }
+                           else if( value is string stringValue )
+                           {
+                              if( !string.IsNullOrEmpty( stringValue ) )
+                              {
+                                 property.SetValue( dataPoint, Convert.ChangeType( stringValue, property.Type, CultureInfo.InvariantCulture ) );
+                              }
+                           }
+                           else
+                           {
+                              property.SetValue( dataPoint, Convert.ChangeType( value, property.Type, CultureInfo.InvariantCulture ) );
+                           }
                         }
                      }
                   }
