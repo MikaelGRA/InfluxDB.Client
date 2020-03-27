@@ -82,14 +82,24 @@ namespace Vibrant.InfluxDB.Client.Metadata
 
                foreach( var propertyInfo in type.GetProperties( BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public ) )
                {
-                  var fieldAttribute = propertyInfo.GetCustomAttribute<InfluxFieldAttribute>();
-                  var tagAttribute = propertyInfo.GetCustomAttribute<InfluxTagAttribute>();
-                  var computedAttribute = propertyInfo.GetCustomAttribute<InfluxComputedAttribute>();
-                  var timestampAttribute = propertyInfo.GetCustomAttribute<InfluxTimestampAttribute>();
-                  var influxMeasurementAttribute = propertyInfo.GetCustomAttribute<InfluxMeasurementAttribute>();
+                  var fieldAttribute = 
+                     InfluxClassMap.GetMappedAttribute<InfluxFieldAttribute>(propertyInfo) ??
+                     propertyInfo.GetCustomAttribute<InfluxFieldAttribute>();
+                  var tagAttribute = 
+                     InfluxClassMap.GetMappedAttribute<InfluxTagAttribute>(propertyInfo) ??
+                     propertyInfo.GetCustomAttribute<InfluxTagAttribute>();
+                  var computedAttribute = 
+                     InfluxClassMap.GetMappedAttribute<InfluxComputedAttribute>(propertyInfo) ??
+                     propertyInfo.GetCustomAttribute<InfluxComputedAttribute>();
+                  var timestampAttribute = 
+                     InfluxClassMap.GetMappedAttribute<InfluxTimestampAttribute>(propertyInfo) ??
+                     propertyInfo.GetCustomAttribute<InfluxTimestampAttribute>();
+                  var influxMeasurementAttribute = 
+                     InfluxClassMap.GetMappedAttribute<InfluxMeasurementAttribute>(propertyInfo) ??
+                     propertyInfo.GetCustomAttribute<InfluxMeasurementAttribute>();
 
                   // list all attributes so we can ensure the attributes specified on a property are valid
-                  var allAttributes = new Attribute[] { fieldAttribute, tagAttribute, timestampAttribute, computedAttribute }
+                  var allAttributes = new Attribute[] { fieldAttribute, tagAttribute, timestampAttribute, computedAttribute, influxMeasurementAttribute }
                      .Where( x => x != null )
                      .ToList();
 

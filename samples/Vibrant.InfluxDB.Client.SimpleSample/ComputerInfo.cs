@@ -6,19 +6,19 @@ namespace Vibrant.InfluxDB.Client.SimpleSample
 {
    public class ComputerInfo
    {
-      [InfluxTimestamp]
+      // [InfluxTimestamp]
       public DateTime Timestamp { get; set; }
 
-      [InfluxTag( "host" )]
+      // [InfluxTag( "host" )]
       public string Host { get; set; }
 
-      [InfluxTag( "region" )]
+      // [InfluxTag( "region" )]
       public string Region { get; set; }
 
-      [InfluxField( "cpu" )]
+      // [InfluxField( "cpu" )]
       public double CPU { get; set; }
 
-      [InfluxField( "ram" )]
+      // [InfluxField( "ram" )]
       public long RAM { get; set; }
    }
 }

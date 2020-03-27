@@ -56,6 +56,20 @@ On your POCO class you must specify these things:
  * 0-* properties with the type string, long, ulong, int, uint, short, ushort, byte, sbyte, double, float, bool, DateTime, DateTimeOffset, decimal or a user-defined enum (nullables too) with the [InfluxTag] attribute that InfluxDB will use as indexed tags. Note that all tags in InfluxDB is still stored a string. The library will simply making the conversion to the specified type automatically.
  * 1-* properties with the type string, long, ulong, int, uint, short, ushort, byte, sbyte, double, float, bool, DateTime, DateTimeOffset, decimal or a user-defined enum (nullables too) with the [InfluxField] attribute that InfluxDB will use as fields.
 
+From version 4.1.0 you can use InfluxClassMap to map your POCOs; This is good when your models are in another assembly and you don't want to add a dependency to InfluxDB.Client. Note that InfluxClassMap has higher priority than Attributes. 
+
+```C#
+InfluxClassMap.Register<ComputerInfo>(cm => 
+{
+   cm.SetMeasurementName("myMeasurement");
+   cm.MapTimestamp(x => x.Timestamp);
+   cm.MapTag(x => x.Host, "host");
+   cm.MapTag(x => x.Region, "region");
+   cm.MapField(x => x.CPU, "cpu");
+   cm.MapField(x => x.RAM, "ram");
+});
+```
+
 Once you've defined your class, you're ready to use the InfluxClient, which is the main entry point to the API:
 
 Here's how to write to the database:
