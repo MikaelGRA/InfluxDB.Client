@@ -102,7 +102,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
             }
          }
 
-         var attr = Property.GetCustomAttribute<InfluxMeasurementAttribute>();
+         var attr = InfluxClassMap.GetMappedAttribute<InfluxMeasurementAttribute>(Property) ?? Property.GetCustomAttribute<InfluxMeasurementAttribute>();
          if( attr != null )
          {
             IsMeasurementNameProperty = true;

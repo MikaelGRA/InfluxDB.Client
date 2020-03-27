@@ -1,19 +1,29 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Vibrant.InfluxDB.Client.Metadata;
 
 namespace Vibrant.InfluxDB.Client.SimpleSample
 {
    public class Program
    {
+      private static readonly string __measurementName = "aTestMeasurement";
       static void Main( string[] args ) => MainAsync( args ).GetAwaiter().GetResult();
 
       static async Task MainAsync( string[] args )
       {
-         const string influxHost = "http://ipv4.fiddler:8086"; // "http://localhost:8086";
+         InfluxClassMap.Register<ComputerInfo>(cm => 
+         {
+            cm.SetMeasurementName(__measurementName);
+            cm.MapTimestamp(x => x.Timestamp);
+            cm.MapTag(x => x.Host, "host");
+            cm.MapTag(x => x.Region, "region");
+            cm.MapField(x => x.CPU, "cpu");
+            cm.MapField(x => x.RAM, "ram");
+         });
+         const string influxHost = "http://localhost:8086"; //"http://ipv4.fiddler:8086"; 
          const string databaseName = "mydb";
 
          var client = new InfluxClient( new Uri( influxHost ) );
-
          await client.CreateDatabaseAsync( databaseName );
 
          await Should_Write_Typed_Rows_To_Database( databaseName, client );
@@ -29,12 +39,12 @@ namespace Vibrant.InfluxDB.Client.SimpleSample
       public static async Task Should_Write_Typed_Rows_To_Database( string db, InfluxClient client )
       {
          var infos = CreateTypedRowsStartingAt( new DateTime( 2010, 1, 1, 1, 1, 1, DateTimeKind.Utc ), 500 );
-         await client.WriteAsync( db, "myMeasurementName", infos );
+         await client.WriteAsync( db, infos );
       }
 
       public static async Task Should_Query_And_Display_Typed_Data( string db, InfluxClient client )
       {
-         var resultSet = await client.ReadAsync<ComputerInfo>( db, "SELECT * FROM myMeasurementName" );
+         var resultSet = await client.ReadAsync<ComputerInfo>( db, "SELECT * FROM " + __measurementName );
 
          // resultSet will contain 1 result in the Results collection (or multiple if you execute multiple queries at once)
          var result = resultSet.Results[ 0 ];
@@ -55,7 +65,7 @@ namespace Vibrant.InfluxDB.Client.SimpleSample
       {
          var resultSet = await client.ReadAsync<ComputerInfo>( 
             db,
-            "SELECT * FROM myMeasurementName WHERE time >= $myParam", 
+            "SELECT * FROM " + __measurementName + " WHERE time >= $myParam", 
             new { myParam = new DateTime( 2010, 1, 1, 1, 1, 3, DateTimeKind.Utc ) } );
 
          // resultSet will contain 1 result in the Results collection (or multiple if you execute multiple queries at once)

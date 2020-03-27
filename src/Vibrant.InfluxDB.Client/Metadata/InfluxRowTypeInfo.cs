@@ -56,7 +56,7 @@ namespace Vibrant.InfluxDB.Client.Metadata
          New = newLambda.Compile();
 
          ImplementsIHaveMeasurementName = typeof( TInfluxRow ).GetInterfaces().Any( x => x == typeof( IHaveMeasurementName ) );
-         var attr = typeof( TInfluxRow ).GetTypeInfo().GetCustomAttribute<InfluxMeasurementAttribute>();
+         var attr = InfluxClassMap.GetMeasurementAttribute(typeof( TInfluxRow )) ?? typeof( TInfluxRow ).GetTypeInfo().GetCustomAttribute<InfluxMeasurementAttribute>();
          if( attr != null )
          {
             ImplicitMeasurementName = attr.Name;
