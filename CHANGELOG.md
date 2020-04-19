@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.0.3
+ * Fixed a bug where the character used for escaping in a field value was not properly escaped itself when writing to influxdb
+
 ## 4.0.2
  * Fixed a bug that could occur when parsing a an empty string in a field that should be interpreted as a null
 

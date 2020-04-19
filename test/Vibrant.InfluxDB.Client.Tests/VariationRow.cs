@@ -20,6 +20,12 @@ namespace Vibrant.InfluxDB.Client.Tests
       [InfluxTag( "typeIntTag" )]
       public int IntType { get; set; }
 
+      [InfluxTag("BodyProperties.PointsListTag")]
+      public string BodyProperties_PointLint_Tag { get; set; }
+
+      [InfluxField("BodyProperties.PointsListField")]
+      public string BodyProperties_PointLint_Field { get; set; }
+
       [InfluxTag( "doubleTag" )]
       public double DoubleTag { get; set; }
 
@@ -90,6 +96,8 @@ namespace Vibrant.InfluxDB.Client.Tests
 
          return Timestamp == other.Timestamp
             && Type == other.Type
+            && BodyProperties_PointLint_Tag == other.BodyProperties_PointLint_Tag
+            && BodyProperties_PointLint_Field == other.BodyProperties_PointLint_Field
             && IntType == other.IntType
             && DoubleTag == other.DoubleTag
             && CategoryTag == other.CategoryTag

@@ -12,74 +12,76 @@ using Newtonsoft.Json.Converters;
 
 namespace Vibrant.InfluxDB.Client.Http
 {
-   internal static class HttpContentExtensions
-   {
-      private static readonly JsonSerializer Serializer;
+    internal static class HttpContentExtensions
+    {
+        private static readonly JsonSerializer Serializer;
 
-      static HttpContentExtensions()
-      {
-         var settings = new JsonSerializerSettings();
-         settings.Converters.Add( new StringEnumConverter() );
-         settings.DateParseHandling = DateParseHandling.None;
+        static HttpContentExtensions()
+        {
+            var settings = new JsonSerializerSettings();
+            settings.Converters.Add(new StringEnumConverter());
+            settings.DateParseHandling = DateParseHandling.None;
 
 
-         Serializer = JsonSerializer.CreateDefault( settings );
-      }
+            Serializer = JsonSerializer.CreateDefault(settings);
+        }
 
-      internal async static Task<JsonStreamObjectIterator> GetObjectIteratorAsync( this HttpContent content, CancellationToken cancellationToken = default( CancellationToken ) )
-      {
-         if( content == null )
-            throw new ArgumentNullException( nameof( content ) );
+        internal async static Task<JsonStreamObjectIterator> GetObjectIteratorAsync(this HttpContent content, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (content == null)
+                throw new ArgumentNullException(nameof(content));
 
-         var readOnlyStream = await content.ReadAsStreamAsync().ConfigureAwait( false );
-         return new JsonStreamObjectIterator( readOnlyStream, Serializer );
-      }
+            var readOnlyStream = await content.ReadAsStreamAsync().ConfigureAwait(false);
+            return new JsonStreamObjectIterator(readOnlyStream, Serializer);
+        }
 
-      internal static Task<T> ReadAsJsonAsync<T>( this HttpContent content, CancellationToken cancellationToken = default( CancellationToken ) )
-      {
-         if( content == null )
-            throw new ArgumentNullException( nameof( content ) );
+        internal static Task<T> ReadAsJsonAsync<T>(this HttpContent content, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (content == null)
+                throw new ArgumentNullException(nameof(content));
 
-         return ReadAsJsonAsyncCore<T>( content, cancellationToken );
-      }
+            return ReadAsJsonAsyncCore<T>(content, cancellationToken);
+        }
 
-      internal static Task<List<T>> ReadMultipleAsJsonAsync<T>( this HttpContent content, CancellationToken cancellationToken = default( CancellationToken ) )
-      {
-         if( content == null )
-            throw new ArgumentNullException( nameof( content ) );
+        internal static Task<List<T>> ReadMultipleAsJsonAsync<T>(this HttpContent content, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (content == null)
+                throw new ArgumentNullException(nameof(content));
 
-         return ReadMultipleAsJsonAsyncCore<T>( content, cancellationToken );
-      }
+            return ReadMultipleAsJsonAsyncCore<T>(content, cancellationToken);
+        }
 
-      private async static Task<T> ReadAsJsonAsyncCore<T>( HttpContent content, CancellationToken cancellationToken )
-      {
-         cancellationToken.ThrowIfCancellationRequested();
-         var readStream = await content.ReadAsStreamAsync().ConfigureAwait( false );
-         var reader = new JsonTextReader( new StreamReader( readStream, Encoding.UTF8 ) );
-         T result = Serializer.Deserialize<T>( reader );
-         return result;
-      }
+        private async static Task<T> ReadAsJsonAsyncCore<T>(HttpContent content, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var readStream = await content.ReadAsStreamAsync().ConfigureAwait(false);
+            var reader = new JsonTextReader(new StreamReader(readStream, Encoding.UTF8));
+            T result = Serializer.Deserialize<T>(reader);
+            return result;
+        }
 
-      private async static Task<List<T>> ReadMultipleAsJsonAsyncCore<T>( HttpContent content, CancellationToken cancellationToken )
-      {
-         cancellationToken.ThrowIfCancellationRequested();
-         var readOnlyStream = await content.ReadAsStreamAsync().ConfigureAwait( false );
+        private async static Task<List<T>> ReadMultipleAsJsonAsyncCore<T>(HttpContent content, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var readOnlyStream = await content.ReadAsStreamAsync().ConfigureAwait(false);
 
-         List<T> results = new List<T>();
-         var reader = new JsonTextReader( new StreamReader( readOnlyStream, Encoding.UTF8 ) );
-         reader.SupportMultipleContent = true;
-         while( true )
-         {
-            if( !reader.Read() )
+            List<T> results = new List<T>();
+            var reader = new JsonTextReader(new StreamReader(readOnlyStream, Encoding.UTF8));
+            reader.SupportMultipleContent = true;
+            while (true)
             {
-               break;
+                if (!reader.Read())
+                {
+                    break;
+                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                T result = Serializer.Deserialize<T>(reader);
+                results.Add(result);
             }
 
-            T result = Serializer.Deserialize<T>( reader );
-            results.Add( result );
-         }
-
-         return results;
-      }
-   }
+            return results;
+        }
+    }
 }
