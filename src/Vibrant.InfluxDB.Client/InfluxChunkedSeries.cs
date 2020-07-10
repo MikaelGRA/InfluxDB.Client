@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Vibrant.InfluxDB.Client.Helpers;
 
@@ -41,9 +38,9 @@ namespace Vibrant.InfluxDB.Client
       /// Null if none are available.
       /// </summary>
       /// <returns></returns>
-      public async Task<InfluxChunk<TInfluxRow>> GetNextChunkAsync()
+      public async Task<InfluxChunk<TInfluxRow>> GetNextChunkAsync(CancellationToken cancellationToken = default)
       {
-         if( await _iterator.ConsumeNextBatchAsync().ConfigureAwait( false ) )
+         if( await _iterator.ConsumeNextBatchAsync(cancellationToken).ConfigureAwait( false ) )
          {
             return new InfluxChunk<TInfluxRow>( _iterator.CurrentBatch );
          }

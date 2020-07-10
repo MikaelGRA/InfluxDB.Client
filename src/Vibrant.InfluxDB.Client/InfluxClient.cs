@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Vibrant.InfluxDB.Client.Dto;
 using Vibrant.InfluxDB.Client.Metadata;
 using Vibrant.InfluxDB.Client.Parsers;
 using Vibrant.InfluxDB.Client.Resources;
-using Vibrant.InfluxDB.Client.Rows;
 using Vibrant.InfluxDB.Client.Http;
 using Vibrant.InfluxDB.Client.Helpers;
 
@@ -23,16 +21,44 @@ namespace Vibrant.InfluxDB.Client
     /// <summary>
     /// An InfluxClient exposes all HTTP operations on InfluxDB.
     /// </summary>
+    /// <seealso cref="System.IDisposable" />
+    /// <seealso cref="Vibrant.InfluxDB.Client.IInfluxClient" />
     public sealed class InfluxClient : IDisposable, IInfluxClient
     {
+        /// <summary>
+        /// The series meta cache
+        /// </summary>
         private readonly Dictionary<DatabaseMeasurementInfoKey, DatabaseMeasurementInfo> _seriesMetaCache;
+        /// <summary>
+        /// The authz header
+        /// </summary>
         private readonly AuthenticationHeaderValue _authzHeader;
+        /// <summary>
+        /// The client
+        /// </summary>
         private readonly HttpClient _client;
+        /// <summary>
+        /// The endpoint
+        /// </summary>
         private readonly Uri _endpoint;
 
+        /// <summary>
+        /// The disposed
+        /// </summary>
         private bool _disposed;
-        private bool _disposeHttpClientHandler;
+        /// <summary>
+        /// The dispose HTTP client handler
+        /// </summary>
+        private readonly bool _disposeHttpClientHandler;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InfluxClient"/> class.
+        /// </summary>
+        /// <param name="endpoint">The endpoint.</param>
+        /// <param name="username">The username.</param>
+        /// <param name="password">The password.</param>
+        /// <param name="client">The client.</param>
+        /// <param name="disposeHttpClient">if set to <c>true</c> [dispose HTTP client].</param>
         private InfluxClient(Uri endpoint, string username, string password, HttpClient client, bool disposeHttpClient)
         {
             _disposeHttpClientHandler = disposeHttpClient;
@@ -57,10 +83,10 @@ namespace Vibrant.InfluxDB.Client
         /// <summary>
         /// Constructs an InfluxClient that uses the specified credentials and HttpClient.
         /// </summary>
-        /// <param name="endpoint"></param>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
-        /// <param name="client"></param>
+        /// <param name="endpoint">The endpoint.</param>
+        /// <param name="username">The username.</param>
+        /// <param name="password">The password.</param>
+        /// <param name="client">The client.</param>
         public InfluxClient(Uri endpoint, string username, string password, HttpClient client)
            : this(endpoint, username, password, client, false)
         {
@@ -70,9 +96,9 @@ namespace Vibrant.InfluxDB.Client
         /// <summary>
         /// Constructs an InfluxClient that uses the specified credentials.
         /// </summary>
-        /// <param name="endpoint"></param>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
+        /// <param name="endpoint">The endpoint.</param>
+        /// <param name="username">The username.</param>
+        /// <param name="password">The password.</param>
         public InfluxClient(Uri endpoint, string username, string password)
            : this(endpoint, username, password, new HttpClient(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip }, true), true)
         {
@@ -81,7 +107,7 @@ namespace Vibrant.InfluxDB.Client
         /// <summary>
         /// Constructs an InfluxClient that does not use any credentials.
         /// </summary>
-        /// <param name="endpoint"></param>
+        /// <param name="endpoint">The endpoint.</param>
         public InfluxClient(Uri endpoint)
            : this(endpoint, null, null)
         {
@@ -91,6 +117,9 @@ namespace Vibrant.InfluxDB.Client
         /// <summary>
         /// Gets or sets the timeout for all requests made.
         /// </summary>
+        /// <value>
+        /// The timeout.
+        /// </value>
         public TimeSpan Timeout
         {
             get
@@ -106,16 +135,25 @@ namespace Vibrant.InfluxDB.Client
         /// <summary>
         /// Gets the default write options.
         /// </summary>
+        /// <value>
+        /// The default write options.
+        /// </value>
         public InfluxWriteOptions DefaultWriteOptions { get; private set; }
 
         /// <summary>
         /// Gets the default query optionns.
         /// </summary>
+        /// <value>
+        /// The default query options.
+        /// </value>
         public InfluxQueryOptions DefaultQueryOptions { get; private set; }
 
         /// <summary>
         /// Gets the timestamp parser registry.
         /// </summary>
+        /// <value>
+        /// The timestamp parser registry.
+        /// </value>
         public ITimestampParserRegistry TimestampParserRegistry { get; private set; }
 
         #region Raw Operations
@@ -123,27 +161,29 @@ namespace Vibrant.InfluxDB.Client
         /// <summary>
         /// Executes an arbitrary command that returns a table as a result.
         /// </summary>
-        /// <typeparam name="TInfluxRow"></typeparam>
-        /// <param name="commandOrQuery"></param>
-        /// <param name="db"></param>
-        /// <param name="parameters"></param>
+        /// <typeparam name="TInfluxRow">The type of the influx row.</typeparam>
+        /// <param name="commandOrQuery">The command or query.</param>
+        /// <param name="db">The database.</param>
+        /// <param name="parameters">The parameters.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns></returns>
-        public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>(string commandOrQuery, string db, object parameters)
+        public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>(string commandOrQuery, string db, object parameters, CancellationToken cancellationToken = default)
            where TInfluxRow : new()
         {
-            return ExecuteQueryInternalAsync<TInfluxRow>(commandOrQuery, db, false, true, parameters, DefaultQueryOptions);
+            return ExecuteQueryInternalAsync<TInfluxRow>(commandOrQuery, db, false, true, parameters, DefaultQueryOptions, cancellationToken);
         }
 
         /// <summary>
         /// Executes an arbitrary command that does not return a table.
         /// </summary>
-        /// <param name="commandOrQuery"></param>
-        /// <param name="db"></param>
-        /// <param name="parameters"></param>
+        /// <param name="commandOrQuery">The command or query.</param>
+        /// <param name="db">The database.</param>
+        /// <param name="parameters">The parameters.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns></returns>
-        public Task<InfluxResultSet> ExecuteOperationAsync(string commandOrQuery, string db, object parameters)
+        public Task<InfluxResultSet> ExecuteOperationAsync(string commandOrQuery, string db, object parameters, CancellationToken cancellationToken = default)
         {
-            return ExecuteQueryInternalAsync(commandOrQuery, db, true, parameters, DefaultQueryOptions);
+            return ExecuteQueryInternalAsync(commandOrQuery, db, true, parameters, DefaultQueryOptions, cancellationToken);
         }
 
         #endregion
@@ -153,11 +193,12 @@ namespace Vibrant.InfluxDB.Client
         /// <summary>
         /// Executes a ping and waits for the leader to respond.
         /// </summary>
-        /// <param name="secondsToWaitForLeader"></param>
+        /// <param name="secondsToWaitForLeader">The seconds to wait for leader.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns></returns>
-        public Task<InfluxPingResult> PingAsync(int? secondsToWaitForLeader)
+        public Task<InfluxPingResult> PingAsync(int? secondsToWaitForLeader, CancellationToken cancellationToken = default)
         {
-            return HeadInternalAsync(CreatePingUrl(secondsToWaitForLeader));
+            return HeadInternalAsync(CreatePingUrl(secondsToWaitForLeader), cancellationToken);
         }
 
         #endregion
@@ -167,13 +208,14 @@ namespace Vibrant.InfluxDB.Client
         /// <summary>
         /// Writes the rows with the specified write options.
         /// </summary>
-        /// <typeparam name="TInfluxRow"></typeparam>
-        /// <param name="db"></param>
-        /// <param name="measurementName"></param>
-        /// <param name="rows"></param>
-        /// <param name="options"></param>
+        /// <typeparam name="TInfluxRow">The type of the influx row.</typeparam>
+        /// <param name="db">The database.</param>
+        /// <param name="measurementName">Name of the measurement.</param>
+        /// <param name="rows">The rows.</param>
+        /// <param name="options">The options.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns></returns>
-        public Task WriteAsync<TInfluxRow>(string db, string measurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options)
+        public Task WriteAsync<TInfluxRow>(string db, string measurementName, IEnumerable<TInfluxRow> rows, InfluxWriteOptions options, CancellationToken cancellationToken = default)
            where TInfluxRow : new()
         {
             List<HttpContent> contents = new List<HttpContent>();
@@ -193,59 +235,61 @@ namespace Vibrant.InfluxDB.Client
             {
                 content = new GzipContent(content);
             }
-            return PostInternalIgnoreResultAsync(CreateWriteUrl(db, options), content);
+            return PostInternalIgnoreResultAsync(CreateWriteUrl(db, options), content, cancellationToken);
         }
 
         /// <summary>
         /// Executes the query and returns the result with the specified query options.
         /// </summary>
-        /// <typeparam name="TInfluxRow"></typeparam>
-        /// <param name="query"></param>
-        /// <param name="db"></param>
-        /// <param name="options"></param>
-        /// <param name="parameters"></param>
+        /// <typeparam name="TInfluxRow">The type of the influx row.</typeparam>
+        /// <param name="db">The database.</param>
+        /// <param name="query">The query.</param>
+        /// <param name="parameters">The parameters.</param>
+        /// <param name="options">The options.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns></returns>
-        public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>(string db, string query, object parameters, InfluxQueryOptions options)
+        public Task<InfluxResultSet<TInfluxRow>> ReadAsync<TInfluxRow>(string db, string query, object parameters, InfluxQueryOptions options, CancellationToken cancellationToken = default)
            where TInfluxRow : new()
         {
-            return ExecuteQueryInternalAsync<TInfluxRow>(query, db, true, false, parameters, options);
+            return ExecuteQueryInternalAsync<TInfluxRow>(query, db, true, false, parameters, options, cancellationToken);
         }
 
         /// <summary>
         /// Executes the query and returns a deferred result that can be iterated over as they
         /// are returned by the database.
-        /// 
         /// It does not make sense to use this method unless you are returning a big payload and
         /// have enabled chunking through InfluxQueryOptions.
         /// </summary>
-        /// <typeparam name="TInfluxRow"></typeparam>
-        /// <param name="db"></param>
-        /// <param name="query"></param>
-        /// <param name="options"></param>
-        /// <param name="parameters"></param>
+        /// <typeparam name="TInfluxRow">The type of the influx row.</typeparam>
+        /// <param name="db">The database.</param>
+        /// <param name="query">The query.</param>
+        /// <param name="parameters">The parameters.</param>
+        /// <param name="options">The options.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns></returns>
-        public Task<InfluxChunkedResultSet<TInfluxRow>> ReadChunkedAsync<TInfluxRow>(string db, string query, object parameters, InfluxQueryOptions options)
+        public Task<InfluxChunkedResultSet<TInfluxRow>> ReadChunkedAsync<TInfluxRow>(string db, string query, object parameters, InfluxQueryOptions options, CancellationToken cancellationToken = default)
            where TInfluxRow : new()
         {
-            return ExecuteQueryByObjectIteratorInternalAsync<TInfluxRow>(query, db, true, false, parameters, options);
+            return ExecuteQueryByObjectIteratorInternalAsync<TInfluxRow>(query, db, true, false, parameters, options, cancellationToken);
         }
 
         /// <summary>
         /// Deletes data in accordance with the specified query
         /// </summary>
-        /// <param name="db"></param>
-        /// <param name="deleteQuery"></param>
-        /// <param name="parameters"></param>
+        /// <param name="db">The database.</param>
+        /// <param name="deleteQuery">The delete query.</param>
+        /// <param name="parameters">The parameters.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns></returns>
-        public async Task<InfluxResult> DeleteAsync(string db, string deleteQuery, object parameters)
+        public async Task<InfluxResult> DeleteAsync(string db, string deleteQuery, object parameters, CancellationToken cancellationToken = default)
         {
-            var resultSet = await ExecuteQueryInternalAsync(deleteQuery, db, true, parameters, DefaultQueryOptions).ConfigureAwait(false);
+            var resultSet = await ExecuteQueryInternalAsync(deleteQuery, db, true, parameters, DefaultQueryOptions, cancellationToken).ConfigureAwait(false);
             return resultSet.Results.FirstOrDefault();
         }
 
         #endregion
 
-        internal async Task<DatabaseMeasurementInfo> GetMetaInformationAsync(string db, string measurementName, TimeSpan? expiration)
+        internal async Task<DatabaseMeasurementInfo> GetMetaInformationAsync(string db, string measurementName, TimeSpan? expiration, CancellationToken cancellationToken = default)
         {
             var key = new DatabaseMeasurementInfoKey(db, measurementName);
             DatabaseMeasurementInfo info;
@@ -272,7 +316,7 @@ namespace Vibrant.InfluxDB.Client
             // has expired or never existed, lets retrieve it
 
             // get metadata information from the store
-            var tagsResult = await this.ShowTagKeysAsync(db, measurementName).ConfigureAwait(false);
+            var tagsResult = await this.ShowTagKeysAsync(db, measurementName, cancellationToken).ConfigureAwait(false);
             var tags = tagsResult.Series.FirstOrDefault()?.Rows;
 
             info = new DatabaseMeasurementInfo(now);
@@ -396,72 +440,92 @@ namespace Vibrant.InfluxDB.Client
             }
         }
 
-        private async Task<InfluxChunkedResultSet<TInfluxRow>> ExecuteQueryByObjectIteratorInternalAsync<TInfluxRow>(string query, string db, bool isTimeSeriesQuery, bool forcePost, object parameters, InfluxQueryOptions options)
+        private async Task<InfluxChunkedResultSet<TInfluxRow>> ExecuteQueryByObjectIteratorInternalAsync<TInfluxRow>(string query, string db, bool isTimeSeriesQuery, bool forcePost, object parameters, InfluxQueryOptions options, CancellationToken cancellationToken = default)
            where TInfluxRow : new()
         {
-            var iterator = await PerformQueryInternal<TInfluxRow>(query, db, forcePost, isTimeSeriesQuery, true, parameters, options).ConfigureAwait(false);
+            var iterator = await PerformQueryInternal<TInfluxRow>(query, db, forcePost, isTimeSeriesQuery, true, parameters, options, cancellationToken).ConfigureAwait(false);
             return new InfluxChunkedResultSet<TInfluxRow>(iterator, this, options, db);
         }
 
-        private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>(string query, string db, bool isTimeSeriesQuery, bool forcePost, object parameters, InfluxQueryOptions options)
+        private async Task<InfluxResultSet<TInfluxRow>> ExecuteQueryInternalAsync<TInfluxRow>(string query, string db, bool isTimeSeriesQuery, bool forcePost, object parameters, InfluxQueryOptions options, CancellationToken cancellationToken = default)
            where TInfluxRow : new()
         {
-            List<QueryResult> queryResults = await PerformQueryInternal(query, db, forcePost, isTimeSeriesQuery, false, parameters, options).ConfigureAwait(false);
-            return await ResultSetFactory.CreateAsync<TInfluxRow>(this, queryResults, db, isTimeSeriesQuery, options).ConfigureAwait(false);
+            List<QueryResult> queryResults = await PerformQueryInternal(query, db, forcePost, isTimeSeriesQuery, false, parameters, options, cancellationToken).ConfigureAwait(false);
+            return await ResultSetFactory.CreateAsync<TInfluxRow>(this, queryResults, db, isTimeSeriesQuery, options, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task<InfluxResultSet> ExecuteQueryInternalAsync(string query, string db, bool forcePost, object parameters, InfluxQueryOptions options)
+        private async Task<InfluxResultSet> ExecuteQueryInternalAsync(string query, string db, bool forcePost, object parameters, InfluxQueryOptions options, CancellationToken cancellationToken = default)
         {
-            List<QueryResult> queryResults = await PerformQueryInternal(query, db, forcePost, false, false, parameters, options).ConfigureAwait(false);
+            List<QueryResult> queryResults = await PerformQueryInternal(query, db, forcePost, false, false, parameters, options, cancellationToken).ConfigureAwait(false);
             return ResultSetFactory.Create(queryResults);
         }
 
-        private async Task<ContextualQueryResultIterator<TInfluxRow>> PerformQueryInternal<TInfluxRow>(string query, string db, bool forcePost, bool isTimeSeriesQuery, bool requireChunking, object parameters, InfluxQueryOptions options)
+        private async Task<ContextualQueryResultIterator<TInfluxRow>> PerformQueryInternal<TInfluxRow>(string query, string db, bool forcePost, bool isTimeSeriesQuery, bool requireChunking, object parameters, InfluxQueryOptions options, CancellationToken cancellationToken)
            where TInfluxRow : new()
         {
             ContextualQueryResultIterator<TInfluxRow> iterator;
             if (options.UsePost)
             {
-                iterator = await ExecuteHttpAsync<TInfluxRow>(HttpMethod.Post, new Uri(_endpoint, "query").ToString(), db, options, CreateQueryPostContent(query, db, isTimeSeriesQuery, requireChunking, parameters, options)).ConfigureAwait(false);
+                iterator = await ExecuteHttpAsync<TInfluxRow>(
+                    HttpMethod.Post, 
+                    new Uri(_endpoint, "query").ToString(), 
+                    db, options, 
+                    CreateQueryPostContent(query, db, isTimeSeriesQuery, requireChunking, parameters, options), cancellationToken).ConfigureAwait(false);
             }
             else
             {
                 if (forcePost)
                 {
-                    iterator = await ExecuteHttpAsync<TInfluxRow>(HttpMethod.Post, CreateQueryUrl(query, db, isTimeSeriesQuery, requireChunking, parameters, options), db, options).ConfigureAwait(false);
+                    iterator = await ExecuteHttpAsync<TInfluxRow>(
+                        HttpMethod.Post, 
+                        CreateQueryUrl(query, db, isTimeSeriesQuery, requireChunking, parameters, options), 
+                        db, options, null, cancellationToken).ConfigureAwait(false);
                 }
                 else
                 {
-                    iterator = await ExecuteHttpAsync<TInfluxRow>(HttpMethod.Get, CreateQueryUrl(query, db, isTimeSeriesQuery, requireChunking, parameters, options), db, options).ConfigureAwait(false);
+                    iterator = await ExecuteHttpAsync<TInfluxRow>(
+                        HttpMethod.Get, 
+                        CreateQueryUrl(query, db, isTimeSeriesQuery, requireChunking, parameters, options), 
+                        db, options, null, cancellationToken).ConfigureAwait(false);
                 }
             }
 
             return iterator;
         }
 
-        private async Task<List<QueryResult>> PerformQueryInternal(string query, string db, bool forcePost, bool isTimeSeriesQuery, bool requireChunking, object parameters, InfluxQueryOptions options)
+        private async Task<List<QueryResult>> PerformQueryInternal(string query, string db, bool forcePost, bool isTimeSeriesQuery, bool requireChunking, object parameters, InfluxQueryOptions options, CancellationToken cancellationToken = default)
         {
             List<QueryResult> queryResults;
             if (options.UsePost)
             {
-                queryResults = await ExecuteHttpAsync(HttpMethod.Post, new Uri(_endpoint, "query").ToString(), CreateQueryPostContent(query, db, isTimeSeriesQuery, requireChunking, parameters, options)).ConfigureAwait(false);
+                queryResults = await ExecuteHttpAsync(
+                    HttpMethod.Post, 
+                    new Uri(_endpoint, "query").ToString(), 
+                    CreateQueryPostContent(query, db, isTimeSeriesQuery, requireChunking, parameters, options),
+                    cancellationToken).ConfigureAwait(false);
             }
             else
             {
                 if (forcePost)
                 {
-                    queryResults = await ExecuteHttpAsync(HttpMethod.Post, CreateQueryUrl(query, db, isTimeSeriesQuery, requireChunking, parameters, options)).ConfigureAwait(false);
+                    queryResults = await ExecuteHttpAsync(
+                        HttpMethod.Post, 
+                        CreateQueryUrl(query, db, isTimeSeriesQuery, requireChunking, parameters, options),
+                        null, cancellationToken).ConfigureAwait(false);
                 }
                 else
                 {
-                    queryResults = await ExecuteHttpAsync(HttpMethod.Get, CreateQueryUrl(query, db, isTimeSeriesQuery, requireChunking, parameters, options)).ConfigureAwait(false);
+                    queryResults = await ExecuteHttpAsync(
+                        HttpMethod.Get, 
+                        CreateQueryUrl(query, db, isTimeSeriesQuery, requireChunking, parameters, options),
+                        null, cancellationToken).ConfigureAwait(false);
                 }
             }
 
             return queryResults;
         }
 
-        private async Task<List<QueryResult>> ExecuteHttpAsync(HttpMethod method, string url, HttpContent content = null)
+        private async Task<List<QueryResult>> ExecuteHttpAsync(HttpMethod method, string url, HttpContent content = null, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -469,10 +533,10 @@ namespace Vibrant.InfluxDB.Client
                 {
                     request.Headers.Authorization = _authzHeader;
 
-                    using (var response = await _client.SendAsync(request).ConfigureAwait(false))
+                    using (var response = await _client.SendAsync(request, cancellationToken).ConfigureAwait(false))
                     {
-                        await EnsureSuccessCode(response).ConfigureAwait(false);
-                        return await response.Content.ReadMultipleAsJsonAsync<QueryResult>().ConfigureAwait(false);
+                        await EnsureSuccessCode(response, cancellationToken).ConfigureAwait(false);
+                        return await response.Content.ReadMultipleAsJsonAsync<QueryResult>(cancellationToken: cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -482,7 +546,7 @@ namespace Vibrant.InfluxDB.Client
             }
         }
 
-        private async Task<ContextualQueryResultIterator<TInfluxRow>> ExecuteHttpAsync<TInfluxRow>(HttpMethod method, string url, string db, InfluxQueryOptions options, HttpContent content = null)
+        private async Task<ContextualQueryResultIterator<TInfluxRow>> ExecuteHttpAsync<TInfluxRow>(HttpMethod method, string url, string db, InfluxQueryOptions options, HttpContent content = null, CancellationToken cancellationToken = default)
            where TInfluxRow : new()
         {
             try
@@ -491,10 +555,10 @@ namespace Vibrant.InfluxDB.Client
                 {
                     request.Headers.Authorization = _authzHeader;
 
-                    var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
-                    await EnsureSuccessCode(response).ConfigureAwait(false);
+                    var response = await _client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    await EnsureSuccessCode(response, cancellationToken).ConfigureAwait(false);
 
-                    var objectIterator = await response.Content.GetObjectIteratorAsync().ConfigureAwait(false);
+                    var objectIterator = await response.Content.GetObjectIteratorAsync(cancellationToken).ConfigureAwait(false);
                     var iterator = new QueryResultIterator<TInfluxRow>(response, objectIterator, this, options, db);
                     var contextualIterator = new ContextualQueryResultIterator<TInfluxRow>(iterator);
                     return contextualIterator;
@@ -506,7 +570,7 @@ namespace Vibrant.InfluxDB.Client
             }
         }
 
-        private async Task<InfluxPingResult> HeadInternalAsync(string url)
+        private async Task<InfluxPingResult> HeadInternalAsync(string url, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -514,9 +578,9 @@ namespace Vibrant.InfluxDB.Client
                 {
                     request.Headers.Authorization = _authzHeader;
 
-                    using (var response = await _client.SendAsync(request).ConfigureAwait(false))
+                    using (var response = await _client.SendAsync(request, cancellationToken).ConfigureAwait(false))
                     {
-                        await EnsureSuccessCode(response).ConfigureAwait(false);
+                        await EnsureSuccessCode(response, cancellationToken).ConfigureAwait(false);
                         IEnumerable<string> version = null;
                         response.Headers.TryGetValues("X-Influxdb-Version", out version);
                         return new InfluxPingResult { Version = version?.FirstOrDefault() ?? "unknown" };
@@ -529,7 +593,7 @@ namespace Vibrant.InfluxDB.Client
             }
         }
 
-        private async Task PostInternalIgnoreResultAsync(string url, HttpContent content)
+        private async Task PostInternalIgnoreResultAsync(string url, HttpContent content, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -537,9 +601,9 @@ namespace Vibrant.InfluxDB.Client
                 {
                     request.Headers.Authorization = _authzHeader;
 
-                    using (var response = await _client.SendAsync(request).ConfigureAwait(false))
+                    using (var response = await _client.SendAsync(request, cancellationToken).ConfigureAwait(false))
                     {
-                        await EnsureSuccessCode(response).ConfigureAwait(false);
+                        await EnsureSuccessCode(response, cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -549,13 +613,13 @@ namespace Vibrant.InfluxDB.Client
             }
         }
 
-        private async Task EnsureSuccessCode(HttpResponseMessage response)
+        private async Task EnsureSuccessCode(HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             if (!response.IsSuccessStatusCode)
             {
                 try
                 {
-                    var errorResult = await response.Content.ReadAsJsonAsync<ErrorResult>().ConfigureAwait(false);
+                    var errorResult = await response.Content.ReadAsJsonAsync<ErrorResult>(cancellationToken).ConfigureAwait(false);
                     if (errorResult?.Error != null)
                     {
                         throw new InfluxException(errorResult.Error);
@@ -595,6 +659,10 @@ namespace Vibrant.InfluxDB.Client
             }
         }
 
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         private void Dispose(bool disposing)
         {
             if (disposing)

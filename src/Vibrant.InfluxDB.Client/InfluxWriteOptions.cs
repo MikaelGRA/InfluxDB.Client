@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Vibrant.InfluxDB.Client
+﻿namespace Vibrant.InfluxDB.Client
 {
    /// <summary>
    /// The write options that are being used when write operations are performed against influxDB.

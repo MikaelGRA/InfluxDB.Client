@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Vibrant.InfluxDB.Client.Helpers
@@ -30,7 +31,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
       }
 
 
-      public async Task<bool> ConsumeNextResultAsync()
+      public async Task<bool> ConsumeNextResultAsync(CancellationToken cancellationToken = default)
       {
          if( _consumeCurrentResultNextTime )
          {
@@ -47,7 +48,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
          do
          {
 
-            hasMore = await _resultIterator.ConsumeNextResultAsync().ConfigureAwait( false );
+            hasMore = await _resultIterator.ConsumeNextResultAsync(cancellationToken).ConfigureAwait( false );
             if( hasMore )
             {
                _currentResult = _resultIterator.CurrentResult;
@@ -66,7 +67,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
          return false;
       }
 
-      public async Task<bool> ConsumeNextSerieAsync()
+      public async Task<bool> ConsumeNextSerieAsync(CancellationToken cancellationToken = default)
       {
          if( _consumeCurrentSerieNextTime )
          {
@@ -97,7 +98,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
             do
             {
                // might need to consume both results and series
-               hasMoreSeries = await _resultIterator.ConsumeNextSerieAsync().ConfigureAwait( false );
+               hasMoreSeries = await _resultIterator.ConsumeNextSerieAsync(cancellationToken).ConfigureAwait( false );
                if( hasMoreSeries )
                {
                   // consume until the grouped tags changes
@@ -115,7 +116,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
 
 
             // handle the next result to see if it contains more data for the current statement
-            var hasMoreResults = await _resultIterator.ConsumeNextResultAsync().ConfigureAwait( false );
+            var hasMoreResults = await _resultIterator.ConsumeNextResultAsync(cancellationToken).ConfigureAwait( false );
             if( hasMoreResults )
             {
                _currentResult = _resultIterator.CurrentResult;
@@ -138,7 +139,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
          return false;
       }
 
-      public async Task<bool> ConsumeNextBatchAsync()
+      public async Task<bool> ConsumeNextBatchAsync(CancellationToken cancellationToken = default)
       {
          if( _currentBatch != null )
          {
@@ -156,7 +157,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
                do
                {
                   // might need to consume both results and series
-                  hasMoreSeries = await _resultIterator.ConsumeNextSerieAsync().ConfigureAwait( false );
+                  hasMoreSeries = await _resultIterator.ConsumeNextSerieAsync(cancellationToken).ConfigureAwait( false );
                   if( hasMoreSeries )
                   {
                      // consume until the grouped tags changes
@@ -180,7 +181,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
 
 
                // handle the next result to see if it contains more data for the current statement
-               var hasMoreResults = await _resultIterator.ConsumeNextResultAsync().ConfigureAwait( false );
+               var hasMoreResults = await _resultIterator.ConsumeNextResultAsync(cancellationToken).ConfigureAwait( false );
                if( hasMoreResults )
                {
                   _currentResult = _resultIterator.CurrentResult;
@@ -203,29 +204,11 @@ namespace Vibrant.InfluxDB.Client.Helpers
          }
       }
 
-      public InfluxResult<TInfluxRow> CurrentResult
-      {
-         get
-         {
-            return _capturedResult;
-         }
-      }
+      public InfluxResult<TInfluxRow> CurrentResult => _capturedResult;
 
-      public InfluxSeries<TInfluxRow> CurrentSerie
-      {
-         get
-         {
-            return _capturedSerie;
-         }
-      }
+      public InfluxSeries<TInfluxRow> CurrentSerie => _capturedSerie;
 
-      public List<TInfluxRow> CurrentBatch
-      {
-         get
-         {
-            return _capturedBatch;
-         }
-      }
+      public List<TInfluxRow> CurrentBatch => _capturedBatch;
 
       protected virtual void Dispose( bool disposing )
       {
