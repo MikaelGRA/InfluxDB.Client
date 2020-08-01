@@ -32,6 +32,9 @@ namespace Vibrant.InfluxDB.Client.Tests
       [InfluxField( "m\\es,sa=ge" )]
       public string Message { get; set; }
 
+      [InfluxField( "someValue" )]
+      public string SomeValue { get; set; }
+
       [InfluxField( "count" )]
       public long Count { get; set; }
 

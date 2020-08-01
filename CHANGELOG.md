@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.4
+ * Added cancellation support [#58](https://github.com/MikaelGRA/InfluxDB.Client/issues/58)
+ * Fixed a bug where an empty string could not be used as a field value
+
 ## 4.0.3
  * Fixed a bug where the character used for escaping in a field value was not properly escaped itself when writing to influxdb
 

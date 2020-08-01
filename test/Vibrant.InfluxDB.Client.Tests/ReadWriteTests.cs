@@ -322,6 +322,7 @@ namespace Vibrant.InfluxDB.Client.Tests
                 BodyProperties_PointLint_Field = outerJson,
                 Indicator = true,
                 Message = null, //"Hello, \\athere\nWhat's up? ==",
+                SomeValue = "",
                 Percent = 0.37,
                 Type = "tag, =Value",
                 Category = TestEnum1.Value2,

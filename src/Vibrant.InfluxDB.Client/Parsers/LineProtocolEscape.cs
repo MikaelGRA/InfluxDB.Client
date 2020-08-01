@@ -11,6 +11,8 @@ namespace Vibrant.InfluxDB.Client.Parsers
 {
     internal static class LineProtocolEscape
     {
+        private static readonly string EmptyStringField = "\"\"";
+
         private static readonly IDictionary<string, string> EscapedKeys = new ConcurrentDictionary<string, string>();
 
         internal static string EscapeFieldValue(object valueAsObject)
@@ -53,11 +55,11 @@ namespace Vibrant.InfluxDB.Client.Parsers
             }
         }
 
-        internal static string EscapeFieldStringValue(string str)
+        private static string EscapeFieldStringValue(string str)
         {
-            if (str == null || str.Length == 0)
+            if (str.Length == 0)
             {
-                return "";
+                return EmptyStringField;
             }
 
             char c;
