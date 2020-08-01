@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +26,7 @@ namespace Vibrant.InfluxDB.Client.Http
 
         internal async static Task<JsonStreamObjectIterator> GetObjectIteratorAsync(this HttpContent content, CancellationToken cancellationToken = default(CancellationToken))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (content == null)
                 throw new ArgumentNullException(nameof(content));
 
@@ -51,7 +50,7 @@ namespace Vibrant.InfluxDB.Client.Http
             return ReadMultipleAsJsonAsyncCore<T>(content, cancellationToken);
         }
 
-        private async static Task<T> ReadAsJsonAsyncCore<T>(HttpContent content, CancellationToken cancellationToken)
+        private async static Task<T> ReadAsJsonAsyncCore<T>(HttpContent content, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var readStream = await content.ReadAsStreamAsync().ConfigureAwait(false);

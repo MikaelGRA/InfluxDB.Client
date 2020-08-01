@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Vibrant.InfluxDB.Client.Dto;
 using Vibrant.InfluxDB.Client.Http;
@@ -35,7 +36,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
          _db = db;
       }
 
-      private async Task<bool> ConsumeNextQueryResultAsync()
+      private async Task<bool> ConsumeNextQueryResultAsync(CancellationToken cancellationToken = default)
       {
          // read the next object from the object iterator (stream)
          var queryResult = _objectIterator.ReadNext<QueryResult>();
@@ -46,7 +47,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
          }
 
          // if we found something, construct a normal result object, and initialize our indices
-         _currentResultSet = await ResultSetFactory.CreateAsync<TInfluxRow>( _client, new[] { queryResult }, _db, true, _options ).ConfigureAwait( false );
+         _currentResultSet = await ResultSetFactory.CreateAsync<TInfluxRow>( _client, new[] { queryResult }, _db, true, _options, cancellationToken).ConfigureAwait( false );
          _currentResultIndex = -1;
          _currentSerieIndex = -1;
 
@@ -54,25 +55,25 @@ namespace Vibrant.InfluxDB.Client.Helpers
          return true;
       }
 
-      private async Task<bool> ConsumeNextResultSetAsync()
+      private async Task<bool> ConsumeNextResultSetAsync(CancellationToken cancellationToken = default)
       {
          // short circuit, so we dont go to the stream after we already found there is no more data
          if( _hasConsumedAllQueryResults ) return false;
          
          // consume the next query result and store it in this instance
-         var hasMore = await ConsumeNextQueryResultAsync().ConfigureAwait( false );
+         var hasMore = await ConsumeNextQueryResultAsync(cancellationToken).ConfigureAwait( false );
          _hasConsumedAllQueryResults = !hasMore;
 
          // indicate we found something
          return hasMore;
       }
 
-      public async Task<bool> ConsumeNextResultAsync()
+      public async Task<bool> ConsumeNextResultAsync(CancellationToken cancellationToken = default)
       {
          bool hasMore;
          if( _currentResultSet == null )
          {
-            hasMore = await ConsumeNextResultSetAsync().ConfigureAwait( false );
+            hasMore = await ConsumeNextResultSetAsync(cancellationToken).ConfigureAwait( false );
             if( !hasMore )
             {
                return false;
@@ -90,7 +91,7 @@ namespace Vibrant.InfluxDB.Client.Helpers
          }
 
          // if we get to here, it is an indication that there is no more iterable data available in the current result set
-         hasMore = await ConsumeNextResultSetAsync().ConfigureAwait( false );
+         hasMore = await ConsumeNextResultSetAsync(cancellationToken).ConfigureAwait( false );
          if( !hasMore )
          {
             return false;
@@ -109,12 +110,12 @@ namespace Vibrant.InfluxDB.Client.Helpers
          return false;
       }
 
-      public async Task<bool> ConsumeNextSerieAsync()
+      public async Task<bool> ConsumeNextSerieAsync(CancellationToken cancellationToken = default)
       {
          bool hasMore;
          if( _currentResultSet == null )
          {
-            hasMore = await ConsumeNextResultAsync().ConfigureAwait( false );
+            hasMore = await ConsumeNextResultAsync(cancellationToken).ConfigureAwait( false );
             if( !hasMore )
             {
                return false;

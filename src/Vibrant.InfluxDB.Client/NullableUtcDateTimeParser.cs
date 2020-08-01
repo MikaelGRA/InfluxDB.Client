@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using Vibrant.InfluxDB.Client.Resources;
 
 namespace Vibrant.InfluxDB.Client
 {

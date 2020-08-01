@@ -12,6 +12,7 @@ using Vibrant.InfluxDB.Client.Resources;
 using Vibrant.InfluxDB.Client.Rows;
 using Vibrant.InfluxDB.Client.Http;
 using System.Collections.Concurrent;
+using System.Threading;
 
 namespace Vibrant.InfluxDB.Client.Parsers
 {
@@ -48,7 +49,8 @@ namespace Vibrant.InfluxDB.Client.Parsers
          IEnumerable<QueryResult> queryResult,
          string db,
          bool allowMetadataQuerying,
-         InfluxQueryOptions options )
+         InfluxQueryOptions options,
+         CancellationToken cancellationToken = default)
          where TInfluxRow : new()
       {
          var propertyMap = MetadataCache.GetOrCreate<TInfluxRow>();
@@ -56,7 +58,9 @@ namespace Vibrant.InfluxDB.Client.Parsers
          if( propertyMap.IsBasedOnInterface() )
          {
             var createBasedOnInterfaceAsync = CreateBasedOnInterfaceAsyncMethod.MakeGenericMethod( new[] { typeof( TInfluxRow ), timestampType } );
-            return (Task<InfluxResultSet<TInfluxRow>>)createBasedOnInterfaceAsync.Invoke( null, new object[] { client, queryResult, db, allowMetadataQuerying, propertyMap, options } );
+            return (Task<InfluxResultSet<TInfluxRow>>)createBasedOnInterfaceAsync.Invoke( 
+                null, 
+                new object[] { client, queryResult, db, allowMetadataQuerying, propertyMap, options, cancellationToken } );
          }
          else
          {
@@ -259,13 +263,14 @@ namespace Vibrant.InfluxDB.Client.Parsers
          return tags;
       }
 
-      private async static Task<InfluxResultSet<TInfluxRow>> CreateBasedOnInterfaceAsync<TInfluxRow, TTimestamp>(
+      private static async Task<InfluxResultSet<TInfluxRow>> CreateBasedOnInterfaceAsync<TInfluxRow, TTimestamp>(
          InfluxClient client,
          IEnumerable<QueryResult> queryResults,
          string db,
          bool allowMetadataQuerying,
          InfluxRowTypeInfo<TInfluxRow> propertyMap,
-         InfluxQueryOptions options )
+         InfluxQueryOptions options,
+         CancellationToken cancellationToken = default)
          where TInfluxRow : IInfluxRow<TTimestamp>, new()
       {
          var timestampParser = client.TimestampParserRegistry.FindTimestampParserOrNull<TTimestamp>();
@@ -305,7 +310,8 @@ namespace Vibrant.InfluxDB.Client.Parsers
                      }
 
                      // add data to found series
-                     await AddValuesToInfluxSeriesByInterfaceAsync<TInfluxRow, TTimestamp>( influxSerie, series, client, db, allowMetadataQuerying, propertyMap, options, timestampParser );
+                     await AddValuesToInfluxSeriesByInterfaceAsync<TInfluxRow, TTimestamp>(
+                         influxSerie, series, client, db, allowMetadataQuerying, propertyMap, options, timestampParser, cancellationToken );
                   }
                }
             }
@@ -323,7 +329,8 @@ namespace Vibrant.InfluxDB.Client.Parsers
          bool allowMetadataQuerying,
          InfluxRowTypeInfo<TInfluxRow> propertyMap,
          InfluxQueryOptions options,
-         ITimestampParser<TTimestamp> timestampParser )
+         ITimestampParser<TTimestamp> timestampParser,
+         CancellationToken cancellationToken = default)
          where TInfluxRow : IInfluxRow<TTimestamp>, new()
       {
          // Values will be null, if there are no entries in the result set
@@ -340,7 +347,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
             DatabaseMeasurementInfo meta = null;
             if( allowMetadataQuerying )
             {
-               meta = await client.GetMetaInformationAsync( db, name, options.MetadataExpiration ).ConfigureAwait( false );
+               meta = await client.GetMetaInformationAsync( db, name, options.MetadataExpiration, cancellationToken ).ConfigureAwait( false );
             }
 
             for( int i = 0 ; i < columns.Count ; i++ )

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Vibrant.InfluxDB.Client.Helpers;
 
@@ -31,9 +28,9 @@ namespace Vibrant.InfluxDB.Client
       /// Null if none are available.
       /// </summary>
       /// <returns></returns>
-      public async Task<InfluxChunkedSeries<TInfluxRow>> GetNextSeriesAsync()
+      public async Task<InfluxChunkedSeries<TInfluxRow>> GetNextSeriesAsync(CancellationToken cancellationToken = default)
       {
-         if( await _iterator.ConsumeNextSerieAsync().ConfigureAwait( false ) )
+         if( await _iterator.ConsumeNextSerieAsync(cancellationToken).ConfigureAwait( false ) )
          {
             var currentSerie = _iterator.CurrentSerie;
 

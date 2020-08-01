@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Vibrant.InfluxDB.Client.Helpers;
 using Vibrant.InfluxDB.Client.Http;
@@ -30,11 +31,11 @@ namespace Vibrant.InfluxDB.Client
       /// Null if none are available.
       /// </summary>
       /// <returns></returns>
-      public async Task<InfluxChunkedResult<TInfluxRow>> GetNextResultAsync()
+      public async Task<InfluxChunkedResult<TInfluxRow>> GetNextResultAsync(CancellationToken cancellationToken = default)
       {
          if( _iterator == null ) return null;
 
-         if( await _iterator.ConsumeNextResultAsync().ConfigureAwait( false ) )
+         if( await _iterator.ConsumeNextResultAsync(cancellationToken).ConfigureAwait( false ) )
          {
             var currentResult = _iterator.CurrentResult;
 
