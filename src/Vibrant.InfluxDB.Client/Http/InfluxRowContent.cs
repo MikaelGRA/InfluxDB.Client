@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Vibrant.InfluxDB.Client.Metadata;
@@ -52,18 +50,12 @@ namespace Vibrant.InfluxDB.Client.Http
                // write measurement name
                writer.Write( LineProtocolEscape.EscapeMeasurementName( getMeasurementName( (TInfluxRow)dp ) ) ); // FIXME: Escape?
 
+               var tags = _options.GlobalTags is null
+                             ? dp.GetAllTags()
+                             : _options.GlobalTags.Union( dp.GetAllTags() );
+
                // write all tags
-               foreach ( var kvp in dp.GetAllTags() ) // Ensure tags are in correct order?
-               {
-                  var value = kvp.Value;
-                  if ( value != null )
-                  {
-                     writer.Write( ',' );
-                     writer.Write( LineProtocolEscape.EscapeKey( kvp.Key ) );
-                     writer.Write( '=' );
-                     writer.Write( LineProtocolEscape.EscapeTagValue( value ) );
-                  }
-               }
+               WriteTags( tags, writer );
 
                // write tag to field seperator
                writer.Write( ' ' );
@@ -108,7 +100,7 @@ namespace Vibrant.InfluxDB.Client.Http
                      }
                   }
                }
-               
+
                // write timestamp, if exists
                var ts = dp.GetTimestamp();
                if ( ts != null )
@@ -132,6 +124,10 @@ namespace Vibrant.InfluxDB.Client.Http
             {
                // write measurement name
                writer.Write( LineProtocolEscape.EscapeMeasurementName( getMeasurementName( dp ) ) );
+
+
+               if ( _options.GlobalTags != null )
+                  WriteTags( _options.GlobalTags, writer );
 
                // write all tags
                if ( tags.Count > 0 )
@@ -219,6 +215,21 @@ namespace Vibrant.InfluxDB.Client.Http
          writer.Flush();
 
          return Task.FromResult( 0 );
+      }
+
+      private static void WriteTags( IEnumerable<KeyValuePair<string, string>> tags, StreamWriter writer )
+      {
+         foreach ( var kvp in tags )
+         {
+            var value = kvp.Value;
+            if ( value is null )
+               continue;
+            
+            writer.Write( ',' );
+            writer.Write( LineProtocolEscape.EscapeKey( kvp.Key ) );
+            writer.Write( '=' );
+            writer.Write( LineProtocolEscape.EscapeTagValue( value ) );
+         }
       }
 
       protected override bool TryComputeLength( out long length )

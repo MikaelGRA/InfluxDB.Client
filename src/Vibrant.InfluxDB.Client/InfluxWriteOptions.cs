@@ -1,4 +1,6 @@
-﻿namespace Vibrant.InfluxDB.Client
+﻿using System.Collections.Generic;
+
+namespace Vibrant.InfluxDB.Client
 {
    /// <summary>
    /// The write options that are being used when write operations are performed against influxDB.
@@ -34,5 +36,10 @@
       /// Gets or sets a bool indicating if gzip compression should be used for write operations.
       /// </summary>
       public bool UseGzip { get; set; }
+
+      /// <summary>
+      /// Gets or sets global tags. Default is null.
+      /// </summary>
+      public IDictionary<string, string> GlobalTags { get; set; }
    }
 }
