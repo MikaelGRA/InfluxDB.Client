@@ -571,6 +571,54 @@ namespace Vibrant.InfluxDB.Client.Tests
         }
 
         [Fact]
+        public async Task Should_Write_Global_Tags()
+        {
+           var start = new DateTime( 2011, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc );
+
+           const string measurementName = "GlobalTagsTest";
+           const string environmentTagKey = "Environment";
+           const string environmentTagValue = "Test";
+           const int typedCount = 100;
+           const int dynamicCount = typedCount;
+
+           var globalTags = new Dictionary<string, string>
+                            {
+                               { environmentTagKey, environmentTagValue }
+                            };
+
+           await _client.WriteAsync(
+              InfluxClientFixture.DatabaseName,
+              measurementName,
+              InfluxClientFixture.CreateTypedRowsStartingAt( start, typedCount, includeNulls: true ),
+              new InfluxWriteOptions
+              {
+                 GlobalTags = globalTags
+              } );
+
+           await _client.WriteAsync(
+              InfluxClientFixture.DatabaseName,
+              measurementName,
+              InfluxClientFixture.CreateDynamicRowsStartingAt( start, dynamicCount ),
+              new InfluxWriteOptions
+              {
+                 GlobalTags = globalTags
+              } );
+
+           var resultSet = await _client.ReadAsync<LocalizedComputerInfo>(
+                              InfluxClientFixture.DatabaseName,
+                              $"SELECT * FROM {measurementName}  " +
+                              $"WHERE \"{environmentTagKey}\"='{environmentTagValue}'" );
+
+           Assert.Equal( 1, resultSet.Results.Count );
+
+           var result = resultSet.Results[0];
+           Assert.Equal( 1, result.Series.Count );
+
+           var series = result.Series[0];
+           Assert.Equal( typedCount + dynamicCount, series.Rows.Count );
+        }
+
+        [Fact]
         public async Task Should_Write_Read_And_Delete_Dynamic_Typed_Data_With_Timezones_And_Offset()
         {
             HashSet<TimeSpan> validOffsets = new HashSet<TimeSpan> { TimeSpan.FromHours(1), TimeSpan.FromHours(2) }; // valid offsets in 'Europe/Copenhagen'
