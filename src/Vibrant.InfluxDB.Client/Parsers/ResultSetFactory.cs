@@ -347,7 +347,7 @@ namespace Vibrant.InfluxDB.Client.Parsers
             DatabaseMeasurementInfo meta = null;
             if( allowMetadataQuerying )
             {
-               meta = await client.GetMetaInformationAsync( db, name, options.MetadataExpiration, cancellationToken ).ConfigureAwait( false );
+               meta = await client.GetMetaInformationAsync( db, name, options, cancellationToken ).ConfigureAwait( false );
             }
 
             for( int i = 0 ; i < columns.Count ; i++ )

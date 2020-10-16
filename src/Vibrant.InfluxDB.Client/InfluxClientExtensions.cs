@@ -26,7 +26,7 @@ namespace Vibrant.InfluxDB.Client
         public static Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( this IInfluxClient client, string commandOrQuery, string db , CancellationToken cancellationToken = default)
          where TInfluxRow : new()
       {
-         return client.ExecuteOperationAsync<TInfluxRow>( commandOrQuery, db, null, cancellationToken);
+         return client.ExecuteOperationAsync<TInfluxRow>( commandOrQuery, db, null, null, cancellationToken);
       }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Vibrant.InfluxDB.Client
         public static Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( this IInfluxClient client, string commandOrQuery , CancellationToken cancellationToken = default)
          where TInfluxRow : new()
       {
-         return client.ExecuteOperationAsync<TInfluxRow>( commandOrQuery, null, null, cancellationToken);
+         return client.ExecuteOperationAsync<TInfluxRow>( commandOrQuery, null, null, null, cancellationToken);
       }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Vibrant.InfluxDB.Client
         public static Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( this IInfluxClient client, string commandOrQuery, object parameters , CancellationToken cancellationToken = default)
          where TInfluxRow : new()
       {
-         return client.ExecuteOperationAsync<TInfluxRow>( commandOrQuery, null, parameters, cancellationToken);
+         return client.ExecuteOperationAsync<TInfluxRow>( commandOrQuery, null, parameters, null, cancellationToken);
       }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Vibrant.InfluxDB.Client
         /// <returns></returns>
         public static Task<InfluxResultSet> ExecuteOperationAsync( this IInfluxClient client, string commandOrQuery, string db , CancellationToken cancellationToken = default)
       {
-         return client.ExecuteOperationAsync( commandOrQuery, db, null, cancellationToken);
+         return client.ExecuteOperationAsync( commandOrQuery, db, null, null, cancellationToken);
       }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Vibrant.InfluxDB.Client
         /// <returns></returns>
         public static Task<InfluxResultSet> ExecuteOperationAsync( this IInfluxClient client, string commandOrQuery , CancellationToken cancellationToken = default)
       {
-         return client.ExecuteOperationAsync( commandOrQuery, null, null, cancellationToken);
+         return client.ExecuteOperationAsync( commandOrQuery, null, null, null, cancellationToken);
       }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Vibrant.InfluxDB.Client
         /// <returns></returns>
         public static Task<InfluxResultSet> ExecuteOperationAsync( this IInfluxClient client, string commandOrQuery, object parameters , CancellationToken cancellationToken = default)
       {
-         return client.ExecuteOperationAsync( commandOrQuery, null, parameters, cancellationToken);
+         return client.ExecuteOperationAsync( commandOrQuery, null, parameters, null, cancellationToken);
       }
 
         #endregion
@@ -704,11 +704,11 @@ namespace Vibrant.InfluxDB.Client
         /// <param name="measurementName">Name of the measurement.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns></returns>
-        public static async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( this IInfluxClient client, string db, string measurementName , CancellationToken cancellationToken = default)
+        public static async Task<InfluxResult<TagKeyRow>> ShowTagKeysAsync( this IInfluxClient client, string db, string measurementName , InfluxQueryOptions options, CancellationToken cancellationToken = default)
       {
          var parserResult = await client.ExecuteOperationAsync<TagKeyRow>( 
              $"SHOW TAG KEYS FROM \"{measurementName}\"", 
-             db, cancellationToken: cancellationToken).ConfigureAwait( false );
+             db, null, options, cancellationToken: cancellationToken).ConfigureAwait( false );
          return parserResult.Results.First();
       }
 
