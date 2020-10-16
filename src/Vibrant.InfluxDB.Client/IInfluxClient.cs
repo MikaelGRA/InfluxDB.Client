@@ -47,7 +47,7 @@ namespace Vibrant.InfluxDB.Client
         /// <param name="parameters">The parameters.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns></returns>
-        Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery, string db, object parameters, CancellationToken cancellationToken = default );
+        Task<InfluxResultSet> ExecuteOperationAsync( string commandOrQuery, string db, object parameters, InfluxQueryOptions options, CancellationToken cancellationToken = default );
         /// <summary>
         /// Executes an arbitrary command that returns a table as a result.
         /// </summary>
@@ -57,7 +57,7 @@ namespace Vibrant.InfluxDB.Client
         /// <param name="parameters">The parameters.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns></returns>
-        Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery, string db, object parameters, CancellationToken cancellationToken = default ) where TInfluxRow : new();
+        Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>( string commandOrQuery, string db, object parameters, InfluxQueryOptions options, CancellationToken cancellationToken = default ) where TInfluxRow : new();
 
         /// <summary>
         /// Executes a ping and waits for the leader to respond.

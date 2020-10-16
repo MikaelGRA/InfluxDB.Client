@@ -167,10 +167,10 @@ namespace Vibrant.InfluxDB.Client
         /// <param name="parameters">The parameters.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns></returns>
-        public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>(string commandOrQuery, string db, object parameters, CancellationToken cancellationToken = default)
+        public Task<InfluxResultSet<TInfluxRow>> ExecuteOperationAsync<TInfluxRow>(string commandOrQuery, string db, object parameters, InfluxQueryOptions options, CancellationToken cancellationToken = default)
            where TInfluxRow : new()
         {
-            return ExecuteQueryInternalAsync<TInfluxRow>(commandOrQuery, db, false, true, parameters, DefaultQueryOptions, cancellationToken);
+            return ExecuteQueryInternalAsync<TInfluxRow>(commandOrQuery, db, false, false, parameters, options ?? DefaultQueryOptions, cancellationToken);
         }
 
         /// <summary>
@@ -181,9 +181,9 @@ namespace Vibrant.InfluxDB.Client
         /// <param name="parameters">The parameters.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns></returns>
-        public Task<InfluxResultSet> ExecuteOperationAsync(string commandOrQuery, string db, object parameters, CancellationToken cancellationToken = default)
+        public Task<InfluxResultSet> ExecuteOperationAsync(string commandOrQuery, string db, object parameters, InfluxQueryOptions options, CancellationToken cancellationToken = default)
         {
-            return ExecuteQueryInternalAsync(commandOrQuery, db, true, parameters, DefaultQueryOptions, cancellationToken);
+            return ExecuteQueryInternalAsync(commandOrQuery, db, true, parameters, options ?? DefaultQueryOptions, cancellationToken);
         }
 
         #endregion
@@ -289,7 +289,7 @@ namespace Vibrant.InfluxDB.Client
 
         #endregion
 
-        internal async Task<DatabaseMeasurementInfo> GetMetaInformationAsync(string db, string measurementName, TimeSpan? expiration, CancellationToken cancellationToken = default)
+        internal async Task<DatabaseMeasurementInfo> GetMetaInformationAsync(string db, string measurementName, InfluxQueryOptions options, CancellationToken cancellationToken = default)
         {
             var key = new DatabaseMeasurementInfoKey(db, measurementName);
             DatabaseMeasurementInfo info;
@@ -302,12 +302,12 @@ namespace Vibrant.InfluxDB.Client
             var now = DateTime.UtcNow;
             if (info != null)
             {
-                if (!expiration.HasValue) // info never expires
+                if (!options.MetadataExpiration.HasValue) // info never expires
                 {
                     return info;
                 }
 
-                if (now - info.Timestamp < expiration.Value) // has not expired
+                if (now - info.Timestamp < options.MetadataExpiration.Value) // has not expired
                 {
                     return info;
                 }
@@ -316,7 +316,7 @@ namespace Vibrant.InfluxDB.Client
             // has expired or never existed, lets retrieve it
 
             // get metadata information from the store
-            var tagsResult = await this.ShowTagKeysAsync(db, measurementName, cancellationToken).ConfigureAwait(false);
+            var tagsResult = await this.ShowTagKeysAsync(db, measurementName, options, cancellationToken).ConfigureAwait(false);
             var tags = tagsResult.Series.FirstOrDefault()?.Rows;
 
             info = new DatabaseMeasurementInfo(now);
