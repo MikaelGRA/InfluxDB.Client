@@ -617,6 +617,9 @@ namespace Vibrant.InfluxDB.Client
         {
             if (!response.IsSuccessStatusCode)
             {
+                if (response.Content.Headers.ContentType.MediaType == "text/html") {
+                    throw new InfluxException($"Expected JSON but got HTML: {await response.Content.ReadAsStringAsync()}");
+                }
                 try
                 {
                     var errorResult = await response.Content.ReadAsJsonAsync<ErrorResult>(cancellationToken).ConfigureAwait(false);
