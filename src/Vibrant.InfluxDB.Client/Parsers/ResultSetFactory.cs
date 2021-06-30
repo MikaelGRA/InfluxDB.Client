@@ -12,7 +12,9 @@ using Vibrant.InfluxDB.Client.Resources;
 using Vibrant.InfluxDB.Client.Rows;
 using Vibrant.InfluxDB.Client.Http;
 using System.Collections.Concurrent;
+using System.Numerics;
 using System.Threading;
+using Vibrant.InfluxDB.Client.Helpers;
 
 namespace Vibrant.InfluxDB.Client.Parsers
 {
@@ -195,6 +197,10 @@ namespace Vibrant.InfluxDB.Client.Parsers
                               {
                                  property.SetValue( dataPoint, Convert.ChangeType( stringValue, property.Type, CultureInfo.InvariantCulture ) );
                               }
+                           }
+                           else if (value is BigInteger bigIntValue)
+                           {
+                               property.SetValue(dataPoint, BigIntConversionHelper.ChangeType(bigIntValue, property.Type));
                            }
                            else
                            {
